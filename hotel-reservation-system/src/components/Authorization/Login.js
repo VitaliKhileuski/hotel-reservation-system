@@ -1,29 +1,92 @@
-import React from 'react'
-import './../../css/Login.css'
+import React from 'react';
+import Button from '@material-ui/core/Button';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import TextField from '@material-ui/core/TextField';
 import {Link} from 'react-router-dom'
-function Login() {
+import Grid from '@material-ui/core/Grid';
+import Box from '@material-ui/core/Box';
+import Typography from '@material-ui/core/Typography';
+import { makeStyles } from '@material-ui/core/styles';
+import Container from '@material-ui/core/Container';
 
-    return (
-        <main className="form-signin">
-            <form>
-            <h1 className="h3 mb-3 fw-normal">Please sign in</h1>
-            <div className="form-floating">
-                <input type="email" className="form-control" id="floatingInput" placeholder="name@example.com"/>
-                <label htmlFor="floatingInput">Email address</label>
-            </div>
-            <div className="form-floating">
-                <input type="password" className="form-control" id="floatingPassword" placeholder="Password"/>
-                <label htmlFor="floatingPassword">Password</label>
-            </div>
+const useStyles = makeStyles((theme) => ({
+  paper: {
+    marginTop: theme.spacing(8),
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  avatar: {
+    margin: theme.spacing(1),
+    backgroundColor: theme.palette.secondary.main,
+  },
+  form: {
+    width: '100%', // Fix IE 11 issue.
+    marginTop: theme.spacing(1),
+  },
+  submit: {
+    margin: theme.spacing(3, 0, 2),
+  },
+}));
 
-    <div className="checkbox mb-3">
-    </div>
-    <button className="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
-            </form>
-            <Link to="/register" className="text-primary">
-            <label>don't have an account?</label>
-            </Link>
-        </main>
-    );
-};
-export default Login;
+export default function Login() {
+  const classes = useStyles();
+
+  return (
+    <Container component="main" maxWidth="xs">
+      <CssBaseline />
+      <div className={classes.paper}>
+        <Typography component="h1" variant="h5">
+          Sign in
+        </Typography>
+        <form className={classes.form} noValidate>
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            id="email"
+            label="Email Address"
+            name="email"
+            autoComplete="email"
+            autoFocus
+          />
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            name="password"
+            label="Password"
+            type="password"
+            id="password"
+            autoComplete="current-password"
+          />
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            color="primary"
+            className={classes.submit}
+          >
+            Sign In
+          </Button>
+          <Grid container>
+            <Grid item xs>
+              <Link  variant="body2">
+                Forgot password?
+              </Link>
+            </Grid>
+            <Grid item>
+              <Link to="/register">
+                <label>Don't have an account? Sign Up</label>
+              </Link>
+            </Grid>
+          </Grid>
+        </form>
+      </div>
+      <Box mt={8}>
+      </Box>
+    </Container>
+  );
+}
