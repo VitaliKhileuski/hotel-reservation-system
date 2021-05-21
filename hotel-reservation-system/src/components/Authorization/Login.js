@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Login() {
   const classes = useStyles();
-
+  
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
@@ -39,7 +39,7 @@ export default function Login() {
         <Typography component="h1" variant="h5">
           Sign in
         </Typography>
-        <form className={classes.form} noValidate>
+        <form className={classes.form} Validate>
           <TextField
             variant="outlined"
             margin="normal"
@@ -61,6 +61,7 @@ export default function Login() {
             type="password"
             id="password"
             autoComplete="current-password"
+
           />
           <Button
             type="submit"
@@ -78,8 +79,8 @@ export default function Login() {
               </Link>
             </Grid>
             <Grid item>
-              <Link to="/register">
-                <label>Don't have an account? Sign Up</label>
+              <Link to="/register" variant="body2">
+                Don't have an account? Sign Up
               </Link>
             </Grid>
           </Grid>
