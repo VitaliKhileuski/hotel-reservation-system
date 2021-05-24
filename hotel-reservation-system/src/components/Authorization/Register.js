@@ -36,7 +36,8 @@ const useStyles = makeStyles((theme) => ({
 export default function Register() {
   const classes = useStyles();
   const [customError, setCustomError] = useState('');
-  const [flag, setFlag] = useState(true);
+  const [flag, setFlag] = useState(false);
+  const [focus, setFocus] = useState(false);
   const phoneRegExp = /^\+((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
   const initialValues = {
     lastName:'',
@@ -47,14 +48,21 @@ export default function Register() {
     phone: ''
   }
   const validationSchema = Yup.object().shape({
-    firstName: Yup.string().required("firstName is required"),
-    lastName: Yup.string().required("lastName is required"),
+    firstName: Yup.string().required("first name is required"),
+    lastName: Yup.string().required("last name is required"),
     phone : Yup.string().required("phone number is required").matches(phoneRegExp,"enter valid phone"),
-    email: Yup.string().email("Enter valid email").required("email is required").test('userExists','batwa',function(){return true}),
+    email: Yup.string().email("Enter valid email").required("email is required").test("user alreay exists","user with that email already exists",function(){
+      if(flag===false){
+        return true;
+      }
+      if(flag){
+        return false;
+      }
+    }),
     password: Yup.string().min(5, "Minimum characters should be 5").required('password is required').matches(/^(?=.*[0-9])(?=.*[a-z])/,"password should contains numbers and letters")
 })
-  const onSubmit = (values,props) => {
-    setFlag(true);
+  const onSubmit = (values,setErrors ) => {
+    console.log(flag);
     const request = {
       Email: values.email,
       Name: values.firstName,
@@ -72,7 +80,9 @@ export default function Register() {
 			.catch((error) => {
           setCustomError(error.response.data.Message)
           setFlag(true);
-          console.log(error.response.data.Message)
+          setFocus(true);
+          console.log(flag);
+          console.log(error.response.data.Message);
           console.log(error.response.data);
       })
   }
@@ -84,7 +94,7 @@ export default function Register() {
         <Typography component="h1" variant="h5">
           Sign up
         </Typography>
-        <Formik initialValues ={ initialValues } async onSubmit={onSubmit} validationSchema={validationSchema}>
+        <Formik initialValues ={ initialValues } onSubmit={onSubmit} validationSchema={validationSchema}>
         {(props) =>(
         <Form className={classes.form}>
           <Grid container spacing={2}>
@@ -123,8 +133,9 @@ export default function Register() {
                 id="email"
                 label="Email Address"
                 name="email"
-                error={props.touched.email}
+                error={flag}
                 helperText={<ErrorMessage name='email' />}
+                autoFocus = {focus}
                 autoComplete="email"
               />
             </Grid>
