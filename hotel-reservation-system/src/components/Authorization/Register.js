@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import {React, useState} from 'react'
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
@@ -8,6 +8,9 @@ import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import {Formik, Form, ErrorMessage, Field} from 'formik'
+import * as Yup from 'yup'
+import api from './../../api/'
 
 
 const useStyles = makeStyles((theme) => ({
@@ -32,8 +35,48 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Register() {
   const classes = useStyles();
-  const [email,setEmail] = useState("")
-  const [password,setPassword] = useState("")
+  const [customError, setCustomError] = useState('');
+  const [flag, setFlag] = useState(true);
+  const phoneRegExp = /^\+((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
+  const initialValues = {
+    lastName:'',
+    firstName:'',
+    email :'',
+    password :'',
+    birthDate: Date.UTC,
+    phone: ''
+  }
+  const validationSchema = Yup.object().shape({
+    firstName: Yup.string().required("firstName is required"),
+    lastName: Yup.string().required("lastName is required"),
+    phone : Yup.string().required("phone number is required").matches(phoneRegExp,"enter valid phone"),
+    email: Yup.string().email("Enter valid email").required("email is required").test('userExists','batwa',function(){return true}),
+    password: Yup.string().min(5, "Minimum characters should be 5").required('password is required').matches(/^(?=.*[0-9])(?=.*[a-z])/,"password should contains numbers and letters")
+})
+  const onSubmit = (values,props) => {
+    setFlag(true);
+    const request = {
+      Email: values.email,
+      Name: values.firstName,
+      SurName: values.lastName,
+      UserName: values.userName,
+      PhoneNumber: values.phone,
+      Password: values.password,
+      BirthDate: values.birthDate,
+    };
+      api
+      .post('/account/register', request)
+			.then((response) => {
+			console.log(response);
+			})
+			.catch((error) => {
+          setCustomError(error.response.data.Message)
+          setFlag(true);
+          console.log(error.response.data.Message)
+          console.log(error.response.data);
+      })
+  }
+  
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
@@ -41,14 +84,18 @@ export default function Register() {
         <Typography component="h1" variant="h5">
           Sign up
         </Typography>
-        <form className={classes.form} noValidate>
+        <Formik initialValues ={ initialValues } async onSubmit={onSubmit} validationSchema={validationSchema}>
+        {(props) =>(
+        <Form className={classes.form}>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
-              <TextField
-                autoComplete="fname"
-                name="firstName"
+              <Field as = {TextField}
                 variant="outlined"
+                autoComplete="lname"
+                name="firstName"
                 required
+                error={props.errors.firstName && props.touched.firstName}
+                helperText={<ErrorMessage name='firstName' />}
                 fullWidth
                 id="firstName"
                 label="First Name"
@@ -56,52 +103,61 @@ export default function Register() {
               />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField
+              <Field as = {TextField}
                 variant="outlined"
                 required
                 fullWidth
                 id="lastName"
                 label="Last Name"
                 name="lastName"
+                error={props.errors.lastName && props.touched.lastName}
+                helperText={<ErrorMessage name='lastName' />}
                 autoComplete="lname"
               />
             </Grid>
             <Grid item xs={12}>
-              <TextField
+              <Field as = {TextField}
                 variant="outlined"
                 required
                 fullWidth
                 id="email"
                 label="Email Address"
                 name="email"
+                error={props.touched.email}
+                helperText={<ErrorMessage name='email' />}
                 autoComplete="email"
               />
             </Grid>
             <Grid item xs={12}>
-              <TextField
+              <Field as = {TextField}
               fullWidth
               required
               label='Phone Number'
               variant='outlined'
               name='phone'
+              error={props.errors.phone && props.touched.phone}
+              helperText={<ErrorMessage name='phone' />}
               />
             </Grid>
             <Grid item xs={12}>
-              <TextField
+              <Field as = {TextField}
               fullWidth
-              required
               type ='Date'
               variant='outlined'
               name='birthdate'
+              error={props.errors.birthDate && props.touched.birthDate}
+              helperText={<ErrorMessage name='birthDate' />}
               />
             </Grid>
             <Grid item xs={12}>
-              <TextField
+              <Field as = {TextField}
                 variant="outlined"
                 required
                 fullWidth
                 name="password"
                 label="Password"
+                error={props.errors.password && props.touched.password}
+                helperText={<ErrorMessage name='password' />}
                 type="password"
                 id="password"
                 autoComplete="current-password"
@@ -124,7 +180,9 @@ export default function Register() {
               </Link>
             </Grid>
           </Grid>
-        </form>
+        </Form>
+        )}
+        </Formik>
       </div>
       <Box mt={5}>
       </Box>

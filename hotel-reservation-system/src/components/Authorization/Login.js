@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
@@ -8,7 +7,8 @@ import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-
+import {Formik, Form, ErrorMessage, Field} from 'formik'
+import * as Yup from 'yup'
 const useStyles = makeStyles((theme) => ({
   paper: {
     marginTop: theme.spacing(8),
@@ -30,8 +30,19 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Login() {
+
+  const initialValues ={
+    email :'',
+    password :''
+  }
+  const validationSchema = Yup.object().shape({
+    email: Yup.string().email("Enter valid email").required("email is required"),
+    password: Yup.string().min(5, "Minimum characters should be 5").required('password is required').matches(/^(?=.*[0-9])(?=.*[a-z])/,"should contains numbers and letters")
+})
+  const onSubmit=(values,props) =>{
+    console.log(values);
+  }
   const classes = useStyles();
-  
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
@@ -39,11 +50,15 @@ export default function Login() {
         <Typography component="h1" variant="h5">
           Sign in
         </Typography>
-        <form className={classes.form} Validate>
-          <TextField
+        <Formik initialValues ={ initialValues } onSubmit={onSubmit} validationSchema={validationSchema}>
+          {(props) =>(
+            <Form className={classes.form}>
+          <Field as={TextField}
             variant="outlined"
             margin="normal"
             required
+            error={props.errors.email && props.touched.email}
+            helperText={<ErrorMessage name='email' />}
             fullWidth
             id="email"
             label="Email Address"
@@ -51,12 +66,14 @@ export default function Login() {
             autoComplete="email"
             autoFocus
           />
-          <TextField
+          <Field as={TextField}
             variant="outlined"
             margin="normal"
             required
             fullWidth
             name="password"
+            error={props.errors.password && props.touched.password}
+            helperText={<ErrorMessage name='password' />}
             label="Password"
             type="password"
             id="password"
@@ -74,7 +91,7 @@ export default function Login() {
           </Button>
           <Grid container>
             <Grid item xs>
-              <Link  variant="body2">
+              <Link to="/forgotPassword"  variant="body2">
                 Forgot password?
               </Link>
             </Grid>
@@ -84,7 +101,10 @@ export default function Login() {
               </Link>
             </Grid>
           </Grid>
-        </form>
+        </Form>
+          )}
+        </Formik>
+        
       </div>
       <Box mt={8}>
       </Box>

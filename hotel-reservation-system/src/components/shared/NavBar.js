@@ -1,24 +1,15 @@
 import React from 'react';
 import './../../css/App.css'
 import { Link } from 'react-router-dom'
-import { AppBar,Button,Toolbar,IconButton, Typography} from '@material-ui/core'
-import MenuIcon from '@material-ui/icons/Menu'
+import { AppBar,Button,Toolbar,Typography} from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles';
 const useStyles = makeStyles((theme) => ({
-  root: {
+  title: {
     flexGrow: 1,
   },
   navElement: {
     marginRight: theme.spacing(2),
   },
-  title: {
-    flexGrow: 1,
-    display: 'none',
-    [
-      theme.breakpoints.up('sm')]: {
-        display: 'block',
-    },
-  }
 }));
 
 function NavBar() {
@@ -27,10 +18,7 @@ function NavBar() {
     return (
         <AppBar position="static">
   <Toolbar>
-    <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
-      <MenuIcon/>
-    </IconButton>
-    <Typography variant="h6" className="title">
+    <Typography variant="h6" className={classes.title}>
       Hotels
     </Typography>
     <Link to="/login"  style={{ textDecoration: 'none' }}>
