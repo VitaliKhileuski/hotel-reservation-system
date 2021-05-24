@@ -15,7 +15,7 @@ import api from './../../api/'
 
 const useStyles = makeStyles((theme) => ({
   paper: {
-    marginTop: theme.spacing(8),
+    marginTop: theme.spacing(2),
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -35,9 +35,8 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Register() {
   const classes = useStyles();
-  const [customError, setCustomError] = useState('');
-  const [flag, setFlag] = useState(false);
-  const [focus, setFocus] = useState(false);
+  const [emailErrorLabel, setEmailErrorLabel] = useState('');
+  const [email, setEmail] = useState('');
   const phoneRegExp = /^\+((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
   const initialValues = {
     lastName:'',
@@ -45,26 +44,19 @@ export default function Register() {
     email :'',
     password :'',
     birthDate: Date.UTC,
-    phone: ''
+    phone: '',
+    passwordConfirm: ''
   }
   const validationSchema = Yup.object().shape({
     firstName: Yup.string().required("first name is required"),
     lastName: Yup.string().required("last name is required"),
     phone : Yup.string().required("phone number is required").matches(phoneRegExp,"enter valid phone"),
-    email: Yup.string().email("Enter valid email").required("email is required").test("user alreay exists","user with that email already exists",function(){
-      if(flag===false){
-        return true;
-      }
-      if(flag){
-        return false;
-      }
-    }),
-    password: Yup.string().min(5, "Minimum characters should be 5").required('password is required').matches(/^(?=.*[0-9])(?=.*[a-z])/,"password should contains numbers and letters")
-})
-  const onSubmit = (values,setErrors ) => {
-    console.log(flag);
+    password: Yup.string().min(5, "Minimum characters should be 5").required('password is required').matches(/^(?=.*[0-9])(?=.*[a-z])/,"password should contains numbers and letters"),
+    passwordConfirm: Yup.string().oneOf([Yup.ref('password'), null], 'Passwords must match').required('Required'),
+  })
+  const onSubmit = (values) => {
     const request = {
-      Email: values.email,
+      Email: email,
       Name: values.firstName,
       SurName: values.lastName,
       UserName: values.userName,
@@ -78,14 +70,23 @@ export default function Register() {
 			console.log(response);
 			})
 			.catch((error) => {
-          setCustomError(error.response.data.Message)
-          setFlag(true);
-          setFocus(true);
-          console.log(flag);
+          setEmailErrorLabel(error.response.data.Message);
           console.log(error.response.data.Message);
           console.log(error.response.data);
       })
   }
+   function ValidateEmail(email){
+      setEmailErrorLabel('')
+      const emailRegex = /^[\w!#$%&'+-/=?^_`{|}~]+(.[\w!#$%&'+-/=?^_`{|}~]+)*@((([-\w]+.)+[a-zA-Z]{2,4})|(([0-9]{1,3}.){3}[0-9]{1,3}))$/;
+      const flag = emailRegex.test(email);
+      if(!flag){
+        setEmailErrorLabel("invalid email");
+      }
+      if(email===''){
+        setEmailErrorLabel("email is reqired");
+      }
+      setEmail(email);
+    }
   
   return (
     <Container component="main" maxWidth="xs">
@@ -127,15 +128,19 @@ export default function Register() {
             </Grid>
             <Grid item xs={12}>
               <Field as = {TextField}
+                onClick = {() => {
+                  setEmailErrorLabel('');
+                }}
                 variant="outlined"
                 required
                 fullWidth
                 id="email"
                 label="Email Address"
                 name="email"
-                error={flag}
-                helperText={<ErrorMessage name='email' />}
-                autoFocus = {focus}
+                value = {email}
+                onChange = {(e) => ValidateEmail(e.target.value)}
+                error={emailErrorLabel!==''}
+                helperText={emailErrorLabel}
                 autoComplete="email"
               />
             </Grid>
@@ -171,6 +176,20 @@ export default function Register() {
                 helperText={<ErrorMessage name='password' />}
                 type="password"
                 id="password"
+                autoComplete="current-password"
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Field as = {TextField}
+                variant="outlined"
+                required
+                fullWidth
+                name="passwordConfirm"
+                label="confirm your password"
+                error={props.errors.passwordConfirm && props.touched.passwordConfirm}
+                helperText={<ErrorMessage name='passwordConfirm' />}
+                type="password"
+                id="passwordConfirm"
                 autoComplete="current-password"
               />
             </Grid>

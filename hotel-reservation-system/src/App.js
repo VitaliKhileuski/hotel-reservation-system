@@ -2,6 +2,7 @@ import React from "react";
 import NavBar from "./components/shared/NavBar";
 import Login from "./components/Authorization/Login";
 import Register from "./components/Authorization/Register";
+import home from "./components/home"
 import {BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 function App() {
 
@@ -12,6 +13,7 @@ function App() {
         <Switch>
           <Route path="/login" component = {Login} />
           <Route path="/register" component = {Register}/>
+          <Route path ="/home" component = {home}/>
         </Switch>
       </div>
     </Router>

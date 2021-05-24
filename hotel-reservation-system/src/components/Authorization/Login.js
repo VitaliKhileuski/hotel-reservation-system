@@ -1,17 +1,21 @@
+import {React, useState} from 'react'
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import {Link} from 'react-router-dom'
+import {Link, Redirect} from 'react-router-dom'
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import {Formik, Form, ErrorMessage, Field} from 'formik'
-import * as Yup from 'yup'
+import {Formik, Form, Field} from 'formik'
+import API from './../../api'
+import {useDispatch, useSelector} from 'react-redux'
+import { IS_LOGGED, NAME} from "../../storage/actions/actionTypes.js";
+
 const useStyles = makeStyles((theme) => ({
   paper: {
-    marginTop: theme.spacing(8),
+    marginTop: theme.spacing(2),
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -31,18 +35,77 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Login() {
 
+  const dispatch = useDispatch();
+  const isLogged = useSelector((state) => state.isLogged);
+  const [email,setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [emailErrorLabel, setEmailErrorLabel] = useState('');
+  const [passwordErrorLabel, setPasswordErrorLabel] = useState('');
+
   const initialValues ={
     email :'',
     password :''
   }
-  const validationSchema = Yup.object().shape({
-    email: Yup.string().email("Enter valid email").required("email is required"),
-    password: Yup.string().min(5, "Minimum characters should be 5").required('password is required').matches(/^(?=.*[0-9])(?=.*[a-z])/,"should contains numbers and letters")
-})
-  const onSubmit=(values,props) =>{
-    console.log(values);
+function ValidateEmail(email){
+  setEmailErrorLabel('')
+  const emailRegex = /^[\w!#$%&'+-/=?^_`{|}~]+(.[\w!#$%&'+-/=?^_`{|}~]+)*@((([-\w]+.)+[a-zA-Z]{2,4})|(([0-9]{1,3}.){3}[0-9]{1,3}))$/;
+  const flag = emailRegex.test(email);
+  if(!flag){
+    setEmailErrorLabel("invalid email");
   }
+  if(email===''){
+    setEmailErrorLabel("email is required");
+  }
+  setEmail(email);
+}
+function ValidatePassword(password){
+  setPasswordErrorLabel('')
+  const passwordRegex = /^(?=.*[0-9])(?=.*[a-z])/;
+  const flag = passwordRegex.test(password);
+  if(!flag){
+    setPasswordErrorLabel("password should contains numbers and english letters");
+  }
+  if(password===''){
+    setPasswordErrorLabel("password is required");
+  }
+  if(password.length<5){
+    setPasswordErrorLabel("minimum characters should be 5");
+  }
+  setPassword(password);
+}
+
+const onSubmit = () => {
+  const request = {
+    Email: email,
+    Password: password,
+  };
+    API
+    .post('/account/login', request)
+    .then((response) => {
+    localStorage.setItem('token',response.data[0]);
+    localStorage.setItem('refreshToken',response.data[1]);
+    const jwt = JSON.parse(atob(response.data[0].split(".")[1]));
+    dispatch({ type: IS_LOGGED, isLogged: true });
+    dispatch({type : NAME, name : jwt.firstname});
+    console.log(isLogged);
+
+    console.log(response);
+    })
+    .catch((error) => {
+        if(error.response.data.Message.includes("exists")){
+          setEmailErrorLabel(error.response.data.Message)
+        }
+        else{
+          setPasswordErrorLabel(error.response.data.Message)
+        }
+        console.log(error.response.data);
+    })
+}
   const classes = useStyles();
+  if(isLogged){
+   return <Redirect to='/home'></Redirect>
+  }
+  else
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
@@ -50,15 +113,20 @@ export default function Login() {
         <Typography component="h1" variant="h5">
           Sign in
         </Typography>
-        <Formik initialValues ={ initialValues } onSubmit={onSubmit} validationSchema={validationSchema}>
+        <Formik initialValues ={ initialValues } onSubmit={onSubmit}>
           {(props) =>(
             <Form className={classes.form}>
           <Field as={TextField}
             variant="outlined"
             margin="normal"
             required
-            error={props.errors.email && props.touched.email}
-            helperText={<ErrorMessage name='email' />}
+            onClick = {() => {
+              setEmailErrorLabel('');
+            }}
+            value = {email}
+            onChange = {(e) => ValidateEmail(e.target.value)}
+            error={emailErrorLabel!==''}
+            helperText={emailErrorLabel}
             fullWidth
             id="email"
             label="Email Address"
@@ -72,13 +140,14 @@ export default function Login() {
             required
             fullWidth
             name="password"
-            error={props.errors.password && props.touched.password}
-            helperText={<ErrorMessage name='password' />}
+            value = {password}
+            onChange = {(e) => ValidatePassword(e.target.value)}
+            error={passwordErrorLabel!==''}
+            helperText={passwordErrorLabel}
             label="Password"
             type="password"
             id="password"
             autoComplete="current-password"
-
           />
           <Button
             type="submit"
