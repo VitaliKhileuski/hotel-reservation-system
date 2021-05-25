@@ -15,7 +15,7 @@ import { IS_LOGGED, NAME} from "../../storage/actions/actionTypes.js";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
-    marginTop: theme.spacing(2),
+    marginTop: theme.spacing(6),
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -63,7 +63,7 @@ function ValidatePassword(password){
   const passwordRegex = /^(?=.*[0-9])(?=.*[a-z])/;
   const flag = passwordRegex.test(password);
   if(!flag){
-    setPasswordErrorLabel("password should contains numbers and english letters");
+    setPasswordErrorLabel("password should contains numbers and latin letters");
   }
   if(password===''){
     setPasswordErrorLabel("password is required");

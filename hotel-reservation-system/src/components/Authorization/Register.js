@@ -2,7 +2,7 @@ import {React, useState} from 'react'
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import { Link } from 'react-router-dom'
+import { Link , Redirect } from 'react-router-dom'
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
@@ -11,11 +11,13 @@ import Container from '@material-ui/core/Container';
 import {Formik, Form, ErrorMessage, Field} from 'formik'
 import * as Yup from 'yup'
 import api from './../../api/'
+import {useDispatch, useSelector} from 'react-redux'
+import { IS_LOGGED, NAME} from "../../storage/actions/actionTypes.js";
 
 
 const useStyles = makeStyles((theme) => ({
   paper: {
-    marginTop: theme.spacing(2),
+    marginTop: theme.spacing(6),
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -34,6 +36,9 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Register() {
+
+  const dispatch = useDispatch();
+  const isLogged = useSelector((state) => state.isLogged);
   const classes = useStyles();
   const [emailErrorLabel, setEmailErrorLabel] = useState('');
   const [email, setEmail] = useState('');
@@ -43,7 +48,6 @@ export default function Register() {
     firstName:'',
     email :'',
     password :'',
-    birthDate: Date.UTC,
     phone: '',
     passwordConfirm: ''
   }
@@ -51,7 +55,7 @@ export default function Register() {
     firstName: Yup.string().required("first name is required"),
     lastName: Yup.string().required("last name is required"),
     phone : Yup.string().required("phone number is required").matches(phoneRegExp,"enter valid phone"),
-    password: Yup.string().min(5, "Minimum characters should be 5").required('password is required').matches(/^(?=.*[0-9])(?=.*[a-z])/,"password should contains numbers and letters"),
+    password: Yup.string().min(8, "Minimum characters should be 8").required('password is required').matches(/^(?=.*[0-9])(?=.*[a-z])/,"password should contains numbers and latin letters"),
     passwordConfirm: Yup.string().oneOf([Yup.ref('password'), null], 'Passwords must match').required('Required'),
   })
   const onSubmit = (values) => {
@@ -62,11 +66,15 @@ export default function Register() {
       UserName: values.userName,
       PhoneNumber: values.phone,
       Password: values.password,
-      BirthDate: values.birthDate,
     };
       api
       .post('/account/register', request)
 			.then((response) => {
+        localStorage.setItem('token',response.data[0]);
+        localStorage.setItem('refreshToken',response.data[1]);
+        const jwt = JSON.parse(atob(response.data[0].split(".")[1]));
+        dispatch({ type: IS_LOGGED, isLogged: true });
+        dispatch({type : NAME, name : jwt.firstname});
 			console.log(response);
 			})
 			.catch((error) => {
@@ -87,7 +95,10 @@ export default function Register() {
       }
       setEmail(email);
     }
-  
+  if(isLogged){
+    return <Redirect to='/home'></Redirect>
+  }
+  else
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
@@ -153,16 +164,6 @@ export default function Register() {
               name='phone'
               error={props.errors.phone && props.touched.phone}
               helperText={<ErrorMessage name='phone' />}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Field as = {TextField}
-              fullWidth
-              type ='Date'
-              variant='outlined'
-              name='birthdate'
-              error={props.errors.birthDate && props.touched.birthDate}
-              helperText={<ErrorMessage name='birthDate' />}
               />
             </Grid>
             <Grid item xs={12}>
