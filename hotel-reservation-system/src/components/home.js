@@ -6,7 +6,8 @@ import { Typography , Button} from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { makeStyles } from '@material-ui/core/styles';
-import API from './../api'
+import API from '../api'
+import HotelList from './HotelList';
 
 
 
@@ -28,6 +29,7 @@ export default function Home(){
   const [countries,setCountries] = useState([]);
   const [cities,setCities] = useState([]);
   const [currentCountry, setCurrentCountry] = useState("");
+  const [hotels,setHotels] = useState([]);
 
   useEffect(() => {
     const loadCountries = async () => {
@@ -36,14 +38,26 @@ export default function Home(){
       .then(response => response.data)
       .then((data) => {
         setCountries(data);
-        console.log(data);
       })
       .catch((error) => console.log(error));
-
     };
     loadCountries();
-    
   }, []);
+  useEffect(() => {
+      const loadHotels = async () => {
+        await API
+        .get('/hotels')
+        .then(response => response.data)
+        .then(data => {
+          setHotels(data);
+        })
+        .catch((error) => {
+          console.log(error.response.data.Message);
+        });
+      };
+    loadHotels();
+  }, []);
+
     useEffect(() => {
       const loadCities = async () => {
         await  API
@@ -51,14 +65,11 @@ export default function Home(){
         .then(response => response.data)
         .then((data) => {
           setCities(data);
-          console.log(data);
         })
         .catch((error) => console.log(error));
   
       };
-      console.log(cities);
       setCities([]);
-      console.log(cities);
       if(currentCountry!==""){
         loadCities();
       }
@@ -76,6 +87,7 @@ export default function Home(){
       setCheckOutDate(date);
     };
     return (
+      <>
         <Grid
           className={classes.grid}
           container
@@ -132,19 +144,36 @@ export default function Home(){
                 renderInput={(params) => <TextField  {...params} label="choose your counrty" variant="outlined" />}
                 />
           </Grid>
-          <Grid> <Autocomplete 
+          <Grid>
+            <Typography variant='h6'>
+              Choose your city
+            </Typography>
+             <Autocomplete 
                 id="combo-box-demo2"
                 options={cities}
                 getOptionLabel={(option) => option}
+                onChange={(event, value) => setCity(value)}
                 style={{ width: 300 }}
                 value = {city}
                 renderInput={(params) => <TextField  {...params} label="choose your city" variant="outlined" />}
                 /></Grid>
-          <Grid>
-            <Button variant="contained" color="primary" size='large'>
+          <Grid container
+  container
+  direction="row"
+  justify="center"
+  alignItems="flex-start"
+    
+          > 
+            <Button
+             variant="contained"
+              color="primary"
+               size='large'
+               >
              Search
             </Button>
           </Grid>
           </Grid>
+          <HotelList {...hotels}></HotelList>
+          </>
     );
 }

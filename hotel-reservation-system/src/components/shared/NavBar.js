@@ -1,6 +1,6 @@
 import React from 'react';
 import './../../css/App.css'
-import { Link } from 'react-router-dom'
+import { Link , Redirect } from 'react-router-dom'
 import { AppBar,Button,Toolbar,Typography} from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles';
 import {useSelector} from 'react-redux'
@@ -25,7 +25,7 @@ function NavBar() {
       <div className={classes.root}>
         <AppBar position="static">
           <Toolbar>
-            <Typography align='left' variant="h6" className={classes.title}>
+            <Typography align='left' variant="h6" className={classes.title} onclick= {<Redirect to='home'/>}>
               Hotels
             </Typography>
               {isLogged ? (<>
