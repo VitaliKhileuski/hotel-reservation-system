@@ -1,34 +1,36 @@
-import {React, useState} from 'react'
-import { Card , makeStyles, CardActionArea, CardActions,
+import {React, useState, useEffect} from 'react'
+import { Card , makeStyles, CardActionArea,
          CardContent, 
          CardMedia,
          Typography} from '@material-ui/core';
+import image from './../img/hotel.jpg'
 
 
 const useStyles = makeStyles({
     root : {
-        maxWidth : 345,
+        minWidth : 350,
+        margin : 11
     },
     media : {
-        height : 140,
+        height : 170,
     }
 })
 
-export default function HotelListItem(hotel){
-    console.log(hotel);
-const [hotel2, setHotel2] = useState(hotel);
-    useEffect(() => {
-        setHotel2(hotel);
-        console.log(hotel);
-        console.log("dasgasg")
-      }, [hotel]);
+export default function HotelListItem({hotel}){
+    console.log(hotel.location);
+// const [hotel2, setHotel2] = useState(hotel);
+//     useEffect(() => {
+//         setHotel2(hotel);
+//         console.log(hotel);
+//         console.log("dasgasg")
+//       }, [hotel]);
 
     const classes = useStyles();
     return (
         <Card className={classes.root}>
             <CardActionArea>
                 <CardMedia
-                 image = "./../img/hotel.jpg"
+                 image = {image}
                  className={classes.media}
                  title={hotel.name}>
                  </CardMedia>
@@ -37,7 +39,13 @@ const [hotel2, setHotel2] = useState(hotel);
                          {hotel.name}
                      </Typography>
                      <Typography variant='body2'>
-                         location info
+                         counrty:{hotel.location.country}
+                     </Typography>
+                     <Typography variant='body2'>
+                         city:{hotel.location.city}
+                     </Typography>
+                     <Typography variant='body2'>
+                         street:{hotel.location.street} {hotel.location.buildingNumber}
                      </Typography>
                  </CardContent>
             </CardActionArea>

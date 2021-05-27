@@ -1,23 +1,25 @@
 
 import {React, useEffect, useState} from 'react'
 import { Box, Grid } from '@material-ui/core'
+import HotelListItem from './HotelListItem'
 
 
 
-export default function HotelList(hotels){
-    const [hotels2, setHotels2] = useState(Array.from(hotels));
-    useEffect(() => {
-        setHotels2(Array.from(hotels));
-        console.log(hotels);
-      }, [hotels]);
+export default function HotelList({hotels}){
+    // const [hotels2, setHotels2] = useState(Array.from(hotels));
+    // useEffect(() => {
+    //     setHotels2(Array.from(hotels));
+    //     console.log(hotels);
+    //   }, [hotels]);
+    //   const hotelList = Array.from(hotels).map(hotel => <hotelListItem hotel={hotel})
     return(
-        <Box p={5}>
-        <Grid container spacing ={5}>
-            {Array.from(hotels).map((HotelListItem, i) => {
+        <Box p={4}>
+        <Grid justify="center" alignItems="center" container spacing ={0} margin='normal'>
+            {hotels.map((hotelListItem, i) => {
                 return(
-                    <Grid key={i} item>
-                        <HotelListItem {...HotelListItem}/>
-                    </Grid>
+                    <>
+                        <HotelListItem hotel ={hotelListItem}/>
+                    </>
                 );
             })}
         </Grid>

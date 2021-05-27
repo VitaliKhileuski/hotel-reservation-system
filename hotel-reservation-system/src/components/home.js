@@ -8,21 +8,29 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import { makeStyles } from '@material-ui/core/styles';
 import API from '../api'
 import HotelList from './HotelList';
+import Pagination from '@material-ui/lab/Pagination';
 
 
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   option: {
     fontSize: 15,
     '& > span': {
       marginRight: 10,
       fontSize: 18,
     },
-    grid : {
-      MarginTop : 30
-    }
-  },
-});
+    pagination: {
+      '& > * + *': {
+        marginTop: '2'
+      },
+    },
+    nav: {
+      '& > * + *': {
+        marginTop: theme.spacing(5),
+      },
+         }
+  }
+}));
 
 export default function Home(){
   const [city,setCity] = useState('');
@@ -50,6 +58,7 @@ export default function Home(){
         .then(response => response.data)
         .then(data => {
           setHotels(data);
+          console.log(data);
         })
         .catch((error) => {
           console.log(error.response.data.Message);
@@ -73,6 +82,7 @@ export default function Home(){
       if(currentCountry!==""){
         loadCities();
       }
+      setCity("")
       
     },[currentCountry])
 
@@ -173,7 +183,9 @@ export default function Home(){
             </Button>
           </Grid>
           </Grid>
-          <HotelList {...hotels}></HotelList>
+          <HotelList  hotels ={hotels}></HotelList>
+          <Pagination className={classes.pagination} count={10} color="primary" />
           </>
+
     );
 }
