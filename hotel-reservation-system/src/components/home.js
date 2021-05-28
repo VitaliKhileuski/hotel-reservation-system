@@ -40,6 +40,7 @@ export default function Home(){
   const [hotels,setHotels] = useState([]);
   const [checkInDate, setCheckInDate] = useState(new Date(Date.now()));
   const [checkOutDate, setCheckOutDate] = useState(new Date(Date.now() + 24*60*60*1000));
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     const loadCountries = async () => {
@@ -91,6 +92,22 @@ export default function Home(){
       
     },[currentCountry])
 
+    useEffect(() => {
+      const loadHotels = async () => {
+        await  API
+        .get(`/hotels/pages?PageNumber=${page}&PageSize=8`)
+        .then(response => response.data)
+        .then((data) => {
+          if(data!==undefined)
+          setHotels(data);
+        })
+        .catch((error) => console.log(error));
+  
+      };
+     loadHotels();
+    },[page])
+
+
     const classes = useStyles();
     const tommorow  = new Date(Date.now() + 24*60*60*1000);
     const handleDateCheckInChange = (date) => {
@@ -99,6 +116,9 @@ export default function Home(){
     const handleDateCheckOutChange = (date) => {
       setCheckOutDate(date);
     };
+    const changePage = (event, value) => {
+      setPage(value);
+    };
 
     const getFilteredHotels = async () => {
       console.log(checkInDate);
@@ -106,7 +126,7 @@ export default function Home(){
      console.log(currentCountry);
      console.log(city);
       await  API
-      .get('/hotels/filter='+checkInDate.toJSON()+'&'+checkOutDate.toJSON()+'&'+currentCountry+'&'+city)
+      .get('/hotels?checkInDate='+checkInDate.toJSON()+'&checkOutDate='+checkOutDate.toJSON()+'&country='+currentCountry+'&city='+city)
       .then(response => response.data)
       .then((data) => {
         setHotels(data);
@@ -202,7 +222,7 @@ export default function Home(){
           </Grid>
           </Grid>
           <HotelList  hotels ={hotels}></HotelList>
-          <Pagination className={classes.pagination} count={10} color="primary" />
+          <Pagination className={classes.pagination} page={page} count={10} color="primary" onChange={changePage} />
           </>
 
     );
