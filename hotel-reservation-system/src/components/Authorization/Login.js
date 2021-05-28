@@ -82,16 +82,18 @@ const onSubmit = () => {
     API
     .post('/account/login', request)
     .then((response) => {
-    localStorage.setItem('token',response.data[0]);
-    localStorage.setItem('refreshToken',response.data[1]);
-    const jwt = JSON.parse(atob(response.data[0].split(".")[1]));
-    dispatch({ type: IS_LOGGED, isLogged: true });
-    dispatch({type : NAME, name : jwt.firstname});
-    console.log(isLogged);
-
-    console.log(response);
+      if(response!==undefined && response.data!==undefined){
+          localStorage.setItem('token',response.data[0]);
+          localStorage.setItem('refreshToken',response.data[1]);
+          const jwt = JSON.parse(atob(response.data[0].split(".")[1]));
+          dispatch({ type: IS_LOGGED, isLogged: true });
+          dispatch({type : NAME, name : jwt.firstname});
+          console.log(isLogged);
+          console.log(response);
+      }
     })
     .catch((error) => {
+      if(error.response!==undefined){
         if(error.response.data.Message.includes("exists")){
           setEmailErrorLabel(error.response.data.Message)
         }
@@ -99,6 +101,7 @@ const onSubmit = () => {
           setPasswordErrorLabel(error.response.data.Message)
         }
         console.log(error.response.data);
+      }  
     })
 }
   const classes = useStyles();

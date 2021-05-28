@@ -70,17 +70,21 @@ export default function Register() {
       api
       .post('/account/register', request)
 			.then((response) => {
-        localStorage.setItem('token',response.data[0]);
-        localStorage.setItem('refreshToken',response.data[1]);
-        const jwt = JSON.parse(atob(response.data[0].split(".")[1]));
-        dispatch({ type: IS_LOGGED, isLogged: true });
-        dispatch({type : NAME, name : jwt.firstname});
-			console.log(response);
+        if(response!==undefined && response.data!==undefined){
+          localStorage.setItem('token',response.data[0]);
+          localStorage.setItem('refreshToken',response.data[1]);
+          const jwt = JSON.parse(atob(response.data[0].split(".")[1]));
+          dispatch({ type: IS_LOGGED, isLogged: true });
+          dispatch({type : NAME, name : jwt.firstname});
+			    console.log(response);
+        }
 			})
 			.catch((error) => {
-          setEmailErrorLabel(error.response.data.Message);
+          if(error.response!==undefined){
+            setEmailErrorLabel(error.response.data.Message);
           console.log(error.response.data.Message);
           console.log(error.response.data);
+          }
       })
   }
    function ValidateEmail(email){

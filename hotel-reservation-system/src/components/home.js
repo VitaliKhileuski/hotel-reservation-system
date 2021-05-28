@@ -36,8 +36,10 @@ export default function Home(){
   const [city,setCity] = useState('');
   const [countries,setCountries] = useState([]);
   const [cities,setCities] = useState([]);
-  const [currentCountry, setCurrentCountry] = useState("");
+  const [currentCountry, setCurrentCountry] = useState('');
   const [hotels,setHotels] = useState([]);
+  const [checkInDate, setCheckInDate] = useState(new Date(Date.now()));
+  const [checkOutDate, setCheckOutDate] = useState(new Date(Date.now() + 24*60*60*1000));
 
   useEffect(() => {
     const loadCountries = async () => {
@@ -45,6 +47,7 @@ export default function Home(){
       .get('/locations/countries')
       .then(response => response.data)
       .then((data) => {
+        if(data!==undefined)
         setCountries(data);
       })
       .catch((error) => console.log(error));
@@ -57,10 +60,11 @@ export default function Home(){
         .get('/hotels')
         .then(response => response.data)
         .then(data => {
+          if(data!==undefined)
           setHotels(data);
-          console.log(data);
         })
         .catch((error) => {
+          if(error.response!==undefined)
           console.log(error.response.data.Message);
         });
       };
@@ -73,6 +77,7 @@ export default function Home(){
         .get('/locations/cities/'+currentCountry)
         .then(response => response.data)
         .then((data) => {
+          if(data!==undefined)
           setCities(data);
         })
         .catch((error) => console.log(error));
@@ -87,8 +92,6 @@ export default function Home(){
     },[currentCountry])
 
     const classes = useStyles();
-    const [checkInDate, setCheckInDate] = useState(Date.now);
-    const [checkOutDate, setCheckOutDate] = useState(new Date(Date.now() + 24*60*60*1000));
     const tommorow  = new Date(Date.now() + 24*60*60*1000);
     const handleDateCheckInChange = (date) => {
       setCheckInDate(date);
@@ -96,6 +99,22 @@ export default function Home(){
     const handleDateCheckOutChange = (date) => {
       setCheckOutDate(date);
     };
+
+    const getFilteredHotels = async () => {
+      console.log(checkInDate);
+      console.log(checkOutDate);
+     console.log(currentCountry);
+     console.log(city);
+      await  API
+      .get('/hotels/filter='+checkInDate.toJSON()+'&'+checkOutDate.toJSON()+'&'+currentCountry+'&'+city)
+      .then(response => response.data)
+      .then((data) => {
+        setHotels(data);
+      })
+      .catch((error) => console.log(error));
+
+    };
+      
     return (
       <>
         <Grid
@@ -168,16 +187,15 @@ export default function Home(){
                 renderInput={(params) => <TextField  {...params} label="choose your city" variant="outlined" />}
                 /></Grid>
           <Grid container
-  container
-  direction="row"
-  justify="center"
-  alignItems="flex-start"
-    
+            direction="row"
+            justify="center"
+            alignItems="flex-start"
           > 
             <Button
              variant="contained"
               color="primary"
                size='large'
+               onClick = {getFilteredHotels}
                >
              Search
             </Button>
