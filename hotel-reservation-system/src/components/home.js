@@ -39,8 +39,9 @@ export default function Home(){
   const [currentCountry, setCurrentCountry] = useState('');
   const [hotels,setHotels] = useState([]);
   const [checkInDate, setCheckInDate] = useState(new Date(Date.now()));
-  const [checkOutDate, setCheckOutDate] = useState(new Date(Date.now() + 24*60*60*1000));
+  const [checkOutDate, setCheckOutDate] = useState(new Date(Date.now() + 2*24*60*60*1000));
   const [page, setPage] = useState(1);
+  const [maxPage,setMaxPage] = useState(1);
 
   useEffect(() => {
     const loadCountries = async () => {
@@ -54,22 +55,6 @@ export default function Home(){
       .catch((error) => console.log(error));
     };
     loadCountries();
-  }, []);
-  useEffect(() => {
-      const loadHotels = async () => {
-        await API
-        .get('/hotels')
-        .then(response => response.data)
-        .then(data => {
-          if(data!==undefined)
-          setHotels(data);
-        })
-        .catch((error) => {
-          if(error.response!==undefined)
-          console.log(error.response.data.Message);
-        });
-      };
-    loadHotels();
   }, []);
 
     useEffect(() => {
@@ -92,19 +77,20 @@ export default function Home(){
       
     },[currentCountry])
 
+    const getFilteredHotels = async () => {
+      await  API
+      .get('/hotels?checkInDate='+checkInDate.toJSON()+'&checkOutDate='+checkOutDate.toJSON()+'&country='+currentCountry+'&city='+city+'&PageNumber='+page+'&PageSize=4')
+      .then(response => response.data)
+      .then((data) => {
+        setHotels(data.item1);
+        setMaxPage(data.item2);
+      })
+      .catch((error) => console.log(error));
+      
+    };
+
     useEffect(() => {
-      const loadHotels = async () => {
-        await  API
-        .get(`/hotels/pages?PageNumber=${page}&PageSize=8`)
-        .then(response => response.data)
-        .then((data) => {
-          if(data!==undefined)
-          setHotels(data);
-        })
-        .catch((error) => console.log(error));
-  
-      };
-     loadHotels();
+     getFilteredHotels();
     },[page])
 
 
@@ -120,20 +106,7 @@ export default function Home(){
       setPage(value);
     };
 
-    const getFilteredHotels = async () => {
-      console.log(checkInDate);
-      console.log(checkOutDate);
-     console.log(currentCountry);
-     console.log(city);
-      await  API
-      .get('/hotels?checkInDate='+checkInDate.toJSON()+'&checkOutDate='+checkOutDate.toJSON()+'&country='+currentCountry+'&city='+city)
-      .then(response => response.data)
-      .then((data) => {
-        setHotels(data);
-      })
-      .catch((error) => console.log(error));
-
-    };
+    
       
     return (
       <>
@@ -222,7 +195,7 @@ export default function Home(){
           </Grid>
           </Grid>
           <HotelList  hotels ={hotels}></HotelList>
-          <Pagination className={classes.pagination} page={page} count={10} color="primary" onChange={changePage} />
+          <Pagination className={classes.pagination} page={page} count={maxPage} color="primary" onChange={changePage} />
           </>
 
     );

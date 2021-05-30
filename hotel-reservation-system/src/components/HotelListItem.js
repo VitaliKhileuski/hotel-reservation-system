@@ -1,4 +1,4 @@
-import {React, useState, useEffect} from 'react'
+import {React} from 'react'
 import { Card , makeStyles, CardActionArea,
          CardContent, 
          CardMedia,
@@ -17,14 +17,6 @@ const useStyles = makeStyles({
 })
 
 export default function HotelListItem({hotel}){
-    console.log(hotel.location);
-// const [hotel2, setHotel2] = useState(hotel);
-//     useEffect(() => {
-//         setHotel2(hotel);
-//         console.log(hotel);
-//         console.log("dasgasg")
-//       }, [hotel]);
-
     const classes = useStyles();
     return (
         <Card className={classes.root}>
