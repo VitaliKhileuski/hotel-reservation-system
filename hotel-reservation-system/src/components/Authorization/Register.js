@@ -12,7 +12,7 @@ import {Formik, Form, ErrorMessage, Field} from 'formik'
 import * as Yup from 'yup'
 import api from './../../api/'
 import {useDispatch, useSelector} from 'react-redux'
-import { IS_LOGGED, NAME} from "../../storage/actions/actionTypes.js";
+import { IS_LOGGED, NAME, ROLE} from "../../storage/actions/actionTypes.js";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -76,6 +76,7 @@ export default function Register() {
           const jwt = JSON.parse(atob(response.data[0].split(".")[1]));
           dispatch({ type: IS_LOGGED, isLogged: true });
           dispatch({type : NAME, name : jwt.firstname});
+          dispatch({type : ROLE, role : jwt.role});
 			    console.log(response);
         }
 			})

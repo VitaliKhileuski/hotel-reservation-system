@@ -5,18 +5,18 @@ import Register from "./components/Authorization/Register";
 import Home from "./components/Home"
 import API from './api'
 import {BrowserRouter as Router, Switch, Route, Redirect} from 'react-router-dom'
-import {useDispatch} from 'react-redux'
-import { IS_LOGGED, NAME} from "./storage/actions/actionTypes";
+import {useDispatch, useSelector} from 'react-redux'
+import { IS_LOGGED, NAME, ROLE} from "./storage/actions/actionTypes";
+import HotelTable from './components/Hotel/HotelTable'
 
 
 export default function App() {
 
   const dispatch = useDispatch();
-
+  const role = useSelector((state) => state.role);
   async function tokenVerification() {
     if (localStorage.getItem("token") !== null) {
       const token = localStorage.getItem("token");
-
       let result;
       
       try{
@@ -38,17 +38,21 @@ export default function App() {
           dispatch({ type: NAME, name: jwt.firstname });
           localStorage.setItem("token", token);
           dispatch({ type: IS_LOGGED, isLogged: true });
+          dispatch({type : ROLE, role : jwt.role});
         }else{
           localStorage.setItem('token',result.data[0]);
           localStorage.setItem('refreshToken',result.data[1]);
           const jwt = JSON.parse(atob(result.data[0].split(".")[1]));
           dispatch({ type: IS_LOGGED, isLogged: true });
           dispatch({type : NAME, name : jwt.firstname});
+          dispatch({type : ROLE, role : jwt.role});
         }
       } else {
         localStorage.removeItem("refreshToken");
           localStorage.removeItem("token");
           dispatch({ type: IS_LOGGED, isLogged: false });
+          dispatch({type : NAME, name : ''});
+          dispatch({type : ROLE, role : ''});
       }
     }else{
       if(localStorage.getItem("refreshToken") !== undefined){
@@ -60,14 +64,18 @@ export default function App() {
           const jwt = JSON.parse(atob(result.data[0].split(".")[1]));
           dispatch({ type: IS_LOGGED, isLogged: true });
           dispatch({type : NAME, name : jwt.firstname});
+          dispatch({type : ROLE, role : jwt.role});
           }
         } else {
           localStorage.removeItem("refreshToken");
           localStorage.removeItem("token");
           dispatch({ type: IS_LOGGED, isLogged: false });
+          dispatch({type : ROLE, role : ''});
         }
       }  
   }
+
+
     useEffect(() => {
       tokenVerification();
     }, []);
@@ -80,6 +88,7 @@ export default function App() {
             <Route path="/login" component = {Login} />
             <Route path="/register" component = {Register}/>
             <Route path ="/home" component = {Home}/>
+            {role==='Admin' ? <Route path='/ownedHotels' component = {HotelTable}></Route> : ''}
             <Redirect to="/home" />
           </Switch>
         </div>

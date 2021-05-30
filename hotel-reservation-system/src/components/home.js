@@ -9,6 +9,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import API from '../api'
 import HotelList from './HotelList';
 import Pagination from '@material-ui/lab/Pagination';
+import { Redirect } from 'react-router';
 
 
 
@@ -105,9 +106,7 @@ export default function Home(){
     const changePage = (event, value) => {
       setPage(value);
     };
-
-    
-      
+ 
     return (
       <>
         <Grid

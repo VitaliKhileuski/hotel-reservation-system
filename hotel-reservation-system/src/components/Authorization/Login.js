@@ -11,7 +11,7 @@ import Container from '@material-ui/core/Container';
 import {Formik, Form, Field} from 'formik'
 import API from './../../api'
 import {useDispatch, useSelector} from 'react-redux'
-import { IS_LOGGED, NAME} from "../../storage/actions/actionTypes.js";
+import { IS_LOGGED, NAME, ROLE} from "../../storage/actions/actionTypes.js";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -88,8 +88,9 @@ const onSubmit = () => {
           const jwt = JSON.parse(atob(response.data[0].split(".")[1]));
           dispatch({ type: IS_LOGGED, isLogged: true });
           dispatch({type : NAME, name : jwt.firstname});
-          console.log(isLogged);
-          console.log(response);
+          dispatch({type : ROLE, role : jwt.role});
+          
+          console.log(jwt.role);
       }
     })
     .catch((error) => {
