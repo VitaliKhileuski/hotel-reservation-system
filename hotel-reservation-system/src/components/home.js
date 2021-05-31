@@ -43,6 +43,7 @@ export default function Home(){
   const [checkOutDate, setCheckOutDate] = useState(new Date(Date.now() + 2*24*60*60*1000));
   const [page, setPage] = useState(1);
   const [maxPage,setMaxPage] = useState(1);
+  const pageSize = 8;
 
   useEffect(() => {
     const loadCountries = async () => {
@@ -80,7 +81,7 @@ export default function Home(){
 
     const getFilteredHotels = async () => {
       await  API
-      .get('/hotels?checkInDate='+checkInDate.toJSON()+'&checkOutDate='+checkOutDate.toJSON()+'&country='+currentCountry+'&city='+city+'&PageNumber='+page+'&PageSize=4')
+      .get('/hotels?checkInDate='+checkInDate.toJSON()+'&checkOutDate='+checkOutDate.toJSON()+'&country='+currentCountry+'&city='+city+'&PageNumber='+page+'&PageSize='+pageSize)
       .then(response => response.data)
       .then((data) => {
         setHotels(data.item1);

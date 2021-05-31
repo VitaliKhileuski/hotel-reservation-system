@@ -88,7 +88,7 @@ export default function App() {
             <Route path="/login" component = {Login} />
             <Route path="/register" component = {Register}/>
             <Route path ="/home" component = {Home}/>
-            {role==='Admin' ? <Route path='/ownedHotels' component = {HotelTable}></Route> : ''}
+            <Route path='/ownedHotels' component = {HotelTable}></Route>
             <Redirect to="/home" />
           </Switch>
         </div>
