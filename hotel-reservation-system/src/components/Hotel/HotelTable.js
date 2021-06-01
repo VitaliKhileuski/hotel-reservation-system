@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux'
 import {Redirect} from 'react-router-dom'
 import EditHotelDialog from './EditHotelDialog'
 import { makeStyles } from '@material-ui/core/styles';
-import {Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow} from '@material-ui/core';
+import {Paper,IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow} from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 import API from './../../api'
@@ -24,6 +24,7 @@ export default function HotelTable(){
     const classes = useStyles();
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(1);
+    let hotelAdminField = ''
 
 
   useEffect(() => {
@@ -49,6 +50,7 @@ export default function HotelTable(){
     setPage(0);
   };
     const ToEditHotelDialog = () => {
+      console.log("click");
       return <EditHotelDialog/>
     }
     
@@ -132,15 +134,19 @@ export default function HotelTable(){
                           {hotel.location.buildingNumber}
                         </TableCell>
                         <TableCell align='right'>
-                          {hotel.admin.name} {hotel.admin.surname}
-                          <br></br>
-                          ({hotel.admin.email})
+                           { hotelAdminField = hotel.admin === null ? "not assigned" : hotel.admin.name + " " + hotel.admin.surname} 
+                           <br></br>
+                           {hotel.admin===null ? '' : "("+hotel.admin.email+")"}
                         </TableCell>
                         <TableCell>
-                          <EditIcon></EditIcon>
+                          <IconButton color="black">
+                          <EditIcon onClick ={ToEditHotelDialog}></EditIcon>
+                          </IconButton>
                         </TableCell>
                         <TableCell>
-                          <DeleteIcon></DeleteIcon>
+                           <IconButton color="black">
+                           <DeleteIcon></DeleteIcon>
+                           </IconButton>
                         </TableCell>
                       </TableRow>
                   ))}
@@ -156,7 +162,9 @@ export default function HotelTable(){
               onChangePage={handleChangePage}
               onChangeRowsPerPage={handleChangeRowsPerPage}
             />
+            <EditHotelDialog></EditHotelDialog>
           </Paper>
+          
         );
 }
 }
