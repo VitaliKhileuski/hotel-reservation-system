@@ -2,10 +2,13 @@ import {React, useEffect, useState} from 'react'
 import { useSelector } from 'react-redux'
 import {Redirect} from 'react-router-dom'
 import { makeStyles } from '@material-ui/core/styles';
-import {Paper,IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow} from '@material-ui/core';
+import {Paper,IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Button} from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 import API from './../../api'
+import AddHotelDialog from './AddHotelDialog'
+import DeleteHotelDialog from './DeleteHotelDialog'
+
 
 
 const useStyles = makeStyles({
@@ -15,6 +18,9 @@ const useStyles = makeStyles({
   container: {
     minHeight: 600,
   },
+  addHotelButton : {
+    marginTop : 30
+  }
 });
 
 export default function HotelTable(){
@@ -25,8 +31,12 @@ export default function HotelTable(){
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [pageForRequest,SetPageForRequest] = useState(0);
     const [maxNumberOfHotels,setMaxNumberOfHotels] = useState(0);
-    let hotelAdminField = ''
+    const [open,setOpen] = useState(false);
+    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+    const [hotelId, setHotelId] = useState();
 
+    let hotelAdminField = ''
+    const token = localStorage.getItem("token");
 
   useEffect(() => {
     const loadHotels = async () => {
@@ -41,18 +51,55 @@ export default function HotelTable(){
       .catch((error) => console.log(error.response.data.message));
     };
     loadHotels();     
-  },[rowsPerPage, page])
+  },[rowsPerPage, page,open,openDeleteDialog])
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
     SetPageForRequest(newPage+1);
-    console.log(newPage)
+    console.log(newPage);
   };
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
     
   };
+
+  function handleClose(){
+     setOpen(false);
+  }
+
+  function OpenAddHotelDialog(){
+    setOpen(true);
+    console.log(true);
+  }
+
+  function handleCloseDeleteDialog(){
+    setOpenDeleteDialog(false);
+  };
+
+  function deleteHotel(){
+    console.log(hotelId);
+    const DeleteHotel = async () => {
+    await API
+    .delete('/hotels/'+ hotelId,{
+      headers: { Authorization: "Bearer " + token}
+    })
+  .then(response => response.data)
+  .then((data) => {
+  })
+  .catch((error) => console.log(error.response.data.message));
+};
+
+    DeleteHotel();
+    handleCloseDeleteDialog();
+  }
+
+
+  function callAlertDialog(hotelId){
+    setHotelId(hotelId);
+    console.log(hotelId);
+    setOpenDeleteDialog(true);
+  }
     
     if(role==='User'){
         return <Redirect to='/home'></Redirect>
@@ -61,6 +108,7 @@ export default function HotelTable(){
       
       
         return (
+          <>
           <Paper className={classes.root}>
             <TableContainer className={classes.container}>
               <Table stickyHeader aria-label="sticky table">
@@ -144,7 +192,8 @@ export default function HotelTable(){
                           </IconButton>
                         </TableCell>
                         <TableCell>
-                           <IconButton color="inherit">
+                           <IconButton color="inherit"
+                           onClick = {() => callAlertDialog(hotel.id)}>
                            <DeleteIcon></DeleteIcon>
                            </IconButton>
                         </TableCell>
@@ -164,7 +213,18 @@ export default function HotelTable(){
               onChangeRowsPerPage={handleChangeRowsPerPage}
             />
           </Paper>
-          
+          <Button
+           variant="contained"
+            color="primary"
+            size="large"
+            margin='normal'
+            className={classes.addHotelButton}
+            onClick={OpenAddHotelDialog}>
+            Add hotel
+          </Button>
+          <AddHotelDialog open={open} handleClose={handleClose}></AddHotelDialog>
+          <DeleteHotelDialog open={openDeleteDialog} handleCloseDeleteDialog={handleCloseDeleteDialog} deleteHotel={deleteHotel}></DeleteHotelDialog>
+          </>
         );
 }
 }
