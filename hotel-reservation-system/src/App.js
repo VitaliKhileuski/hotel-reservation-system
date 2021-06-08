@@ -8,6 +8,7 @@ import {BrowserRouter as Router, Switch, Route, Redirect} from 'react-router-dom
 import {useDispatch, useSelector} from 'react-redux'
 import { IS_LOGGED, NAME, ROLE} from "./storage/actions/actionTypes";
 import HotelTable from './components/Hotel/HotelTable'
+import HotelEditor from './components/Hotel/HotelEditor'
 
 
 export default function App() {
@@ -89,6 +90,7 @@ export default function App() {
             <Route path="/register" component = {Register}/>
             <Route path ="/home" component = {Home}/>
             <Route path='/ownedHotels' component = {HotelTable}></Route>
+            <Route path ="/hotelEditor" render={(props) => <HotelEditor {...props}/>}/>
             <Redirect to="/home" />
           </Switch>
         </div>

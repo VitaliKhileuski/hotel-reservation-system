@@ -1,5 +1,5 @@
 import {React, useState, useEffect} from 'react'
-import Button from '@material-ui/core/Button';
+import {Button, Snackbar} from '@material-ui/core';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
 import { Link , Redirect } from 'react-router-dom'
@@ -12,12 +12,17 @@ import {Formik, Form, ErrorMessage, Field} from 'formik'
 import * as Yup from 'yup'
 import API from './../../api/'
 import Autocomplete from '@material-ui/lab/Autocomplete';
+import MuiAlert from '@material-ui/lab/Alert';
 
-
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+} 
 
 const useStyles = makeStyles((theme) => ({
+  root : {
+  },
   paper: {
-    marginTop: theme.spacing(6),
+    marginTop: theme.spacing(3),
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -28,20 +33,20 @@ const useStyles = makeStyles((theme) => ({
   },
   form: {
     width: '100%', // Fix IE 11 issue.
-    marginTop: theme.spacing(3),
+    marginTop: theme.spacing(1),
   },
   submit: {
     margin: theme.spacing(3, 0, 2),
   },
 }));
 
-export default function AddHotelForm({handleClose}) {
+export default function AddHotelForm({hotel,handleClose,callAlert}) {
 
   const classes = useStyles();
   const [users,setUsers] = useState([]);
-  const [admin,setAdmin] = useState();
+  const [admin,setAdmin] = useState(hotel===undefined ? '' : hotel.admin);
+  const [showAlert,setShowAlert] = useState(false);
   const token = localStorage.getItem("token");
-
   useEffect(() => {
     const loadUsers = async () => {
       await  API
@@ -61,11 +66,11 @@ export default function AddHotelForm({handleClose}) {
   },[])
 
   const initialValues = {
-    name:'',
-    country:'',
-    city :'',
-    street :'',
-    buildingNumber: '',
+    name: hotel===undefined ? '' : hotel.name,
+    country:hotel===undefined ? '' : hotel.location.country,
+    city :hotel===undefined ? '' : hotel.location.city,
+    street :hotel===undefined ? '' : hotel.location.street,
+    buildingNumber: hotel===undefined ? '' : hotel.location.buildingNumber,
   }
   const validationSchema = Yup.object().shape({
     name: Yup.string().required("name is required"),
@@ -73,7 +78,7 @@ export default function AddHotelForm({handleClose}) {
     street : Yup.string().required("street is required"),
     buildingNumber: Yup.string().required('building number is required')
   })
-  const onSubmit = (values) => {
+  const onSubmit = async (values)  => {
     const request = {
       Name: values.name,
       Location : {
@@ -94,14 +99,14 @@ export default function AddHotelForm({handleClose}) {
         })
         .catch((error) => console.log(error.response.data.message));
       };
-    CreateHotel();
+    await CreateHotel();
     handleClose();
-    function DeleteHotel(id){
-        
-    }
+    callAlert();
+    setShowAlert(true);
 }
   return (
-    <Container component="main" maxWidth="xs">
+    <>
+    <Container component="main" maxWidth="xs" className={classes.root}>
       <CssBaseline />
       <div className={classes.paper}>
         <Formik initialValues ={ initialValues } onSubmit={onSubmit} validationSchema={validationSchema}>
@@ -112,6 +117,7 @@ export default function AddHotelForm({handleClose}) {
         <Autocomplete 
                 id="hotelAdmin"
                 options={users}
+                value={hotel===undefined ? users[0] : admin} 
                 onChange={(event, value) => setAdmin(value)}
                 getOptionLabel={(option) => `${option.name} ${option.surname}(${option.email})`}
                 renderInput={(params) => <TextField  {...params} label="choose hotel admin" variant="outlined" />}
@@ -186,7 +192,7 @@ export default function AddHotelForm({handleClose}) {
             color="primary"
             className={classes.submit}
           >
-            Create hotel
+            Save
           </Button>
           <Grid container justify="flex-end">
             <Grid item>
@@ -199,5 +205,11 @@ export default function AddHotelForm({handleClose}) {
       <Box mt={5}>
       </Box>
     </Container>
+    <Snackbar open={showAlert} autoHideDuration={3000} >
+    <Alert  severity="success">
+    Hotel Added successfully!
+    </Alert>
+  </Snackbar>
+  </>
   );
 }

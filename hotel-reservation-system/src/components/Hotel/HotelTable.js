@@ -1,15 +1,19 @@
 import {React, useEffect, useState} from 'react'
 import { useSelector } from 'react-redux'
-import {Redirect} from 'react-router-dom'
+import {Redirect, useHistory} from 'react-router-dom'
 import { makeStyles } from '@material-ui/core/styles';
-import {Paper,IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Button} from '@material-ui/core';
+import {Paper,IconButton, Table, TableBody, TableCell, TableContainer, TableHead,
+   TablePagination, TableRow, Button,Snackbar} from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 import API from './../../api'
 import AddHotelDialog from './AddHotelDialog'
 import DeleteHotelDialog from './DeleteHotelDialog'
+import MuiAlert from '@material-ui/lab/Alert';
 
-
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+} 
 
 const useStyles = makeStyles({
   root: {
@@ -24,6 +28,7 @@ const useStyles = makeStyles({
 });
 
 export default function HotelTable(){
+    const history = useHistory();
     const role = useSelector((state) => state.role)
     const [hotels, setHotels] = useState([]);
     const classes = useStyles();
@@ -34,7 +39,9 @@ export default function HotelTable(){
     const [open,setOpen] = useState(false);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [hotelId, setHotelId] = useState();
-
+    const [alertOpen,setAlertOpen] = useState(false);
+    
+    const isLogged = useSelector((state) => state.isLogged);
     let hotelAdminField = ''
     const token = localStorage.getItem("token");
 
@@ -76,21 +83,25 @@ export default function HotelTable(){
   function handleCloseDeleteDialog(){
     setOpenDeleteDialog(false);
   };
+  const handleCloseAlert = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
 
-  function deleteHotel(){
+    setAlertOpen(false);
+  };
+
+  async function deleteHotel(){
     console.log(hotelId);
     const DeleteHotel = async () => {
     await API
     .delete('/hotels/'+ hotelId,{
       headers: { Authorization: "Bearer " + token}
     })
-  .then(response => response.data)
-  .then((data) => {
-  })
   .catch((error) => console.log(error.response.data.message));
 };
 
-    DeleteHotel();
+    await DeleteHotel();
     handleCloseDeleteDialog();
   }
 
@@ -100,13 +111,22 @@ export default function HotelTable(){
     console.log(hotelId);
     setOpenDeleteDialog(true);
   }
+  function toHotelEditor(hotel){
+    history.push(({
+    pathname:"/hotelEditor",
+    state:{
+      hotel
+     }
+   }));
+  }
+  function callAlert(){
+    setAlertOpen(true);
+  }
     
-    if(role==='User'){
+    if(!isLogged || role==='User'){
         return <Redirect to='/home'></Redirect>
       }
       else{
-      
-      
         return (
           <>
           <Paper className={classes.root}>
@@ -187,7 +207,9 @@ export default function HotelTable(){
                            {hotel.admin===null ? '' : "("+hotel.admin.email+")"}
                         </TableCell>
                         <TableCell>
-                          <IconButton  color="inherit">
+                          <IconButton
+                            color="inherit"
+                            onClick={() => toHotelEditor(hotel)}>
                           <EditIcon ></EditIcon>
                           </IconButton>
                         </TableCell>
@@ -222,8 +244,13 @@ export default function HotelTable(){
             onClick={OpenAddHotelDialog}>
             Add hotel
           </Button>
-          <AddHotelDialog open={open} handleClose={handleClose}></AddHotelDialog>
+          <AddHotelDialog open={open} handleClose={handleClose} callAlert={callAlert}></AddHotelDialog>
           <DeleteHotelDialog open={openDeleteDialog} handleCloseDeleteDialog={handleCloseDeleteDialog} deleteHotel={deleteHotel}></DeleteHotelDialog>
+          <Snackbar open={alertOpen} autoHideDuration={5000} onClose={handleCloseAlert}>
+            <Alert  severity="success" onClose={handleCloseAlert}>
+              Hotel Added successfully!
+            </Alert>
+          </Snackbar>
           </>
         );
 }
