@@ -1,5 +1,5 @@
 import {React, useState, useEffect} from 'react'
-import {Button, Snackbar} from '@material-ui/core';
+import {Button} from '@material-ui/core';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
 import { Link , Redirect } from 'react-router-dom'
@@ -12,11 +12,7 @@ import {Formik, Form, ErrorMessage, Field} from 'formik'
 import * as Yup from 'yup'
 import API from './../../api/'
 import Autocomplete from '@material-ui/lab/Autocomplete';
-import MuiAlert from '@material-ui/lab/Alert';
 
-function Alert(props) {
-  return <MuiAlert elevation={6} variant="filled" {...props} />;
-} 
 
 const useStyles = makeStyles((theme) => ({
   root : {
@@ -40,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function AddHotelForm({hotel,handleClose,callAlert}) {
+export default function AddHotelForm({hotel,handleClose,callAlert,callUpdateAlert,toRoomSection}) {
 
   const classes = useStyles();
   const [users,setUsers] = useState([]);
@@ -90,8 +86,34 @@ export default function AddHotelForm({hotel,handleClose,callAlert}) {
       } 
     };
     const CreateHotel = async () => {
+
         await  API
-        .post('/hotels/'+ admin.id,request,{
+        .post('/hotels/'+ admin.id,request, {
+          headers: { Authorization: "Bearer " + token,},
+          })
+        .then(response => response.data)
+        .then((data) => {
+        })
+        .catch((error) => console.log(error.response.data.message));
+      };
+      if(hotel===undefined){
+        await CreateHotel();
+      }
+      else{
+        await UpdateHotel(request);
+        UpdateHotelAdmin();
+        callUpdateAlert();
+        toRoomSection();
+      }
+    
+    handleClose();
+    callAlert();
+    setShowAlert(true);
+    }
+
+      const UpdateHotel = async (request) => {
+        await  API
+        .put('/hotels/'+ hotel.id,request,{
             headers: { Authorization: "Bearer " + token}
           })
         .then(response => response.data)
@@ -99,11 +121,18 @@ export default function AddHotelForm({hotel,handleClose,callAlert}) {
         })
         .catch((error) => console.log(error.response.data.message));
       };
-    await CreateHotel();
-    handleClose();
-    callAlert();
-    setShowAlert(true);
-}
+      const UpdateHotelAdmin = async () => {
+        await API
+        .put('hotels/'+hotel.id+'/'+admin.id+'/setHotelAdmin',{
+          headers: { Authorization: "Bearer " + token}
+        })
+      .then(response => response.data)
+      .then((data) => {
+      })
+      .catch((error) => console.log(error.response.data.message));
+      };
+
+
   return (
     <>
     <Container component="main" maxWidth="xs" className={classes.root}>
@@ -205,11 +234,6 @@ export default function AddHotelForm({hotel,handleClose,callAlert}) {
       <Box mt={5}>
       </Box>
     </Container>
-    <Snackbar open={showAlert} autoHideDuration={3000} >
-    <Alert  severity="success">
-    Hotel Added successfully!
-    </Alert>
-  </Snackbar>
   </>
   );
 }

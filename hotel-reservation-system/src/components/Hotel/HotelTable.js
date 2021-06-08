@@ -3,17 +3,15 @@ import { useSelector } from 'react-redux'
 import {Redirect, useHistory} from 'react-router-dom'
 import { makeStyles } from '@material-ui/core/styles';
 import {Paper,IconButton, Table, TableBody, TableCell, TableContainer, TableHead,
-   TablePagination, TableRow, Button,Snackbar} from '@material-ui/core';
+   TablePagination, TableRow, Button} from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 import API from './../../api'
 import AddHotelDialog from './AddHotelDialog'
 import DeleteHotelDialog from './DeleteHotelDialog'
-import MuiAlert from '@material-ui/lab/Alert';
+import BaseAlert from './../shared/BaseAlert'
 
-function Alert(props) {
-  return <MuiAlert elevation={6} variant="filled" {...props} />;
-} 
+
 
 const useStyles = makeStyles({
   root: {
@@ -39,7 +37,10 @@ export default function HotelTable(){
     const [open,setOpen] = useState(false);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [hotelId, setHotelId] = useState();
-    const [alertOpen,setAlertOpen] = useState(false);
+
+
+    const [addAlertOpen,setAddAlertOpen] = useState(false);
+    const [deleteAlertOpen,setDeleteAlertOpen] = useState(false)
     
     const isLogged = useSelector((state) => state.isLogged);
     let hotelAdminField = ''
@@ -83,13 +84,6 @@ export default function HotelTable(){
   function handleCloseDeleteDialog(){
     setOpenDeleteDialog(false);
   };
-  const handleCloseAlert = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-
-    setAlertOpen(false);
-  };
 
   async function deleteHotel(){
     console.log(hotelId);
@@ -103,6 +97,7 @@ export default function HotelTable(){
 
     await DeleteHotel();
     handleCloseDeleteDialog();
+    callDeleteAlert();
   }
 
 
@@ -119,9 +114,21 @@ export default function HotelTable(){
      }
    }));
   }
-  function callAlert(){
-    setAlertOpen(true);
+  function callAddAlert(){
+    setAddAlertOpen(true);
   }
+  function callDeleteAlert(){
+    setDeleteAlertOpen(true);
+  }
+  
+  const handleCloseAlert = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setAddAlertOpen(false);
+    setDeleteAlertOpen(false);
+  };
     
     if(!isLogged || role==='User'){
         return <Redirect to='/home'></Redirect>
@@ -244,13 +251,11 @@ export default function HotelTable(){
             onClick={OpenAddHotelDialog}>
             Add hotel
           </Button>
-          <AddHotelDialog open={open} handleClose={handleClose} callAlert={callAlert}></AddHotelDialog>
+          <AddHotelDialog open={open} handleClose={handleClose} callAlert={callAddAlert}></AddHotelDialog>
           <DeleteHotelDialog open={openDeleteDialog} handleCloseDeleteDialog={handleCloseDeleteDialog} deleteHotel={deleteHotel}></DeleteHotelDialog>
-          <Snackbar open={alertOpen} autoHideDuration={5000} onClose={handleCloseAlert}>
-            <Alert  severity="success" onClose={handleCloseAlert}>
-              Hotel Added successfully!
-            </Alert>
-          </Snackbar>
+          
+          <BaseAlert open={addAlertOpen} handleClose = {handleCloseAlert} message = {'hotel added successfully'}></BaseAlert>
+          <BaseAlert open ={deleteAlertOpen} handleClose ={handleCloseAlert} message = {'hotel deleted succesfully'}></BaseAlert>
           </>
         );
 }
