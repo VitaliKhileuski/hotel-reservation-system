@@ -4,9 +4,11 @@ import { makeStyles } from '@material-ui/core/styles';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
-import Box from '@material-ui/core/Box';
+import {Box,Button} from '@material-ui/core';
 import AddHotelForm from './AddHotelForm';
 import BaseAlert from './../shared/BaseAlert'
+import RoomTable from './RoomTable';
+import ServiceTable from './ServiceTable';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -39,6 +41,13 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.background.paper,
     display: 'flex',
   },
+  section: {
+    width : '80%',
+    alignItems : 'center'
+  },
+  createRoomButton : {
+    marginTop : 10
+  }
 }));
 
 export default function HotelEditor(props) {
@@ -82,11 +91,14 @@ export default function HotelEditor(props) {
       <TabPanel value={value} index={0}>
         <AddHotelForm toRoomSection ={toRoomSection} hotel = {hotel} callUpdateAlert={callUpdateAlert}></AddHotelForm>
       </TabPanel>
-      <TabPanel value={value} index={1}>
-        Rooms
+      <TabPanel className={classes.section} value={value} index={1}>
+        <RoomTable
+        rooms={hotel.rooms}
+        hotelId ={hotel.id}>
+        </RoomTable>
       </TabPanel>
       <TabPanel value={value} index={2}>
-        Services
+        <ServiceTable services={hotel.services}></ServiceTable>
       </TabPanel>
       <BaseAlert open ={updateAlertOpen}  handleClose ={handleCloseUpdateAlert} message = {'hotel updated succesfully'}></BaseAlert>
     </div>

@@ -6,10 +6,11 @@ import {Paper,IconButton, Table, TableBody, TableCell, TableContainer, TableHead
    TablePagination, TableRow, Button} from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
-import API from './../../api'
-import AddHotelDialog from './AddHotelDialog'
-import DeleteHotelDialog from './DeleteHotelDialog'
-import BaseAlert from './../shared/BaseAlert'
+import API from './../../api';
+import DeleteHotelDialog from './DeleteHotelDialog';
+import BaseAlert from './../shared/BaseAlert';
+import BaseAddDialog from './../shared/BaseAddDialog';
+import AddHotelForm from './AddHotelForm';
 
 
 
@@ -45,6 +46,10 @@ export default function HotelTable(){
     const isLogged = useSelector((state) => state.isLogged);
     let hotelAdminField = ''
     const token = localStorage.getItem("token");
+    let form = <AddHotelForm
+    handleClose={() => handleClose()}
+    callAlert={() => callAddAlert()}>
+   </AddHotelForm>;
 
   useEffect(() => {
     const loadHotels = async () => {
@@ -117,6 +122,8 @@ export default function HotelTable(){
   function callAddAlert(){
     setAddAlertOpen(true);
   }
+
+
   function callDeleteAlert(){
     setDeleteAlertOpen(true);
   }
@@ -183,8 +190,8 @@ export default function HotelTable(){
                       >
                       Hotel Admin
                       </TableCell>
-                    <TableCell/>
-                    <TableCell/>
+                    <TableCell style={{ minWidth: 30 }}/>
+                    <TableCell style={{ minWidth: 30 }}/>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -251,7 +258,7 @@ export default function HotelTable(){
             onClick={OpenAddHotelDialog}>
             Add hotel
           </Button>
-          <AddHotelDialog open={open} handleClose={handleClose} callAlert={callAddAlert}></AddHotelDialog>
+          <BaseAddDialog open={open} handleClose={handleClose} callAlert={callAddAlert} form ={form}></BaseAddDialog>
           <DeleteHotelDialog open={openDeleteDialog} handleCloseDeleteDialog={handleCloseDeleteDialog} deleteHotel={deleteHotel}></DeleteHotelDialog>
           
           <BaseAlert open={addAlertOpen} handleClose = {handleCloseAlert} message = {'hotel added successfully'}></BaseAlert>

@@ -5,7 +5,6 @@ import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import Slide from '@material-ui/core/Slide';
-import AddHotelForm from './AddHotelForm'
 
 const useStyles = makeStyles((theme) => ({
   appBar: {
@@ -21,7 +20,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="down" ref={ref} {...props} />;
 });
 
-export default function AddHotelDialog({open,handleClose,callAlert}) {
+export default function BaseAddDialog({open,handleClose,callAlert,form}) {
   const classes = useStyles();
 
 
@@ -30,17 +29,14 @@ export default function AddHotelDialog({open,handleClose,callAlert}) {
         <AppBar className={classes.appBar}>
           <Toolbar>
           <Typography variant="h6" className={classes.title}>
-              Create hotel
+              Create/Update
             </Typography>
             <IconButton edge="end" color="inherit" onClick={() => handleClose()} aria-label="close">
               <CloseIcon />
             </IconButton>
           </Toolbar>
         </AppBar>
-        <AddHotelForm
-         handleClose={() => handleClose()}
-         callAlert={() => callAlert()}>
-        </AddHotelForm>
+        {form}
       </Dialog>
   );
 }
