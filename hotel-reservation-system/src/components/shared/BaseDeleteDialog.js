@@ -6,7 +6,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-export default function DeleteHotelDialog({open,deleteHotel,handleCloseDeleteDialog}) {
+export default function BaseDeleteDialog({open,deleteItem,handleCloseDeleteDialog,title,message}) {
 
   return (
       <Dialog
@@ -15,17 +15,17 @@ export default function DeleteHotelDialog({open,deleteHotel,handleCloseDeleteDia
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">{"Are you sure to delete this hotel?"}</DialogTitle>
+        <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-          the hotel will be permanently deleted
+          {message}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => handleCloseDeleteDialog()} color="primary">
             Cancel
           </Button>
-          <Button onClick={() => deleteHotel()} color="primary" autoFocus>
+          <Button onClick={() => deleteItem()} color="primary" autoFocus>
             Delete
           </Button>
         </DialogActions>

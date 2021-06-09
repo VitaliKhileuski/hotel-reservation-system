@@ -7,10 +7,10 @@ import {Paper,IconButton, Table, TableBody, TableCell, TableContainer, TableHead
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 import API from './../../api';
-import DeleteHotelDialog from './DeleteHotelDialog';
 import BaseAlert from './../shared/BaseAlert';
 import BaseAddDialog from './../shared/BaseAddDialog';
 import AddHotelForm from './AddHotelForm';
+import BaseDeleteDialog from './../shared/BaseDeleteDialog'
 
 
 
@@ -78,6 +78,7 @@ export default function HotelTable(){
   };
 
   function handleClose(){
+    console.log("close")
      setOpen(false);
   }
 
@@ -259,7 +260,13 @@ export default function HotelTable(){
             Add hotel
           </Button>
           <BaseAddDialog open={open} handleClose={handleClose} callAlert={callAddAlert} form ={form}></BaseAddDialog>
-          <DeleteHotelDialog open={openDeleteDialog} handleCloseDeleteDialog={handleCloseDeleteDialog} deleteHotel={deleteHotel}></DeleteHotelDialog>
+          <BaseDeleteDialog
+           open={openDeleteDialog}
+            handleCloseDeleteDialog={handleCloseDeleteDialog}
+             deleteItem={deleteHotel}
+             title ={"Are you sure to delete this hotel?"}
+             message = {"the hotel will be permanently deleted"}
+             ></BaseDeleteDialog>
           
           <BaseAlert open={addAlertOpen} handleClose = {handleCloseAlert} message = {'hotel added successfully'}></BaseAlert>
           <BaseAlert open ={deleteAlertOpen} handleClose ={handleCloseAlert} message = {'hotel deleted succesfully'}></BaseAlert>

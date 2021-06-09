@@ -9,6 +9,8 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import API from './../../api'
 import BaseAddDialog from '../shared/BaseAddDialog';
 import AddRoomForm from './AddRoomForm'
+import BaseDeleteDialog from './../shared/BaseDeleteDialog'
+import BaseAlert from './../shared/BaseAlert'
 
 
 
@@ -25,43 +27,108 @@ const useStyles = makeStyles({
   }
 });
 
-export default function RoomTable({rooms,hotelId}){
+export default function RoomTable({hotelId}){
 
-    console.log(rooms);
-    const [hotelRooms, setHotelRooms] = useState(rooms);
+
+    const token = localStorage.getItem("token");
+    const [rooms, setRooms] = useState([]);
+    const [maxNumberOfRooms, setMaxNumberOfRooms] = useState(0);
     const classes = useStyles();
     const [page, setPage] = useState(0);
+    const [pageForRequest,SetPageForRequest] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [openDialog,setOpenDialog] = useState(false);
+    const [openDeleteDialog,setOpenDeleteDialog] = useState(false);
+    const [roomId,setRoomId] = useState(0);
+    const [room,setRoom] = useState()
+
+    const [addAlertOpen,setAddAlertOpen] = useState(false);
+    const [deleteAlertOpen,setDeleteAlertOpen] = useState(false);
+    const [updateAlertOpen,setUpdateAlertOpen] = useState(false);
 
     let form = <AddRoomForm
     handleClose={() => handleClose()}
-    addRoomToTable = {addRoomToTable}
     hotelId = {hotelId}
+    room = {room}
+    callAddAlert = {callAddAlert}
+    callUpdateAlert ={callUpdateAlert}
     >
    </AddRoomForm>;
    
    useEffect(() => {
-    
-  },[hotelRooms])
+    const loadRooms = async () => {
+      await  API
+      .get('/rooms/'+hotelId+'/pages?PageNumber='+ pageForRequest + '&PageSize=' + rowsPerPage)
+      .then(response => response.data)
+      .then((data) => {
+        console.log(data);
+        setRooms(data.item1);
+        setMaxNumberOfRooms(data.item2);
+      })
+      .catch((error) => console.log(error.response.data.message));
+    };
+  loadRooms();     
+  },[rowsPerPage, page, openDialog,openDeleteDialog])
 
-   function addRoomToTable(room){
-        hotelRooms.push(room);
-   }
     
-  const handleChangePage = (event, newPage) => {
+   const handleChangePage = (event, newPage) => {
     setPage(newPage);
+    SetPageForRequest(newPage+1);
+    console.log(newPage);
   };
 
   const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(+event.target.value);    
+    setRowsPerPage(+event.target.value);
+    
   };
-  function OpenAddRoomDialog(){
+  function OpenAddRoomDialog(room){
+    setRoom(room)
     setOpenDialog(true);
   }
   function handleClose(){
     setOpenDialog(false);
  }
+ function callDeleteDialog(roomId){
+   console.log(roomId);
+   setRoomId(roomId);
+   setOpenDeleteDialog(true);
+ }
+  function handleCloseDeleteDialog(){
+    setOpenDeleteDialog(false);
+  };
+  const handleCloseAlert = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setAddAlertOpen(false);
+    setDeleteAlertOpen(false);
+    setUpdateAlertOpen(false);
+  };
+  function callAddAlert(){
+    setAddAlertOpen(true);
+  }
+  function callUpdateAlert(){
+    setUpdateAlertOpen(true);
+  }
+  function callDeleteAlert(){
+    setDeleteAlertOpen(true);
+  }
+
+  async function deleteRoom(){
+    const DeleteRoom = async () => {
+    await API
+    .delete('/rooms/'+ roomId,{
+      headers: { Authorization: "Bearer " + token}
+    })
+  .catch((error) => console.log(error.response.data.message));
+};
+
+    await DeleteRoom();
+    handleCloseDeleteDialog();
+    callDeleteAlert();
+  }
+
 
   
         return (
@@ -100,7 +167,7 @@ export default function RoomTable({rooms,hotelId}){
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {hotelRooms.map((room) => (
+                  {rooms.map((room) => (
                       <TableRow key ={room.id} >
                         <TableCell align='right'>
                           {room.id}
@@ -116,12 +183,15 @@ export default function RoomTable({rooms,hotelId}){
                         </TableCell>
                         <TableCell>
                           <IconButton
-                            color="inherit">
+                            color="inherit"
+                            onClick ={() => OpenAddRoomDialog(room)}>
                           <EditIcon ></EditIcon>
                           </IconButton>
                         </TableCell>
                         <TableCell>
-                           <IconButton color="inherit">
+                           <IconButton
+                            color="inherit"
+                            onClick ={() => callDeleteDialog(room.id)}>
                            <DeleteIcon></DeleteIcon>
                            </IconButton>
                         </TableCell>
@@ -134,7 +204,7 @@ export default function RoomTable({rooms,hotelId}){
             <TablePagination
               rowsPerPageOptions={[5, 10, 50]}
               component="div"
-              count={rooms.length}
+              count={maxNumberOfRooms}
               rowsPerPage={rowsPerPage}
               page={page}
               onChangePage={handleChangePage}
@@ -147,10 +217,20 @@ export default function RoomTable({rooms,hotelId}){
         size="large"
         margin='normal'
         className = {classes.createRoomButton}
-        onClick ={OpenAddRoomDialog}>
+        onClick ={() => OpenAddRoomDialog()}>
           Create room
         </Button>
         <BaseAddDialog open={openDialog} handleClose = {handleClose} form ={form}></BaseAddDialog>
+        <BaseDeleteDialog
+           open={openDeleteDialog}
+            handleCloseDeleteDialog={handleCloseDeleteDialog}
+             deleteItem={deleteRoom}
+             title ={"Are you sure to delete this room?"}
+             message = {"room will be permanently deleted"}
+             ></BaseDeleteDialog>
+             <BaseAlert open={addAlertOpen} handleClose = {handleCloseAlert} message = {'room added successfully'}></BaseAlert>
+             <BaseAlert open ={deleteAlertOpen} handleClose ={handleCloseAlert} message = {'room deleted succesfully'}></BaseAlert>
+             <BaseAlert open ={updateAlertOpen} handleClose ={handleCloseAlert} message = {'room updated succesfully'}></BaseAlert>
           </>
         );
 }

@@ -45,6 +45,9 @@ const useStyles = makeStyles((theme) => ({
     width : '80%',
     alignItems : 'center'
   },
+  serviceSection : {
+    width : '40%'
+  },
   createRoomButton : {
     marginTop : 10
   }
@@ -93,12 +96,14 @@ export default function HotelEditor(props) {
       </TabPanel>
       <TabPanel className={classes.section} value={value} index={1}>
         <RoomTable
-        rooms={hotel.rooms}
         hotelId ={hotel.id}>
         </RoomTable>
       </TabPanel>
-      <TabPanel value={value} index={2}>
-        <ServiceTable services={hotel.services}></ServiceTable>
+      <TabPanel className={classes.serviceSection} value={value} index={2}>
+        <ServiceTable
+        hotelId ={hotel.id}>
+
+        </ServiceTable>
       </TabPanel>
       <BaseAlert open ={updateAlertOpen}  handleClose ={handleCloseUpdateAlert} message = {'hotel updated succesfully'}></BaseAlert>
     </div>

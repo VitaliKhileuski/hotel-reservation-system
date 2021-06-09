@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function AddHotelForm({hotelId,room,handleClose,callAddAlert,callUpdateAlert}) {
+export default function AddServiceForm({hotelId,service,handleClose,callAddAlert,callUpdateAlert}) {
 
   const classes = useStyles();
   const [showAlert,setShowAlert] = useState(false);
@@ -43,40 +43,38 @@ export default function AddHotelForm({hotelId,room,handleClose,callAddAlert,call
   
 
   const initialValues = {
-    roomNumber: room===undefined ? '' : room.roomNumber,
-    bedsNumber: room===undefined ? '' : room.bedsNumber,
-    paymentPerDay: room===undefined ? '' : room.paymentPerDay,
+    name: service===undefined ? '' : service.name,
+    payment: service===undefined ? '' : service.payment,
   }
   const validationSchema = Yup.object().shape({
-    roomNumber: Yup.string().required("room Number is required"),
-    bedsNumber: Yup.number("beds number must be a number").required("beds number is required"),
-    paymentPerDay: Yup.number("payment per day must be a number").required("payment per day is required")
+    name: Yup.string().required("name is required"),
+    payment: Yup.number("payment must be a number").required("payment is required")
   })
+
   const onSubmit = async (values)  => {
     const request = {
-        RoomNumber : values.roomNumber,
-        BedsNumber : values.bedsNumber,
-        PaymentPerDay : values.PaymentPerDay
-      }; 
-    const CreateRoom = async () => {
+        Name : values.name,
+        Payment : values.payment
+      };
+
+    const CreateService = async () => {
 
         await  API
-        .post('/rooms/'+ hotelId,request, {
+        .post('/services/'+ hotelId,request, {
           headers: { Authorization: "Bearer " + token,},
           })
         .then(response => response.data)
         .then((data) => {
-          console.log(hotelId);
         })
         .catch((error) => console.log(error.response.data.message));
       };
-      if(room===undefined){
-       await CreateRoom();
+      if(service===undefined){
+       await CreateService();
         handleClose();
         callAddAlert();
       }
       else{
-        await UpdateRoom(request);
+        await UpdateService(request);
         handleClose();
         callUpdateAlert();
       }
@@ -84,9 +82,9 @@ export default function AddHotelForm({hotelId,room,handleClose,callAddAlert,call
     setShowAlert(true);
     }
 
-      const UpdateRoom = async (request) => {
+      const UpdateService= async (request) => {
         await  API
-        .put('/rooms/'+ room.id,request,{
+        .put('/services/'+ service.id,request,{
             headers: { Authorization: "Bearer " + token}
           })
         .then(response => response.data)
@@ -114,11 +112,11 @@ export default function AddHotelForm({hotelId,room,handleClose,callAddAlert,call
                 variant="outlined"
                 required
                 fullWidth
-                name="roomNumber"
-                label="Room number"
-                error={props.errors.roomNumber && props.touched.roomNumber}
-                helperText={<ErrorMessage name='roomNumber' />}
-                id="roomNumber"
+                name="name"
+                label="Name"
+                error={props.errors.name && props.touched.name}
+                helperText={<ErrorMessage name='name' />}
+                id="name"
               />
             </Grid>
             <Grid item xs={12}>
@@ -126,23 +124,11 @@ export default function AddHotelForm({hotelId,room,handleClose,callAddAlert,call
                 variant="outlined"
                 required
                 fullWidth
-                name="bedsNumber"
-                label="beds amount"
-                error={props.errors.bedsNumber && props.touched.bedsNumber}
-                helperText={<ErrorMessage name='bedsNumber' />}
-                id="bedsNumber"
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Field as = {TextField}
-                variant="outlined"
-                required
-                fullWidth
-                name="paymentPerDay"
-                label="Payment per day"
-                error={props.errors.paymentPerDay && props.touched.paymentPerDay}
-                helperText={<ErrorMessage name='paymentPerDay' />}
-                id="paymentPerDay"
+                name="payment"
+                label="Payment"
+                error={props.errors.payment && props.touched.payment}
+                helperText={<ErrorMessage name='payment' />}
+                id="payment"
               />
             </Grid>
           </Grid>
@@ -168,5 +154,4 @@ export default function AddHotelForm({hotelId,room,handleClose,callAddAlert,call
     </Container>
   </>
   );
-
         }
