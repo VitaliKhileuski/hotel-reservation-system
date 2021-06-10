@@ -68,7 +68,7 @@ export default function RoomTable({hotelId}){
       .catch((error) => console.log(error.response.data.message));
     };
   loadRooms();     
-  },[rowsPerPage, page, openDialog,openDeleteDialog])
+  },[rowsPerPage,page,openDialog,openDeleteDialog])
 
     
    const handleChangePage = (event, newPage) => {
@@ -79,6 +79,8 @@ export default function RoomTable({hotelId}){
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
+    setPage(0);
+    SetPageForRequest(1);
     
   };
   function OpenAddRoomDialog(room){

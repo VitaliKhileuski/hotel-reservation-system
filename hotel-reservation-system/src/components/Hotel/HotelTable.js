@@ -11,6 +11,9 @@ import BaseAlert from './../shared/BaseAlert';
 import BaseAddDialog from './../shared/BaseAddDialog';
 import AddHotelForm from './AddHotelForm';
 import BaseDeleteDialog from './../shared/BaseDeleteDialog'
+import PersonAddIcon from '@material-ui/icons/PersonAdd';
+import PersonAddDisabledIcon from '@material-ui/icons/PersonAddDisabled';
+import HotelAdminDialog from './HotelAdminDialog'
 
 
 
@@ -38,6 +41,8 @@ export default function HotelTable(){
     const [open,setOpen] = useState(false);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [hotelId, setHotelId] = useState();
+    const [flag, setFlag] = useState(false);
+    const [message, setMessage] = useState('');
 
 
     const [addAlertOpen,setAddAlertOpen] = useState(false);
@@ -50,6 +55,11 @@ export default function HotelTable(){
     handleClose={() => handleClose()}
     callAlert={() => callAddAlert()}>
    </AddHotelForm>;
+   let component = <HotelAdminDialog
+   hotelId={hotelId}
+   message={message}
+   handleClose ={() => handleClose()}>
+   </HotelAdminDialog>;
 
   useEffect(() => {
     const loadHotels = async () => {
@@ -64,7 +74,7 @@ export default function HotelTable(){
       .catch((error) => console.log(error.response.data.message));
     };
     loadHotels();     
-  },[rowsPerPage, page,open,openDeleteDialog])
+  },[rowsPerPage,page,open,openDeleteDialog])
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -74,12 +84,14 @@ export default function HotelTable(){
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
+    setPage(0);
+    SetPageForRequest(1);
     
   };
 
   function handleClose(){
-    console.log("close")
      setOpen(false);
+     setFlag(false);
   }
 
   function OpenAddHotelDialog(){
@@ -137,6 +149,17 @@ export default function HotelTable(){
     setAddAlertOpen(false);
     setDeleteAlertOpen(false);
   };
+  function SetAdmin(hotelId){
+    setMessage("add admin");
+    setFlag(true);
+    setHotelId(hotelId);
+    OpenAddHotelDialog();
+  }
+  function DeleteAdmin(hotelId){
+     SetAdmin(hotelId);
+     setMessage("delete admin");
+
+  }
     
     if(!isLogged || role==='User'){
         return <Redirect to='/home'></Redirect>
@@ -193,6 +216,8 @@ export default function HotelTable(){
                       </TableCell>
                     <TableCell style={{ minWidth: 30 }}/>
                     <TableCell style={{ minWidth: 30 }}/>
+                    <TableCell style={{ minWidth: 30 }}/>
+                    <TableCell style={{ minWidth: 30 }}/>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -229,9 +254,21 @@ export default function HotelTable(){
                           </IconButton>
                         </TableCell>
                         <TableCell>
-                           <IconButton color="inherit"
-                           onClick = {() => callAlertDialog(hotel.id)}>
+                           <IconButton
+                            color="inherit"
+                            onClick = {() => callAlertDialog(hotel.id)}>
                            <DeleteIcon></DeleteIcon>
+                           </IconButton>
+                           <IconButton
+                            color="inherit"
+                            onClick  = {() => SetAdmin(hotel.id)}
+                           >
+                           <PersonAddIcon></PersonAddIcon>
+                           </IconButton>
+                           <IconButton
+                            color="inherit"
+                            onClick = {() => DeleteAdmin(hotel.id)}>
+                           <PersonAddDisabledIcon></PersonAddDisabledIcon>
                            </IconButton>
                         </TableCell>
                       </TableRow>
@@ -259,7 +296,7 @@ export default function HotelTable(){
             onClick={OpenAddHotelDialog}>
             Add hotel
           </Button>
-          <BaseAddDialog open={open} handleClose={handleClose} callAlert={callAddAlert} form ={form}></BaseAddDialog>
+          <BaseAddDialog open={open} handleClose={handleClose}  form ={flag===true ? component : form}></BaseAddDialog>
           <BaseDeleteDialog
            open={openDeleteDialog}
             handleCloseDeleteDialog={handleCloseDeleteDialog}

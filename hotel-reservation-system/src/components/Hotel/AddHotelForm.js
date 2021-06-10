@@ -40,7 +40,6 @@ export default function AddHotelForm({hotel,handleClose,callAlert,callUpdateAler
 
   const classes = useStyles();
   const [users,setUsers] = useState([]);
-  const [admin,setAdmin] = useState(hotel===undefined ? '' : hotel.admin);
   const [showAlert,setShowAlert] = useState(false);
   const token = localStorage.getItem("token");
   useEffect(() => {
@@ -88,7 +87,7 @@ export default function AddHotelForm({hotel,handleClose,callAlert,callUpdateAler
     const CreateHotel = async () => {
 
         await  API
-        .post('/hotels/'+ admin.id,request, {
+        .post('/hotels/',request, {
           headers: { Authorization: "Bearer " + token,},
           })
         .then(response => response.data)
@@ -101,7 +100,6 @@ export default function AddHotelForm({hotel,handleClose,callAlert,callUpdateAler
       }
       else{
         await UpdateHotel(request);
-        UpdateHotelAdmin();
         callUpdateAlert();
         toRoomSection();
       }
@@ -121,17 +119,7 @@ export default function AddHotelForm({hotel,handleClose,callAlert,callUpdateAler
         })
         .catch((error) => console.log(error.response.data.message));
       };
-      const UpdateHotelAdmin = async () => {
-        await API
-        .put('hotels/'+hotel.id+'/'+admin.id+'/setHotelAdmin',{
-          headers: { Authorization: "Bearer " + token}
-        })
-      .then(response => response.data)
-      .then((data) => {
-      })
-      .catch((error) => console.log(error.response.data.message));
-      };
-
+      
 
   return (
     <>
@@ -142,16 +130,6 @@ export default function AddHotelForm({hotel,handleClose,callAlert,callUpdateAler
         {(props) =>(
         <Form className={classes.form}>
           <Grid container spacing={2}>
-        <Grid item xs ={12}>
-        <Autocomplete 
-                id="hotelAdmin"
-                options={users}
-                value={hotel===undefined ? users[0] : admin} 
-                onChange={(event, value) => setAdmin(value)}
-                getOptionLabel={(option) => `${option.name} ${option.surname}(${option.email})`}
-                renderInput={(params) => <TextField  {...params} label="choose hotel admin" variant="outlined" />}
-                />
-        </Grid>
           <Grid item xs={12}>
               <Field as = {TextField}
                 variant="outlined"
