@@ -50,7 +50,11 @@ export default function AddHotelForm({hotelId,room,handleClose,callAddAlert,call
   const validationSchema = Yup.object().shape({
     roomNumber: Yup.string().required("room Number is required"),
     bedsNumber: Yup.number("beds number must be a number").required("beds number is required"),
-    paymentPerDay: Yup.number("payment per day must be a number").required("payment per day is required")
+    paymentPerDay: Yup.number("payment per day must be a number").required("payment per day is required").test(
+      'is-decimal',
+      'invalid decimal',
+      value => (value + "").match(/^\d*\.{1}\d*$/),
+    ),
   })
   const onSubmit = async (values)  => {
     const request = {
@@ -58,6 +62,7 @@ export default function AddHotelForm({hotelId,room,handleClose,callAddAlert,call
         BedsNumber : values.bedsNumber,
         PaymentPerDay : values.PaymentPerDay
       }; 
+      console.log(request.PaymentPerDay)
     const CreateRoom = async () => {
 
         await  API

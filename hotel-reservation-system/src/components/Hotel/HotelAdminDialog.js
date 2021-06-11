@@ -44,7 +44,7 @@ export default function HotelAdminDialog({hotelId,message,handleClose,callAssign
     useEffect(() => {
         const loadUsers = async () => {
           await  API
-          .get('/users/'+hotelId, {
+          .get('/users/'+hotelId+'/getPotentialHotelAdmins', {
             headers: { Authorization: "Bearer " + token}
           })
           .then(response => response.data)
@@ -89,10 +89,35 @@ export default function HotelAdminDialog({hotelId,message,handleClose,callAssign
       .catch((error) => console.log(error.response.data.message));
       };
 
+      const DeleteHotelAdmin = async () => {
+        await API
+        .put('hotels/'+hotelId+'/'+admin.id+'/deleteHotelAdmin',{
+          headers: { Authorization: "Bearer " + token}
+        })
+      .then(response => response.data)
+      .then((data) => {
+      })
+      .catch((error) => console.log(error.response.data.message));
+      };
+
       function updateHotelAdmin(){
         UpdateHotelAdmin();
         handleClose();
         callAssignAdminAlert();
+      }
+
+      function deleteHotelAdmin(){
+        DeleteHotelAdmin();
+        handleClose();
+        callDeleteAdminAlert();
+      }
+      function actionWithAdmin(){
+        if(assingFlag===true){
+          updateHotelAdmin();
+        }
+        else{
+          deleteHotelAdmin();
+        }
       }
 
     return (
@@ -120,7 +145,7 @@ export default function HotelAdminDialog({hotelId,message,handleClose,callAssign
                       variant="contained"
                       color="primary"
                       className={classes.submit}
-                      onClick = {() => updateHotelAdmin()}
+                      onClick = {() => actionWithAdmin()}
                     >
                       {message}
                     </Button>

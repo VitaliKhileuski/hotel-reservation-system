@@ -42,24 +42,9 @@ export default function AddHotelForm({hotel,handleClose,callAlert,callUpdateAler
   const [users,setUsers] = useState([]);
   const [showAlert,setShowAlert] = useState(false);
   const token = localStorage.getItem("token");
-  useEffect(() => {
-    const loadUsers = async () => {
-      await  API
-      .get('/users', {
-        headers: { Authorization: "Bearer " + token}
-      })
-      .then(response => response.data)
-      .then((data) => {
-          console.log(data);
-        if(data!==undefined)
-        setUsers(data);
-      })
-      .catch((error) => console.log(error));
-
-    };
-    loadUsers();
-  },[])
-
+  const [buildingNumberLabelError, setBuildingNumberLabelError] = useState('');
+  const [buildingNumber,setBuildingNumber] = useState(hotel===undefined ? '' : hotel.location.buildingNumber);
+  
   const initialValues = {
     name: hotel===undefined ? '' : hotel.name,
     country:hotel===undefined ? '' : hotel.location.country,
@@ -71,7 +56,6 @@ export default function AddHotelForm({hotel,handleClose,callAlert,callUpdateAler
     name: Yup.string().required("name is required"),
     country: Yup.string().required("country is required"),
     street : Yup.string().required("street is required"),
-    buildingNumber: Yup.string().required('building number is required')
   })
   const onSubmit = async (values)  => {
     const request = {
@@ -80,7 +64,7 @@ export default function AddHotelForm({hotel,handleClose,callAlert,callUpdateAler
           Country : values.country,
           City : values.city,
           Street : values.street,
-          buildingNumber : values.buildingNumber
+          buildingNumber : buildingNumber
 
       } 
     };
@@ -92,21 +76,23 @@ export default function AddHotelForm({hotel,handleClose,callAlert,callUpdateAler
           })
         .then(response => response.data)
         .then((data) => {
+          handleClose();
+          callAlert();
+          setShowAlert(true);
         })
-        .catch((error) => console.log(error.response.data.message));
+        .catch((error) => {
+          console.log(error.response.data.Message)
+          setBuildingNumberLabelError(error.response.data.Message);
+        });
       };
       if(hotel===undefined){
         await CreateHotel();
+        
       }
       else{
         await UpdateHotel(request);
-        callUpdateAlert();
-        toRoomSection();
       }
     
-    handleClose();
-    callAlert();
-    setShowAlert(true);
     }
 
       const UpdateHotel = async (request) => {
@@ -116,9 +102,23 @@ export default function AddHotelForm({hotel,handleClose,callAlert,callUpdateAler
           })
         .then(response => response.data)
         .then((data) => {
+          callUpdateAlert();
+          toRoomSection(); 
         })
-        .catch((error) => console.log(error.response.data.message));
+        .catch((error) =>{
+          console.log(error.response.data.message);
+          setBuildingNumberLabelError(error.response.data.Message);
+        });
       };
+      function ValidateLocation(buildingNumber){
+        setBuildingNumberLabelError('')
+        
+        if(buildingNumber===''){
+          setBuildingNumberLabelError("building number is reqired");
+        }
+        setBuildingNumber(buildingNumber);
+      }
+      
       
 
   return (
@@ -186,9 +186,10 @@ export default function AddHotelForm({hotel,handleClose,callAlert,callUpdateAler
                 id="buildingNumber"
                 label="Building Number"
                 name="buildingNumber"
-                error={props.errors.buildingNumber && props.touched.buildingNumber}
-                helperText={<ErrorMessage name='buildingNumber' />}
-                autoComplete="buildingNumber"
+                value = {buildingNumber}
+                onChange = {(e) => ValidateLocation(e.target.value)}
+                error={buildingNumberLabelError!==''}
+                helperText={buildingNumberLabelError}
               />
             </Grid>
           </Grid>

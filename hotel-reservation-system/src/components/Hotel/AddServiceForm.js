@@ -39,7 +39,9 @@ export default function AddServiceForm({hotelId,service,handleClose,callAddAlert
 
   const classes = useStyles();
   const [showAlert,setShowAlert] = useState(false);
+  const [serviceName,setServiceName] = useState(service===undefined ? '' : service.name);
   const token = localStorage.getItem("token");
+  const [serviceNameErrorLabel,setServiceNameErrorLabel] = useState('');
   
 
   const initialValues = {
@@ -47,13 +49,12 @@ export default function AddServiceForm({hotelId,service,handleClose,callAddAlert
     payment: service===undefined ? '' : service.payment,
   }
   const validationSchema = Yup.object().shape({
-    name: Yup.string().required("name is required"),
     payment: Yup.number("payment must be a number").required("payment is required")
   })
 
   const onSubmit = async (values)  => {
     const request = {
-        Name : values.name,
+        Name : serviceName,
         Payment : values.payment
       };
 
@@ -65,33 +66,48 @@ export default function AddServiceForm({hotelId,service,handleClose,callAddAlert
           })
         .then(response => response.data)
         .then((data) => {
+          handleClose();
+        callAddAlert();
+        setShowAlert(true);
         })
-        .catch((error) => console.log(error.response.data.message));
+        .catch((error) => {
+          console.log(error.response.data.message);
+          setServiceNameErrorLabel(error.response.data.Message);
+        });
       };
       if(service===undefined){
        await CreateService();
-        handleClose();
-        callAddAlert();
       }
       else{
         await UpdateService(request);
-        handleClose();
-        callUpdateAlert();
       }
   
-    setShowAlert(true);
     }
 
-      const UpdateService= async (request) => {
+      const UpdateService = async (request) => {
         await  API
         .put('/services/'+ service.id,request,{
             headers: { Authorization: "Bearer " + token}
           })
         .then(response => response.data)
         .then((data) => {
+          handleClose();
+        callUpdateAlert();
         })
-        .catch((error) => console.log(error.response.data.message));
+        .catch((error) =>{
+          console.log(error.response.data.Message);
+          setServiceNameErrorLabel(error.response.data.Message);
+        });
       };
+
+      function ValidateServiceName(serviceName){
+        setServiceNameErrorLabel('')
+        
+        if(serviceName===''){
+          setServiceNameErrorLabel("name is reqired");
+        }
+        setServiceName(serviceName);
+      }
       
 
 
@@ -114,8 +130,10 @@ export default function AddServiceForm({hotelId,service,handleClose,callAddAlert
                 fullWidth
                 name="name"
                 label="Name"
-                error={props.errors.name && props.touched.name}
-                helperText={<ErrorMessage name='name' />}
+                value = {serviceName}
+                onChange = {(e) => ValidateServiceName(e.target.value)}
+                error={serviceNameErrorLabel!==''}
+                helperText={serviceNameErrorLabel}
                 id="name"
               />
             </Grid>
