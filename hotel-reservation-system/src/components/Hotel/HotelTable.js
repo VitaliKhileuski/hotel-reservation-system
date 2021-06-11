@@ -43,10 +43,13 @@ export default function HotelTable(){
     const [hotelId, setHotelId] = useState();
     const [flag, setFlag] = useState(false);
     const [message, setMessage] = useState('');
+    const [assingFlag, setAssignFlag] = useState(false);
 
 
     const [addAlertOpen,setAddAlertOpen] = useState(false);
     const [deleteAlertOpen,setDeleteAlertOpen] = useState(false)
+    const [assignAdminAlertOpen,setAssignAdminAlertOpen] = useState(false);
+    const [deleteAdminAlertOpen,setDeleteAdminAlertOpen] = useState(false);
     
     const isLogged = useSelector((state) => state.isLogged);
     let hotelAdminField = ''
@@ -58,7 +61,10 @@ export default function HotelTable(){
    let component = <HotelAdminDialog
    hotelId={hotelId}
    message={message}
-   handleClose ={() => handleClose()}>
+   handleClose ={() => handleClose()}
+   callAssignAdminAlert = {() => callAssignAdminAlert()}
+   callDeleteAdminAlert = {() => callDeleteAdminAlert()}
+   assingFlag = {assingFlag}>
    </HotelAdminDialog>;
 
   useEffect(() => {
@@ -140,6 +146,12 @@ export default function HotelTable(){
   function callDeleteAlert(){
     setDeleteAlertOpen(true);
   }
+  function callAssignAdminAlert(){
+    setAssignAdminAlertOpen(true);
+  }
+  function callDeleteAdminAlert(){
+    setDeleteAdminAlertOpen(true);
+  }
   
   const handleCloseAlert = (event, reason) => {
     if (reason === 'clickaway') {
@@ -148,15 +160,19 @@ export default function HotelTable(){
 
     setAddAlertOpen(false);
     setDeleteAlertOpen(false);
+    setAssignAdminAlertOpen(false);
+    setDeleteAdminAlertOpen(false);
   };
   function SetAdmin(hotelId){
     setMessage("add admin");
     setFlag(true);
+    setAssignFlag(true);
     setHotelId(hotelId);
     OpenAddHotelDialog();
   }
   function DeleteAdmin(hotelId){
      SetAdmin(hotelId);
+     setAssignFlag(false);
      setMessage("delete admin");
 
   }
@@ -208,12 +224,6 @@ export default function HotelTable(){
                       >
                       Building Number
                       </TableCell>
-                      <TableCell
-                        align='right'
-                        style={{ minWidth: 170 }}
-                      >
-                      Hotel Admin
-                      </TableCell>
                     <TableCell style={{ minWidth: 30 }}/>
                     <TableCell style={{ minWidth: 30 }}/>
                     <TableCell style={{ minWidth: 30 }}/>
@@ -241,19 +251,12 @@ export default function HotelTable(){
                         <TableCell align='right'>
                           {hotel.location.buildingNumber}
                         </TableCell>
-                        <TableCell align='right'>
-                           { hotelAdminField = hotel.admin === null ? "not assigned" : hotel.admin.name + " " + hotel.admin.surname} 
-                           <br></br>
-                           {hotel.admin===null ? '' : "("+hotel.admin.email+")"}
-                        </TableCell>
                         <TableCell>
                           <IconButton
                             color="inherit"
                             onClick={() => toHotelEditor(hotel)}>
                           <EditIcon ></EditIcon>
                           </IconButton>
-                        </TableCell>
-                        <TableCell>
                            <IconButton
                             color="inherit"
                             onClick = {() => callAlertDialog(hotel.id)}>
@@ -307,6 +310,8 @@ export default function HotelTable(){
           
           <BaseAlert open={addAlertOpen} handleClose = {handleCloseAlert} message = {'hotel added successfully'}></BaseAlert>
           <BaseAlert open ={deleteAlertOpen} handleClose ={handleCloseAlert} message = {'hotel deleted succesfully'}></BaseAlert>
+          <BaseAlert open={assignAdminAlertOpen} handleClose = {handleCloseAlert} message = {' hotel admin assigned successfully'}></BaseAlert>
+          <BaseAlert open={deleteAdminAlertOpen} handleClose = {handleCloseAlert} message = {'hotel admin deleted successfully'}></BaseAlert>
           </>
         );
 }

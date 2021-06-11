@@ -33,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
   }));
 
 
-export default function HotelAdminDialog({hotelId,message,handleClose}){
+export default function HotelAdminDialog({hotelId,message,handleClose,callAssignAdminAlert,callDeleteAdminAlert,assingFlag}){
 
     const classes = useStyles();
     const [users,setUsers] = useState([]);
@@ -44,7 +44,7 @@ export default function HotelAdminDialog({hotelId,message,handleClose}){
     useEffect(() => {
         const loadUsers = async () => {
           await  API
-          .get('/users', {
+          .get('/users/'+hotelId, {
             headers: { Authorization: "Bearer " + token}
           })
           .then(response => response.data)
@@ -54,9 +54,28 @@ export default function HotelAdminDialog({hotelId,message,handleClose}){
             setUsers(data);
           })
           .catch((error) => console.log(error));
-    
-        };
-        loadUsers();
+        }
+
+          const loadAdmins = async () => {
+            await API
+            .get('hotels/'+hotelId+'/getHotelAdmins', {
+              headers: { Authorization: "Bearer " + token}
+            })
+            .then(response => response.data)
+            .then((data) => {
+                console.log(data);
+              if(data!==undefined)
+              setUsers(data);
+            })
+            .catch((error) => console.log(error));
+          };
+
+        if(assingFlag===true){
+          loadUsers();
+        }
+        else{
+          loadAdmins();
+        }
       },[])
 
       const UpdateHotelAdmin = async () => {
@@ -69,9 +88,11 @@ export default function HotelAdminDialog({hotelId,message,handleClose}){
       })
       .catch((error) => console.log(error.response.data.message));
       };
+
       function updateHotelAdmin(){
         UpdateHotelAdmin();
         handleClose();
+        callAssignAdminAlert();
       }
 
     return (
