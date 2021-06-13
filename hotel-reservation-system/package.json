@@ -18,6 +18,7 @@
     "material-table": "^1.69.3",
     "material-ui-phone-number": "^2.2.6",
     "materialui-pagination": "0.0.6",
+    "prettier": "^2.3.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-hook-form": "^7.6.5",

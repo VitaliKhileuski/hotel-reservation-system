@@ -1,14 +1,14 @@
-import {React, useState} from 'react';
-import PropTypes from 'prop-types';
-import { makeStyles } from '@material-ui/core/styles';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import Typography from '@material-ui/core/Typography';
-import {Box,Button} from '@material-ui/core';
-import AddHotelForm from './AddHotelForm';
-import BaseAlert from './../shared/BaseAlert'
-import RoomTable from './RoomTable';
-import ServiceTable from './ServiceTable';
+import { React, useState } from "react";
+import PropTypes from "prop-types";
+import { makeStyles } from "@material-ui/core/styles";
+import Tabs from "@material-ui/core/Tabs";
+import Tab from "@material-ui/core/Tab";
+import Typography from "@material-ui/core/Typography";
+import { Box, Button } from "@material-ui/core";
+import AddHotelForm from "./AddHotelForm";
+import BaseAlert from "./../shared/BaseAlert";
+import RoomTable from "./RoomTable";
+import ServiceTable from "./ServiceTable";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -39,41 +39,41 @@ const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 3,
     backgroundColor: theme.palette.background.paper,
-    display: 'flex',
+    display: "flex",
   },
   section: {
-    width : '80%',
-    alignItems : 'center'
+    width: "80%",
+    alignItems: "center",
   },
-  serviceSection : {
-    width : '40%'
+  serviceSection: {
+    width: "40%",
   },
-  createRoomButton : {
-    marginTop : 10
-  }
+  createRoomButton: {
+    marginTop: 10,
+  },
 }));
 
 export default function HotelEditor(props) {
   const classes = useStyles();
   const [value, setValue] = useState(0);
-  const [hotel,setHotel] = useState(props.location.state.hotel);
+  const [hotel, setHotel] = useState(props.location.state.hotel);
   const [updateAlertOpen, setUpdateAlertOpen] = useState(false);
   console.log(props);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
-  function callUpdateAlert(){
+  function callUpdateAlert() {
     setUpdateAlertOpen(true);
   }
-  
+
   const handleCloseUpdateAlert = (event, reason) => {
-    if (reason === 'clickaway') {
+    if (reason === "clickaway") {
       return;
     }
     setUpdateAlertOpen(false);
-  }
-  function toRoomSection(){
+  };
+  function toRoomSection() {
     setValue(1);
   }
 
@@ -81,31 +81,33 @@ export default function HotelEditor(props) {
     <div className={classes.root}>
       <Tabs
         orientation="vertical"
-
         value={value}
         onChange={handleChange}
         aria-label="Vertical tabs example"
         className={classes.tabs}
       >
-        <Tab label="Main Info"/>
-        <Tab label="Rooms"/>
-        <Tab label="Services"/>
+        <Tab label="Main Info" />
+        <Tab label="Rooms" />
+        <Tab label="Services" />
       </Tabs>
       <TabPanel value={value} index={0}>
-        <AddHotelForm toRoomSection ={toRoomSection} hotel = {hotel} callUpdateAlert={callUpdateAlert}></AddHotelForm>
+        <AddHotelForm
+          toRoomSection={toRoomSection}
+          hotel={hotel}
+          callUpdateAlert={callUpdateAlert}
+        ></AddHotelForm>
       </TabPanel>
       <TabPanel className={classes.section} value={value} index={1}>
-        <RoomTable
-        hotelId ={hotel.id}>
-        </RoomTable>
+        <RoomTable hotelId={hotel.id}></RoomTable>
       </TabPanel>
       <TabPanel className={classes.serviceSection} value={value} index={2}>
-        <ServiceTable
-        hotelId ={hotel.id}>
-
-        </ServiceTable>
+        <ServiceTable hotelId={hotel.id}></ServiceTable>
       </TabPanel>
-      <BaseAlert open ={updateAlertOpen}  handleClose ={handleCloseUpdateAlert} message = {'hotel updated succesfully'}></BaseAlert>
+      <BaseAlert
+        open={updateAlertOpen}
+        handleClose={handleCloseUpdateAlert}
+        message={"hotel updated succesfully"}
+      ></BaseAlert>
     </div>
   );
 }
