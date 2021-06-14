@@ -16,6 +16,7 @@
     "date-fns": "^2.21.3",
     "formik": "^2.2.8",
     "material-table": "^1.69.3",
+    "material-ui-dropzone": "^3.5.0",
     "material-ui-phone-number": "^2.2.6",
     "materialui-pagination": "0.0.6",
     "prettier": "^2.3.1",

@@ -10,6 +10,7 @@ import BaseAlert from "./../shared/BaseAlert";
 import RoomTable from "./RoomTable";
 import ServiceTable from "./ServiceTable";
 import { useSelector } from "react-redux";
+import BaseImageDialog from './../shared/BaseImageDialog'
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -59,7 +60,8 @@ export default function HotelEditor(props) {
   const [value, setValue] = useState(0);
   const [hotel, setHotel] = useState(props.location.state.hotel);
   const [updateAlertOpen, setUpdateAlertOpen] = useState(false);
-  console.log(props);
+  const [imageDialogOpen, setImageDialogOpen] = useState(false);
+
   const role = useSelector((state) => state.role)
 
   const handleChange = (event, newValue) => {
@@ -67,6 +69,9 @@ export default function HotelEditor(props) {
   };
   function callUpdateAlert() {
     setUpdateAlertOpen(true);
+  }
+  function callImageDialog(){
+    setImageDialogOpen(true);
   }
 
   const handleCloseUpdateAlert = (event, reason) => {
@@ -78,6 +83,9 @@ export default function HotelEditor(props) {
   function toRoomSection() {
     setValue(1);
   }
+  function handleCloseImageDialog(){
+    setImageDialogOpen(false);
+  }
 
   return (
     <div className={classes.root}>
@@ -88,28 +96,38 @@ export default function HotelEditor(props) {
         aria-label="Vertical tabs example"
         className={classes.tabs}
       >
-        {
-          role==='Admin' ? <Tab label="Main Info" /> : ''
-        }
+        
+        <Tab label="Main Info" />
         <Tab label="Rooms" />
         <Tab label="Services" />
       </Tabs>
-      {
-        role==='Admin' ? <TabPanel value={value} index={0}>
-        <AddHotelForm
+      
+        <TabPanel value={value} index={0}>
+        {role==='Admin' ? <AddHotelForm
           toRoomSection={toRoomSection}
           hotel={hotel}
           callUpdateAlert={callUpdateAlert}
         ></AddHotelForm>
+        : ''}
+      <Button
+        variant="contained"
+        color="primary"
+        onClick= {() => {callImageDialog()}}>
+          Upload hotel image
+        </Button>  
       </TabPanel>
-      : ''
-      }
-      <TabPanel className={classes.section} value={value} index={role==='Admin' ? 1 : 0}>
+      
+      <TabPanel className={classes.section} value={value} index={1}>
         <RoomTable hotelId={hotel.id}></RoomTable>
       </TabPanel>
-      <TabPanel className={classes.serviceSection} value={value} index={role==='Admin' ? 2 : 1}>
+      <TabPanel className={classes.serviceSection} value={value} index={2}>
         <ServiceTable hotelId={hotel.id}></ServiceTable>
       </TabPanel>
+      <BaseImageDialog
+      hotelId = {hotel.id}
+       open = {imageDialogOpen}
+       handleClose = {() => handleCloseImageDialog()}
+        ></BaseImageDialog>
       <BaseAlert
         open={updateAlertOpen}
         handleClose={handleCloseUpdateAlert}

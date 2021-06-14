@@ -59,7 +59,7 @@ export default function AddHotelForm({
     const request = {
       RoomNumber: values.roomNumber,
       BedsNumber: values.bedsNumber,
-      PaymentPerDay: values.PaymentPerDay,
+      PaymentPerDay: values.paymentPerDay,
     };
     console.log(request.PaymentPerDay);
     const CreateRoom = async () => {
@@ -80,6 +80,7 @@ export default function AddHotelForm({
       await UpdateRoom(request);
       handleClose();
       callUpdateAlert();
+      console.log("update");
     }
 
     setShowAlert(true);
