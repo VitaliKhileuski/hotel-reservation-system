@@ -11,7 +11,7 @@ import {
   Redirect,
 } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { IS_LOGGED, NAME, ROLE } from "./storage/actions/actionTypes";
+import { IS_LOGGED, NAME, ROLE, USER_ID } from "./storage/actions/actionTypes";
 import HotelTable from "./components/Hotel/HotelTable";
 import HotelEditor from "./components/Hotel/HotelEditor";
 import createAuthRefreshInterceptor from "axios-auth-refresh";
@@ -29,7 +29,10 @@ export default function App() {
         updateStorage(tokenRefreshResponse.data[0]);
         return Promise.resolve();
       }
-    );
+    )
+    .catch((error) => {
+        logout();
+    });
 
   createAuthRefreshInterceptor(API, refreshAuthLogic);
 
@@ -50,11 +53,14 @@ export default function App() {
       }
 
     } else {
-      localStorage.removeItem("refreshToken");
+      logout();
+    }
+  }
+  function logout(){
+    localStorage.removeItem("refreshToken");
       localStorage.removeItem("token");
       dispatch({ type: IS_LOGGED, isLogged: false });
       dispatch({ type: ROLE, role: "" });
-    }
   }
 
   useEffect(() => {
@@ -66,6 +72,7 @@ export default function App() {
              dispatch({ type: NAME, name: jwt.firstname });
              dispatch({ type: IS_LOGGED, isLogged: true});
              dispatch({type : ROLE, role : jwt.role}); 
+             dispatch({ type: USER_ID, userId: jwt.id });
   }
 
   return (

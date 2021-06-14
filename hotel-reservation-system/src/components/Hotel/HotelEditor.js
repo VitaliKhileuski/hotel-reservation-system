@@ -9,6 +9,7 @@ import AddHotelForm from "./AddHotelForm";
 import BaseAlert from "./../shared/BaseAlert";
 import RoomTable from "./RoomTable";
 import ServiceTable from "./ServiceTable";
+import { useSelector } from "react-redux";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -59,6 +60,7 @@ export default function HotelEditor(props) {
   const [hotel, setHotel] = useState(props.location.state.hotel);
   const [updateAlertOpen, setUpdateAlertOpen] = useState(false);
   console.log(props);
+  const role = useSelector((state) => state.role)
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -86,21 +88,26 @@ export default function HotelEditor(props) {
         aria-label="Vertical tabs example"
         className={classes.tabs}
       >
-        <Tab label="Main Info" />
+        {
+          role==='Admin' ? <Tab label="Main Info" /> : ''
+        }
         <Tab label="Rooms" />
         <Tab label="Services" />
       </Tabs>
-      <TabPanel value={value} index={0}>
+      {
+        role==='Admin' ? <TabPanel value={value} index={0}>
         <AddHotelForm
           toRoomSection={toRoomSection}
           hotel={hotel}
           callUpdateAlert={callUpdateAlert}
         ></AddHotelForm>
       </TabPanel>
-      <TabPanel className={classes.section} value={value} index={1}>
+      : ''
+      }
+      <TabPanel className={classes.section} value={value} index={role==='Admin' ? 1 : 0}>
         <RoomTable hotelId={hotel.id}></RoomTable>
       </TabPanel>
-      <TabPanel className={classes.serviceSection} value={value} index={2}>
+      <TabPanel className={classes.serviceSection} value={value} index={role==='Admin' ? 2 : 1}>
         <ServiceTable hotelId={hotel.id}></ServiceTable>
       </TabPanel>
       <BaseAlert

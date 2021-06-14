@@ -60,8 +60,6 @@ function NavBar() {
     }
   }
 
-  // return focus to the button when we transitioned from !open -> open
-
   const Logout = () => {
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("token");
@@ -111,7 +109,7 @@ function NavBar() {
                           id="menu-list-grow"
                           onKeyDown={handleListKeyDown}
                         >
-                          {role === "Admin" ? (
+                          {role !== "User" ? (
                             <Link to="/ownedHotels" className={classes.link}>
                               <MenuItem onClick={handleClose}>
                                 Owned hotels

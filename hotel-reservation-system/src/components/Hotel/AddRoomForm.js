@@ -54,9 +54,6 @@ export default function AddHotelForm({
     ),
     paymentPerDay: Yup.number("payment per day must be a number")
       .required("payment per day is required")
-      .test("is-decimal", "invalid decimal", (value) =>
-        (value + "").match(/^\d*\.{1}\d*$/)
-      ),
   });
   const onSubmit = async (values) => {
     const request = {
