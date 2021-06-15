@@ -8,6 +8,7 @@ export default function BaseImageDialog({
   open,
   hotelId,
   handleClose,
+  updateMainInfo
 }) {
 
     const [fileObjects, setFileObjects] = useState([]);
@@ -15,19 +16,25 @@ export default function BaseImageDialog({
     const adminId = useSelector((state) => state.userId);
     const token = localStorage.getItem('token');
   
-    function saveImages(){
+   async function saveImages(){
        if(hotelId!==undefined){
         var base64Image = fileObjects[0].data.split(',')[1];
-        setImageToHotel(base64Image);
+        const request = {
+           Image : base64Image
+         }
+        
+        const setImageToHotel = async () => {
+          await API.post("/images/" + hotelId+'/' + adminId+"/"+'setHotelImage',request, {
+            headers: { Authorization: "Bearer " + token },
+          }).catch((error) => console.log(error.response.data.message));
+        };
+        setImageToHotel();
+        updateMainInfo();
         handleClose();
        }
     }
 
-        const setImageToHotel = async (base64Image) => {
-          await API.put("/images/" + hotelId+'/' + adminId,base64Image, {
-            headers: { Authorization: "Bearer " + token },
-          }).catch((error) => console.log(error.response.data.message));
-        };
+        
     
     function deleteFile(file){
                 var index = fileObjects.indexOf(file);

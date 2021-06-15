@@ -12,7 +12,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import API from "../api";
 import HotelList from "./HotelList";
 import Pagination from "@material-ui/lab/Pagination";
-import { Redirect } from "react-router";
+import { Redirect , useHistory } from "react-router";
 
 const useStyles = makeStyles((theme) => ({
   option: {
@@ -47,6 +47,7 @@ export default function Home() {
   const [page, setPage] = useState(1);
   const [maxPage, setMaxPage] = useState(1);
   const pageSize = 8;
+  const history = useHistory();
 
   useEffect(() => {
     const loadCountries = async () => {

@@ -39,7 +39,7 @@ export default function AddHotelForm({
   handleClose,
   callAlert,
   callUpdateAlert,
-  toRoomSection,
+  updateMainInfo
 }) {
   const classes = useStyles();
   const [users, setUsers] = useState([]);
@@ -101,7 +101,7 @@ export default function AddHotelForm({
       .then((response) => response.data)
       .then((data) => {
         callUpdateAlert();
-        toRoomSection();
+        updateMainInfo();
       })
       .catch((error) => {
         console.log(error.response.data.message);

@@ -1,4 +1,4 @@
-import { React, useState } from "react";
+import { React, useState, useEffect} from "react";
 import PropTypes from "prop-types";
 import { makeStyles } from "@material-ui/core/styles";
 import Tabs from "@material-ui/core/Tabs";
@@ -11,6 +11,9 @@ import RoomTable from "./RoomTable";
 import ServiceTable from "./ServiceTable";
 import { useSelector } from "react-redux";
 import BaseImageDialog from './../shared/BaseImageDialog'
+import HotelListItem from "../HotelListItem";
+import Grid from "@material-ui/core/Grid";
+import API from './../../api'
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -62,11 +65,18 @@ export default function HotelEditor(props) {
   const [updateAlertOpen, setUpdateAlertOpen] = useState(false);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
 
-  const role = useSelector((state) => state.role)
+  const role = useSelector((state) => state.role);
+ 
+
+
+  
+  
+
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+
   function callUpdateAlert() {
     setUpdateAlertOpen(true);
   }
@@ -86,6 +96,22 @@ export default function HotelEditor(props) {
   function handleCloseImageDialog(){
     setImageDialogOpen(false);
   }
+  function updateMainInfo(){
+    const GetHotel = async () => {
+      await API.get("/hotels/" + hotel.id)
+        .then((response) => response.data)
+        .then((data) => {
+          setHotel(data);
+        })
+        .catch((error) => {
+          console.log(error.response.data.Message);
+        });
+    };
+    GetHotel();
+  }
+
+  useEffect(() => {
+  }, [hotel]);
 
   return (
     <div className={classes.root}>
@@ -103,18 +129,32 @@ export default function HotelEditor(props) {
       </Tabs>
       
         <TabPanel value={value} index={0}>
-        {role==='Admin' ? <AddHotelForm
+          <Grid container
+            direction="row"
+            justify="space-around"
+            alignItems="center">
+          {role==='Admin' ? <Grid item lg={6}>
+          <AddHotelForm
           toRoomSection={toRoomSection}
           hotel={hotel}
           callUpdateAlert={callUpdateAlert}
-        ></AddHotelForm>
-        : ''}
-      <Button
+          updateMainInfo ={() => updateMainInfo()}>
+            
+          </AddHotelForm>
+              </Grid> : ''
+        }
+        <Grid  item lg={role==='Admin' ? 6 : 12}>
+        <HotelListItem hotel = {hotel}></HotelListItem>
+        <Button
         variant="contained"
         color="primary"
         onClick= {() => {callImageDialog()}}>
           Upload hotel image
-        </Button>  
+        </Button>
+        </Grid>
+        
+          </Grid>
+        
       </TabPanel>
       
       <TabPanel className={classes.section} value={value} index={1}>
@@ -127,6 +167,7 @@ export default function HotelEditor(props) {
       hotelId = {hotel.id}
        open = {imageDialogOpen}
        handleClose = {() => handleCloseImageDialog()}
+       updateMainInfo ={() => updateMainInfo()}
         ></BaseImageDialog>
       <BaseAlert
         open={updateAlertOpen}
@@ -136,3 +177,4 @@ export default function HotelEditor(props) {
     </div>
   );
 }
+

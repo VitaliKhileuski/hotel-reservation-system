@@ -2,7 +2,6 @@ import { React,useState,useEffect} from "react";
 import API from './../api'
 import { useSelector } from "react-redux";
 import defaultImage from './../img/hotel.jpg'
-import { useHistory } from "react-router";
 import {
   Card,
   makeStyles,
@@ -23,9 +22,9 @@ const useStyles = makeStyles({
   },
 });
 
-export default function HotelListItem({ hotel }) {
+export default function RoomListItem({ room }) {
   const classes = useStyles();
-  const history = useHistory();
+
   const adminId = useSelector((state) => state.userId);
   const token = localStorage.getItem('token');
   const [encodedBase64, setEncodedBase64] = useState('');
@@ -47,18 +46,8 @@ export default function HotelListItem({ hotel }) {
     loadImage();
   }, [hotel]);
 
-  function toRoomsPage(hotelId) {
-    history.push({
-      pathname: "/rooms",
-      state: {
-        hotelId,
-      },
-    });
-  }
-
   return (
-    <Card className={classes.root}
-    onClick ={() => toRoomsPage(hotel.id)}>
+    <Card className={classes.root}>
       <CardActionArea>
         <CardMedia
           image={encodedBase64===null ? defaultImage : `data:image/png;base64,${encodedBase64}`}

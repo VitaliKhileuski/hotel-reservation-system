@@ -14,6 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { IS_LOGGED, NAME, ROLE, USER_ID } from "./storage/actions/actionTypes";
 import HotelTable from "./components/Hotel/HotelTable";
 import HotelEditor from "./components/Hotel/HotelEditor";
+import RoomsPage from './components/Room/RoomsPage'
 import createAuthRefreshInterceptor from "axios-auth-refresh";
 
 export default function App() {
@@ -87,6 +88,10 @@ export default function App() {
           <Route
             path="/hotelEditor"
             render={(props) => <HotelEditor {...props} />}
+          />
+          <Route
+            path="/rooms"
+            render={(props) => <RoomsPage {...props} />}
           />
           <Redirect to="/home" />
         </Switch>
