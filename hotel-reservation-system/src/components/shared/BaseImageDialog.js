@@ -1,4 +1,4 @@
-import {React, useState} from "react";
+import {React, useState, useEffect} from "react";
 import { DropzoneDialogBase } from 'material-ui-dropzone';
 import { USER_ID } from "./../../storage/actions/actionTypes";
 import { useSelector } from "react-redux";
@@ -8,15 +8,52 @@ export default function BaseImageDialog({
   open,
   hotelId,
   handleClose,
-  updateMainInfo
+  updateMainInfo,
+  filesLimit,
+  roomId
 }) {
 
     const [fileObjects, setFileObjects] = useState([]);
-    const [base64Image,setBase64Image] = useState('');
     const adminId = useSelector((state) => state.userId);
     const token = localStorage.getItem('token');
+    const [requestFiles,setRequestFiles] = useState([]);
+    
   
-   async function saveImages(){
+   
+    async function saveImages(){
+      console.log(roomId)
+      if(roomId!==undefined){
+        saveImagesForRoom();
+      }
+      else{
+        saveImagesForHotel();
+      }
+    }
+
+
+   async function saveImagesForRoom(){
+    fileObjects.forEach(item => {
+      var base64Image = item.data.split(',')[1];
+      let request = {
+        Image: base64Image
+      }
+      requestFiles.push(request);
+    });
+
+    console.log(requestFiles);
+    
+    const setImagesToRoom = async () => {
+      await API.post("/images/" + roomId + '/setRoomImages',requestFiles, {
+        headers: { Authorization: "Bearer " + token },
+      }).catch((error) => console.log(error.response.data.message));
+    };
+    setImagesToRoom();
+    setRequestFiles([]);
+    setFileObjects([]);
+    handleClose();
+   }
+   
+    async function saveImagesForHotel(){
        if(hotelId!==undefined){
         var base64Image = fileObjects[0].data.split(',')[1];
         const request = {
@@ -30,6 +67,7 @@ export default function BaseImageDialog({
         };
         setImageToHotel();
         updateMainInfo();
+        setFileObjects([]);
         handleClose();
        }
     }
@@ -46,7 +84,7 @@ export default function BaseImageDialog({
     return (
     <DropzoneDialogBase
     acceptedFiles={['image/*']}
-    filesLimit = {1.01}
+    filesLimit = {filesLimit}
     
     cancelButtonText={"cancel"}
     submitButtonText={"submit"}

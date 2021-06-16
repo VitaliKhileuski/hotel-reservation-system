@@ -12,7 +12,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import API from "../api";
 import HotelList from "./HotelList";
 import Pagination from "@material-ui/lab/Pagination";
-import { Redirect , useHistory } from "react-router";
+import { Redirect, useHistory } from "react-router";
 
 const useStyles = makeStyles((theme) => ({
   option: {

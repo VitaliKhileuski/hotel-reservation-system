@@ -1,6 +1,6 @@
 import { React, useEffect, useState } from "react";
 import { Box, Grid, Button } from "@material-ui/core";
-import RoomListItem from './RoomListItem'
+import RoomListItem from "./RoomListItem";
 
 export default function RoomList({ rooms }) {
   return (

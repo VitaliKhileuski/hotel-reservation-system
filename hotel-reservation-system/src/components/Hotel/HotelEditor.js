@@ -64,7 +64,8 @@ export default function HotelEditor(props) {
   const [hotel, setHotel] = useState(props.location.state.hotel);
   const [updateAlertOpen, setUpdateAlertOpen] = useState(false);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
-
+  const [filesLimit, setFilesLimit] = useState(0)
+  const [roomId, setRoomId] = useState();
   const role = useSelector((state) => state.role);
  
 
@@ -80,8 +81,10 @@ export default function HotelEditor(props) {
   function callUpdateAlert() {
     setUpdateAlertOpen(true);
   }
-  function callImageDialog(){
-    setImageDialogOpen(true);
+    function callImageDialog(filesLimit){
+      setFilesLimit(filesLimit);
+      setImageDialogOpen(true);
+  
   }
 
   const handleCloseUpdateAlert = (event, reason) => {
@@ -148,7 +151,7 @@ export default function HotelEditor(props) {
         <Button
         variant="contained"
         color="primary"
-        onClick= {() => {callImageDialog()}}>
+        onClick= {() => callImageDialog(1.01)}>
           Upload hotel image
         </Button>
         </Grid>
@@ -158,7 +161,8 @@ export default function HotelEditor(props) {
       </TabPanel>
       
       <TabPanel className={classes.section} value={value} index={1}>
-        <RoomTable hotelId={hotel.id}></RoomTable>
+        <RoomTable
+          hotelId={hotel.id}></RoomTable>
       </TabPanel>
       <TabPanel className={classes.serviceSection} value={value} index={2}>
         <ServiceTable hotelId={hotel.id}></ServiceTable>
@@ -168,6 +172,7 @@ export default function HotelEditor(props) {
        open = {imageDialogOpen}
        handleClose = {() => handleCloseImageDialog()}
        updateMainInfo ={() => updateMainInfo()}
+       filesLimit = {filesLimit}
         ></BaseImageDialog>
       <BaseAlert
         open={updateAlertOpen}

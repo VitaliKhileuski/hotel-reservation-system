@@ -39,7 +39,7 @@ export default function AddHotelForm({
   handleClose,
   callAlert,
   callUpdateAlert,
-  updateMainInfo
+  updateMainInfo,
 }) {
   const classes = useStyles();
   const [users, setUsers] = useState([]);

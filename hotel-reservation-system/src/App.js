@@ -14,26 +14,28 @@ import { useDispatch, useSelector } from "react-redux";
 import { IS_LOGGED, NAME, ROLE, USER_ID } from "./storage/actions/actionTypes";
 import HotelTable from "./components/Hotel/HotelTable";
 import HotelEditor from "./components/Hotel/HotelEditor";
-import RoomsPage from './components/Room/RoomsPage'
+import RoomsPage from "./components/Room/RoomsPage";
 import createAuthRefreshInterceptor from "axios-auth-refresh";
 
 export default function App() {
   const dispatch = useDispatch();
   const role = useSelector((state) => state.role);
 
- const refreshAuthLogic = async (failedRequest) =>
-   await API.put("/account/refreshTokenVerification",{ Token : localStorage.getItem("refreshToken")}).then(
-      (tokenRefreshResponse) => {
+  const refreshAuthLogic = async (failedRequest) =>
+    await API.put("/account/refreshTokenVerification", {
+      Token: localStorage.getItem("refreshToken"),
+    })
+      .then((tokenRefreshResponse) => {
         localStorage.setItem("token", tokenRefreshResponse.data[0]);
         localStorage.setItem("refreshToken", tokenRefreshResponse.data[1]);
-        failedRequest.response.config.headers['Authorization'] = 'Bearer ' + tokenRefreshResponse.data[0];
+        failedRequest.response.config.headers["Authorization"] =
+          "Bearer " + tokenRefreshResponse.data[0];
         updateStorage(tokenRefreshResponse.data[0]);
         return Promise.resolve();
-      }
-    )
-    .catch((error) => {
+      })
+      .catch((error) => {
         logout();
-    });
+      });
 
   createAuthRefreshInterceptor(API, refreshAuthLogic);
 
@@ -50,30 +52,28 @@ export default function App() {
             "Access-Control-Allow-Origin": "*",
           },
         });
-      } catch (e) {
-      }
-
+      } catch (e) {}
     } else {
       logout();
     }
   }
-  function logout(){
+  function logout() {
     localStorage.removeItem("refreshToken");
-      localStorage.removeItem("token");
-      dispatch({ type: IS_LOGGED, isLogged: false });
-      dispatch({ type: ROLE, role: "" });
+    localStorage.removeItem("token");
+    dispatch({ type: IS_LOGGED, isLogged: false });
+    dispatch({ type: ROLE, role: "" });
   }
 
   useEffect(() => {
     tokenVerification();
   }, []);
 
- async function updateStorage(token){
+  async function updateStorage(token) {
     const jwt = JSON.parse(atob(token.split(".")[1]));
-             dispatch({ type: NAME, name: jwt.firstname });
-             dispatch({ type: IS_LOGGED, isLogged: true});
-             dispatch({type : ROLE, role : jwt.role}); 
-             dispatch({ type: USER_ID, userId: jwt.id });
+    dispatch({ type: NAME, name: jwt.firstname });
+    dispatch({ type: IS_LOGGED, isLogged: true });
+    dispatch({ type: ROLE, role: jwt.role });
+    dispatch({ type: USER_ID, userId: jwt.id });
   }
 
   return (
@@ -89,10 +89,7 @@ export default function App() {
             path="/hotelEditor"
             render={(props) => <HotelEditor {...props} />}
           />
-          <Route
-            path="/rooms"
-            render={(props) => <RoomsPage {...props} />}
-          />
+          <Route path="/rooms" render={(props) => <RoomsPage {...props} />} />
           <Redirect to="/home" />
         </Switch>
       </div>

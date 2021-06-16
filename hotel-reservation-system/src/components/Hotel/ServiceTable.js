@@ -171,8 +171,6 @@ export default function ServiceTable({ hotelId }) {
                     >
                       <EditIcon></EditIcon>
                     </IconButton>
-                  </TableCell>
-                  <TableCell>
                     <IconButton
                       color="inherit"
                       onClick={() => callDeleteDialog(service.id)}

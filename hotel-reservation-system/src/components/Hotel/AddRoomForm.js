@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function AddHotelForm({
+export default function AddRoomForm({
   hotelId,
   room,
   handleClose,
@@ -52,8 +52,9 @@ export default function AddHotelForm({
     bedsNumber: Yup.number("beds number must be a number").required(
       "beds number is required"
     ),
-    paymentPerDay: Yup.number("payment per day must be a number")
-      .required("payment per day is required")
+    paymentPerDay: Yup.number("payment per day must be a number").required(
+      "payment per day is required"
+    ),
   });
   const onSubmit = async (values) => {
     const request = {

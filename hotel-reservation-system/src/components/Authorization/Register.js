@@ -12,7 +12,12 @@ import { Formik, Form, ErrorMessage, Field } from "formik";
 import * as Yup from "yup";
 import api from "./../../api/";
 import { useDispatch, useSelector } from "react-redux";
-import { IS_LOGGED, NAME, ROLE, USER_ID } from "../../storage/actions/actionTypes.js";
+import {
+  IS_LOGGED,
+  NAME,
+  ROLE,
+  USER_ID,
+} from "../../storage/actions/actionTypes.js";
 
 const useStyles = makeStyles((theme) => ({
   paper: {

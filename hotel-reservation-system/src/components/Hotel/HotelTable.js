@@ -24,7 +24,12 @@ import BaseDeleteDialog from "./../shared/BaseDeleteDialog";
 import PersonAddIcon from "@material-ui/icons/PersonAdd";
 import PersonAddDisabledIcon from "@material-ui/icons/PersonAddDisabled";
 import HotelAdminDialog from "./HotelAdminDialog";
-import { IS_LOGGED, NAME, ROLE, USER_ID } from "./../../storage/actions/actionTypes";
+import {
+  IS_LOGGED,
+  NAME,
+  ROLE,
+  USER_ID,
+} from "./../../storage/actions/actionTypes";
 
 const useStyles = makeStyles({
   root: {
@@ -41,7 +46,7 @@ const useStyles = makeStyles({
 export default function HotelTable() {
   const history = useHistory();
   const role = useSelector((state) => state.role);
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem("token");
   const [hotels, setHotels] = useState([]);
   const classes = useStyles();
   const [page, setPage] = useState(0);
@@ -61,7 +66,7 @@ export default function HotelTable() {
   const [deleteAdminAlertOpen, setDeleteAdminAlertOpen] = useState(false);
 
   const isLogged = useSelector((state) => state.isLogged);
-  const adminId = useSelector((state) => state.userId)
+  const adminId = useSelector((state) => state.userId);
   let hotelAdminField = "";
   let form = (
     <AddHotelForm
@@ -86,9 +91,10 @@ export default function HotelTable() {
         "/hotels/pages?PageNumber=" +
           pageForRequest +
           "&PageSize=" +
-          rowsPerPage, {
-            headers: { Authorization: "Bearer " + token },
-          }
+          rowsPerPage,
+        {
+          headers: { Authorization: "Bearer " + token },
+        }
       )
         .then((response) => response.data)
         .then((data) => {
@@ -98,17 +104,19 @@ export default function HotelTable() {
         })
         .catch((error) => console.log(error.response.data.Message));
     };
-    if(role==='Admin'){
+    if (role === "Admin") {
       loadHotels();
     }
-    if(role==='HotelAdmin'){
+    if (role === "HotelAdmin") {
       loadHotelAdminHotels();
     }
   }, [rowsPerPage, page, open, openDeleteDialog]);
 
   const loadHotelAdminHotels = async () => {
     await API.get(
-      "hotels/hotelAdmin/" + adminId +"/pages?PageNumber=" +
+      "hotels/hotelAdmin/" +
+        adminId +
+        "/pages?PageNumber=" +
         pageForRequest +
         "&PageSize=" +
         rowsPerPage
@@ -121,9 +129,6 @@ export default function HotelTable() {
       })
       .catch((error) => console.log(error.response.data.Message));
   };
-
-
-
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -302,19 +307,20 @@ export default function HotelTable() {
             onChangeRowsPerPage={handleChangeRowsPerPage}
           />
         </Paper>
-        {
-          role==='Admin' ?  <Button
-          variant="contained"
-          color="primary"
-          size="large"
-          margin="normal"
-          className={classes.addHotelButton}
-          onClick={OpenAddHotelDialog}
-        >
-          Add hotel
-        </Button>
-        : ''
-        }
+        {role === "Admin" ? (
+          <Button
+            variant="contained"
+            color="primary"
+            size="large"
+            margin="normal"
+            className={classes.addHotelButton}
+            onClick={OpenAddHotelDialog}
+          >
+            Add hotel
+          </Button>
+        ) : (
+          ""
+        )}
         <BaseAddDialog
           open={open}
           handleClose={handleClose}

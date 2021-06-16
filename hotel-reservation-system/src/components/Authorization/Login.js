@@ -11,7 +11,12 @@ import Container from "@material-ui/core/Container";
 import { Formik, Form, Field } from "formik";
 import API from "./../../api";
 import { useDispatch, useSelector } from "react-redux";
-import { IS_LOGGED, NAME, ROLE, USER_ID } from "../../storage/actions/actionTypes.js";
+import {
+  IS_LOGGED,
+  NAME,
+  ROLE,
+  USER_ID,
+} from "../../storage/actions/actionTypes.js";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -91,7 +96,6 @@ export default function Login() {
           dispatch({ type: NAME, name: jwt.firstname });
           dispatch({ type: ROLE, role: jwt.role });
           dispatch({ type: USER_ID, userId: jwt.id });
-
 
           console.log(jwt.role);
         }

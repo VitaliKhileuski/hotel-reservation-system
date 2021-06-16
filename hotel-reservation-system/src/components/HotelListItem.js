@@ -1,7 +1,7 @@
-import { React,useState,useEffect} from "react";
-import API from './../api'
+import { React, useState, useEffect } from "react";
+import API from "./../api";
 import { useSelector } from "react-redux";
-import defaultImage from './../img/hotel.jpg'
+import defaultImage from "./../img/hotel.jpg";
 import { useHistory } from "react-router";
 import {
   Card,
@@ -11,7 +11,6 @@ import {
   CardMedia,
   Typography,
 } from "@material-ui/core";
-
 
 const useStyles = makeStyles({
   root: {
@@ -27,20 +26,20 @@ export default function HotelListItem({ hotel }) {
   const classes = useStyles();
   const history = useHistory();
   const adminId = useSelector((state) => state.userId);
-  const token = localStorage.getItem('token');
-  const [encodedBase64, setEncodedBase64] = useState('');
+  const token = localStorage.getItem("token");
+  const [encodedBase64, setEncodedBase64] = useState("");
 
   useEffect(() => {
     const loadImage = async () => {
-      await API.get("/images/" + hotel.id +'/'+ adminId + "/getHotelImage", {
+      await API.get("/images/" + hotel.id + "/" + adminId + "/getHotelImage", {
         headers: { Authorization: "Bearer " + token },
       })
         .then((response) => response.data)
         .then((data) => {
-          if (data !== null){
+          if (data !== null) {
             console.log(data);
             setEncodedBase64(data.image);
-          } 
+          }
         })
         .catch((error) => console.log(error));
     };
@@ -57,11 +56,14 @@ export default function HotelListItem({ hotel }) {
   }
 
   return (
-    <Card className={classes.root}
-    onClick ={() => toRoomsPage(hotel.id)}>
+    <Card className={classes.root} onClick={() => toRoomsPage(hotel.id)}>
       <CardActionArea>
         <CardMedia
-          image={encodedBase64===null ? defaultImage : `data:image/png;base64,${encodedBase64}`}
+          image={
+            encodedBase64 === null
+              ? defaultImage
+              : `data:image/png;base64,${encodedBase64}`
+          }
           className={classes.media}
           title={hotel.name}
         ></CardMedia>
