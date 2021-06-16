@@ -6,10 +6,10 @@ export default function RoomList({ rooms }) {
   return (
     <Box p={4}>
       <Grid justify="center" alignItems="center" container spacing={0}>
-        {hotels.map((hotelListItem, i) => {
+        {rooms.map((roomListItem, i) => {
           return (
             <>
-              <HotelListItem hotel={hotelListItem} />
+              <RoomListItem room={roomListItem} />
             </>
           );
         })}

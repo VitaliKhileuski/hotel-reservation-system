@@ -74,8 +74,8 @@ export default function RoomTable({ hotelId }) {
         .then((response) => response.data)
         .then((data) => {
           console.log(data);
-          setRooms(data.item1);
-          setMaxNumberOfRooms(data.item2);
+          setRooms(data.items);
+          setMaxNumberOfRooms(data.numberOfItems);
         })
         .catch((error) => console.log(error.response.data.message));
     };

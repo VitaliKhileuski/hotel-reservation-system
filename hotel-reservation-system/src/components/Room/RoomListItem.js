@@ -1,7 +1,9 @@
 import { React,useState,useEffect} from "react";
-import API from './../api'
+import API from './../../api'
 import { useSelector } from "react-redux";
-import defaultImage from './../img/hotel.jpg'
+import { useHistory } from "react-router";
+import Carousel from 'react-material-ui-carousel'
+import defaultImage from './../../img/room.jpg'
 import {
   Card,
   makeStyles,
@@ -23,45 +25,54 @@ const useStyles = makeStyles({
 });
 
 export default function RoomListItem({ room }) {
-  const classes = useStyles();
 
+  const classes = useStyles();
+  const history = useHistory();
   const adminId = useSelector((state) => state.userId);
   const token = localStorage.getItem('token');
   const [encodedBase64, setEncodedBase64] = useState('');
+  const [base64Images,setBase64Images] = useState([]);
 
-  useEffect(() => {
+useEffect(() => {
     const loadImage = async () => {
-      await API.get("/images/" + hotel.id +'/'+ adminId + "/getHotelImage", {
+      await API.get("/images/" + room.id + "/getRoomImages", {
         headers: { Authorization: "Bearer " + token },
       })
         .then((response) => response.data)
         .then((data) => {
           if (data !== null){
             console.log(data);
-            setEncodedBase64(data.image);
+            setBase64Images(data);
           } 
         })
         .catch((error) => console.log(error));
     };
     loadImage();
-  }, [hotel]);
+  }, []);
+  
 
   return (
-    <Card className={classes.root}>
+    <Card className={classes.root}
+    >
       <CardActionArea>
-        <CardMedia
-          image={encodedBase64===null ? defaultImage : `data:image/png;base64,${encodedBase64}`}
-          className={classes.media}
-          title={hotel.name}
-        ></CardMedia>
+        <Carousel>
+        {
+            base64Images.map( (item, i) => <CardMedia
+            key ={i}
+            image={item===null ? defaultImage : `data:image/png;base64,${item.image}`}
+            className={classes.media}
+          ></CardMedia> )
+        }         
+        </Carousel>
         <CardContent>
-          <Typography>{hotel.name}</Typography>
           <Typography variant="body2">
-            counrty:{hotel.location.country}
+            room number:{room.roomNumber}
           </Typography>
-          <Typography variant="body2">city:{hotel.location.city}</Typography>
           <Typography variant="body2">
-            street:{hotel.location.street} {hotel.location.buildingNumber}
+              beds number:{room.bedsNumber}
+              </Typography>
+          <Typography variant="body2">
+            payment per day:{room.paymentPerDay}
           </Typography>
         </CardContent>
       </CardActionArea>
