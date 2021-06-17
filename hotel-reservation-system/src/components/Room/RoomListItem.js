@@ -64,7 +64,7 @@ export default function RoomListItem({ room }) {
             image={
               item === ''
                 ? defaultImage
-                : `data:image/png;base64,${item.image}`
+                : `data:image/png;base64,${item.imageBase64}`
             }
             className={classes.media}
           ></CardMedia>

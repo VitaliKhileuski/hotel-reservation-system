@@ -28,17 +28,19 @@ export default function HotelListItem({ hotel }) {
   const adminId = useSelector((state) => state.userId);
   const token = localStorage.getItem("token");
   const [encodedBase64, setEncodedBase64] = useState("");
+  const [fileType,setFileType] = useState("");
 
   useEffect(() => {
     const loadImage = async () => {
-      await API.get("/images/" + hotel.id + "/" + adminId + "/getHotelImage", {
+      await API.get("/images/" + hotel.id + "/getHotelImage", {
         headers: { Authorization: "Bearer " + token },
       })
         .then((response) => response.data)
         .then((data) => {
           if (data !== null) {
             console.log(data);
-            setEncodedBase64(data.image);
+            setEncodedBase64(data.imageBase64);
+            setFileType(data.type);
           }
         })
         .catch((error) => console.log(error));
@@ -60,9 +62,9 @@ export default function HotelListItem({ hotel }) {
       <CardActionArea>
         <CardMedia
           image={
-            encodedBase64 === null
+            encodedBase64 === ''
               ? defaultImage
-              : `data:image/png;base64,${encodedBase64}`
+              : `data:${fileType};base64,${encodedBase64}`
           }
           className={classes.media}
           title={hotel.name}

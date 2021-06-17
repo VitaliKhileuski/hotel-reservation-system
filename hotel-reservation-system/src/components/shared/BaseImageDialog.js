@@ -10,20 +10,53 @@ export default function BaseImageDialog({
   handleClose,
   updateMainInfo,
   filesLimit,
-  roomId
+  roomId,
 }) {
-
+     
     const [fileObjects, setFileObjects] = useState([]);
-    const adminId = useSelector((state) => state.userId);
     const token = localStorage.getItem('token');
     const [requestFiles,setRequestFiles] = useState([]);
+    const [currentRoomImages,setCurrentRoomImages] = useState([]);
     
-  
+    useEffect(() => {
+      const loadImage = async () => {
+        await API.get("/images/" + roomId + "/getRoomImages", {
+          headers: { Authorization: "Bearer " + token },
+        })
+          .then((response) => response.data)
+          .then((data) => {
+            if (data !== null) {
+              data.forEach(item => {
+                let base64Image = item.imageBase64;
+                let type = item.type;
+                let name = item.title;
+                let file = {
+                  data : `data:${type};base64,${base64Image}`,
+                  file : {
+                    name : name,
+                    type : type, 
+                  }
+                }
+                currentRoomImages.push(file);
+                console.log(fileObjects);
+              });
+              setFileObjects(currentRoomImages);
+              setCurrentRoomImages([]) 
+            }
+          })
+          .catch((error) => console.log(error));
+      };
+      if(roomId!==0 && roomId!==undefined){
+        loadImage();
+        console.log("zdarova")
+      }
+      
+    }, [open]);
    
     async function saveImages(){
       console.log(roomId)
       if(roomId!==undefined){
-        saveImagesForRoom();
+      await saveImagesForRoom();
       }
       else{
         saveImagesForHotel();
@@ -33,9 +66,13 @@ export default function BaseImageDialog({
 
    async function saveImagesForRoom(){
     fileObjects.forEach(item => {
-      var base64Image = item.data.split(',')[1];
+      let base64Image = item.data.split(',')[1];
+      let type = item.file.type;
+      let name = item.file.name;
       let request = {
-        Image: base64Image
+        ImageBase64 : base64Image,
+        Title : name,
+        Type : type,
       }
       requestFiles.push(request);
     });
@@ -50,18 +87,24 @@ export default function BaseImageDialog({
     setImagesToRoom();
     setRequestFiles([]);
     setFileObjects([]);
+    setCurrentRoomImages([]);
     handleClose();
    }
    
     async function saveImagesForHotel(){
        if(hotelId!==undefined){
         var base64Image = fileObjects[0].data.split(',')[1];
+        var type = fileObjects[0].file.type;
+        var name = fileObjects[0].file.name;
+      
         const request = {
-           Image : base64Image
+           ImageBase64 : base64Image,
+           Title : name,
+           Type : type,
          }
         
         const setImageToHotel = async () => {
-          await API.post("/images/" + hotelId+'/' + adminId+"/"+'setHotelImage',request, {
+          await API.post("/images/" + hotelId+'/setHotelImage',request, {
             headers: { Authorization: "Bearer " + token },
           }).catch((error) => console.log(error.response.data.message));
         };
@@ -91,11 +134,10 @@ export default function BaseImageDialog({
     fileObjects={fileObjects}
     maxFileSize={5000000}
     open={open}
-    clearOnUnmount ={true}
     onClose={() => handleClose()}
     onSave={() => saveImages()}
     onAdd={newFileObjs => {
-        console.log(newFileObjs);
+        console.log(...newFileObjs);
         setFileObjects([].concat(fileObjects, newFileObjs));
       }}
       onDelete={deleteFileObj => {

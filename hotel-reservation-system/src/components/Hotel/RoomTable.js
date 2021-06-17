@@ -50,30 +50,16 @@ const useStyles = makeStyles({
         const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
         const [roomId, setRoomId] = useState(0);
         const [room, setRoom] = useState();
+        const [currentRoomImages,setCurrentRoomImages] = useState([]);
 
         const [addAlertOpen, setAddAlertOpen] = useState(false);
         const [deleteAlertOpen, setDeleteAlertOpen] = useState(false);
         const [updateAlertOpen, setUpdateAlertOpen] = useState(false);
         const [imageDialogOpen, setImageDialogOpen] = useState(false);
-        
-
-  
+         
         function callImageDialog(roomId){
           console.log(roomId)
           setRoomId(roomId)
-          const loadImage = async () => {
-            await API.get("/images/" + roomId + "/getRoomImages", {
-              headers: { Authorization: "Bearer " + token },
-            })
-              .then((response) => response.data)
-              .then((data) => {
-                if (data !== null) {
-                  console.log(data);
-                }
-              })
-              .catch((error) => console.log(error));
-          };
-          loadImage();
           setImageDialogOpen(true);
         }
         function handleCloseImageDialog(){
@@ -258,6 +244,7 @@ const useStyles = makeStyles({
             roomId = {roomId}
             open = {imageDialogOpen}
             handleClose = {() => handleCloseImageDialog()}
+            roomImages = {currentRoomImages}
             filesLimit = {5}
         ></BaseImageDialog>
             <BaseAlert
