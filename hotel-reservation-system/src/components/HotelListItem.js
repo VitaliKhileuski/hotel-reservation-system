@@ -31,16 +31,20 @@ export default function HotelListItem({ hotel }) {
   const [fileType,setFileType] = useState("");
 
   useEffect(() => {
+    setEncodedBase64('');
     const loadImage = async () => {
       await API.get("/images/" + hotel.id + "/getHotelImage", {
         headers: { Authorization: "Bearer " + token },
       })
         .then((response) => response.data)
         .then((data) => {
+          console.log(data);
           if (data !== null) {
-            console.log(data);
             setEncodedBase64(data.imageBase64);
             setFileType(data.type);
+          }
+          else{
+            setEncodedBase64("");
           }
         })
         .catch((error) => console.log(error));

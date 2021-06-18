@@ -58,18 +58,19 @@ export default function AddHotelForm({
     buildingNumber: hotel === undefined ? "" : hotel.location.buildingNumber,
   };
   const validationSchema = Yup.object().shape({
-    name: Yup.string().required("name is required"),
-    country: Yup.string().required("country is required"),
-    street: Yup.string().required("street is required"),
+    name: Yup.string().required("name is required").trim(),
+    country: Yup.string().required("country is required").trim(),
+    city: Yup.string().required("city is required").trim(),
+    street: Yup.string().required("street is required").trim(),
   });
   const onSubmit = async (values) => {
     const request = {
-      Name: values.name,
+      Name: values.name.trim(),
       Location: {
-        Country: values.country,
-        City: values.city,
-        Street: values.street,
-        buildingNumber: buildingNumber,
+        Country: values.country.trim(),
+        City: values.city.trim(),
+        Street: values.street.trim(),
+        buildingNumber: buildingNumber.trim(),
       },
     };
     const CreateHotel = async () => {
@@ -109,6 +110,7 @@ export default function AddHotelForm({
       });
   };
   function ValidateLocation(buildingNumber) {
+   buildingNumber =  buildingNumber.trim();
     setBuildingNumberLabelError("");
 
     if (buildingNumber === "") {
@@ -164,7 +166,7 @@ export default function AddHotelForm({
                       fullWidth
                       name="city"
                       label="City"
-                      error={props.errors.country && props.touched.country}
+                      error={props.errors.city && props.touched.city}
                       helperText={<ErrorMessage name="city" />}
                       id="city"
                     />
