@@ -32,6 +32,7 @@ export default function RoomListItem({ room }) {
   const [base64Images, setBase64Images] = useState([]);
 
   useEffect(() => {
+    setEncodedBase64('');
     const loadImage = async () => {
       await API.get("/images/" + room.id + "/getRoomImages", {
         headers: { Authorization: "Bearer " + token },
