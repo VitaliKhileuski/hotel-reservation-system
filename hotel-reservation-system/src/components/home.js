@@ -162,7 +162,10 @@ export default function Home() {
           <Autocomplete
             id="combo-box-demo"
             options={countries}
-            onChange={(event, value) => setCurrentCountry(value)}
+            onChange={(event, value) =>{
+              console.log(value);
+              setCurrentCountry(value);
+            }}
             getOptionLabel={(option) => option}
             style={{ width: 300 }}
             renderInput={(params) => (
@@ -181,6 +184,7 @@ export default function Home() {
             options={cities}
             getOptionLabel={(option) => option}
             onChange={(event, value) => setCity(value)}
+            disabled = {currentCountry===null ? true : false}
             style={{ width: 300 }}
             value={city}
             renderInput={(params) => (
