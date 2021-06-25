@@ -51,10 +51,10 @@ export default function AddRoomForm({
     roomNumber: Yup.string().required("room Number is required").trim(),
     bedsNumber: Yup.number("beds number must be a number").required(
       "beds number is required"
-    ).trim(),
+    ),
     paymentPerDay: Yup.number("payment per day must be a number").required(
       "payment per day is required"
-    ).trim(),
+    ),
   });
   const onSubmit = async (values) => {
     const request = {

@@ -145,9 +145,6 @@ export default function ServiceTable({ hotelId }) {
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>
-                <TableCell align="right" style={{ minWidth: 50 }}>
-                  Id
-                </TableCell>
                 <TableCell align="right" style={{ minWidth: 170 }}>
                   Name
                 </TableCell>
@@ -161,7 +158,6 @@ export default function ServiceTable({ hotelId }) {
             <TableBody>
               {services.map((service) => (
                 <TableRow key={service.id}>
-                  <TableCell align="right">{service.id}</TableCell>
                   <TableCell align="right">{service.name}</TableCell>
                   <TableCell align="right">{service.payment}</TableCell>
                   <TableCell>

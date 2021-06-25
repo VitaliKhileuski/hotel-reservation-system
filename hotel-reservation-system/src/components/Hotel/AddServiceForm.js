@@ -53,7 +53,7 @@ export default function AddServiceForm({
   const validationSchema = Yup.object().shape({
     payment: Yup.number("payment must be a number").required(
       "payment is required"
-    ).trim(),
+    ),
   });
 
   const onSubmit = async (values) => {

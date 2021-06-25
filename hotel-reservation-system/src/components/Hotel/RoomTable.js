@@ -160,9 +160,6 @@ const useStyles = makeStyles({
                 <Table stickyHeader aria-label="sticky table">
                   <TableHead>
                     <TableRow>
-                      <TableCell align="right" style={{ minWidth: 50 }}>
-                        Id
-                      </TableCell>
                       <TableCell align="right" style={{ minWidth: 70 }}>
                         Room number
                       </TableCell>
@@ -180,7 +177,6 @@ const useStyles = makeStyles({
                   <TableBody>
                     {rooms.map((room) => (
                       <TableRow key={room.id}>
-                        <TableCell align="right">{room.id}</TableCell>
                         <TableCell align="right">{room.roomNumber}</TableCell>
                         <TableCell align="right">{room.bedsNumber}</TableCell>
                         <TableCell align="right">{room.paymentPerDay}</TableCell>

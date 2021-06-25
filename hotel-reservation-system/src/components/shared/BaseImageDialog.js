@@ -70,7 +70,7 @@ export default function BaseImageDialog({
       let type = item.file.type;
       let name = item.file.name;
       let request = {
-        ImageBase64 : base64Image,
+        FileBase64 : base64Image,
         Title : name,
         Type : type,
       }

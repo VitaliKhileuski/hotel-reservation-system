@@ -229,9 +229,6 @@ export default function HotelTable() {
             <Table stickyHeader aria-label="sticky table">
               <TableHead>
                 <TableRow>
-                  <TableCell align="right" style={{ minWidth: 50 }}>
-                    Id
-                  </TableCell>
                   <TableCell align="right" style={{ minWidth: 170 }}>
                     Name
                   </TableCell>
@@ -256,7 +253,6 @@ export default function HotelTable() {
               <TableBody>
                 {hotels.map((hotel) => (
                   <TableRow key={hotel.id}>
-                    <TableCell align="right">{hotel.id}</TableCell>
                     <TableCell align="right">{hotel.name}</TableCell>
                     <TableCell align="right">
                       {hotel.location.country}
