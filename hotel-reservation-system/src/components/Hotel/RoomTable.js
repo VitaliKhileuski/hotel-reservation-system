@@ -57,9 +57,11 @@ const useStyles = makeStyles({
         const [updateAlertOpen, setUpdateAlertOpen] = useState(false);
         const [imageDialogOpen, setImageDialogOpen] = useState(false);
          
-        function callImageDialog(roomId){
-          console.log(roomId)
-          setRoomId(roomId)
+        function callImageDialog(room){
+          setRoomId(room.id)
+          setRoom(room);
+          console.log(room)
+          console.log(room.imageUrls);
           setImageDialogOpen(true);
         }
         function handleCloseImageDialog(){
@@ -195,7 +197,7 @@ const useStyles = makeStyles({
                           </IconButton>
                           <IconButton
                           color="inherit"
-                          onClick = {() => callImageDialog(room.id)}>
+                          onClick = {() => callImageDialog(room)}>
                           <AddPhotoAlternateIcon></AddPhotoAlternateIcon>
                           </IconButton>
                         </TableCell>
@@ -240,7 +242,7 @@ const useStyles = makeStyles({
             roomId = {roomId}
             open = {imageDialogOpen}
             handleClose = {() => handleCloseImageDialog()}
-            roomImages = {currentRoomImages}
+            imageUrls = {room===undefined ? undefined  : room.imageUrls}
             filesLimit = {5}
         ></BaseImageDialog>
             <BaseAlert

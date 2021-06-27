@@ -50,7 +50,6 @@ export default function HotelAdminDialog({
       })
         .then((response) => response.data)
         .then((data) => {
-          console.log(data);
           if (data !== undefined) setUsers(data);
         })
         .catch((error) => console.log(error));

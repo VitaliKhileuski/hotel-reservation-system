@@ -38,7 +38,6 @@ export default function HotelListItem({ hotel }) {
       })
         .then((response) => response.data)
         .then((data) => {
-          console.log(data);
           if (data !== null) {
             setEncodedBase64(data.imageBase64);
             setFileType(data.type);

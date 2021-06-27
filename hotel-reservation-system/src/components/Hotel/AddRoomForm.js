@@ -69,7 +69,6 @@ export default function AddRoomForm({
       })
         .then((response) => response.data)
         .then((data) => {
-          console.log(hotelId);
         })
         .catch((error) => console.log(error.response.data.message));
     };

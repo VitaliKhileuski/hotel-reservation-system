@@ -3,55 +3,43 @@ import { DropzoneDialogBase } from 'material-ui-dropzone';
 import { USER_ID } from "./../../storage/actions/actionTypes";
 import { useSelector } from "react-redux";
 import API from './../../api'
+import axios from "axios";
 
 export default function BaseImageDialog({
   open,
+  imageUrls,
   hotelId,
   handleClose,
   updateMainInfo,
-  filesLimit,
   roomId,
 }) {
-     
     const [fileObjects, setFileObjects] = useState([]);
     const token = localStorage.getItem('token');
     const [requestFiles,setRequestFiles] = useState([]);
     const [currentRoomImages,setCurrentRoomImages] = useState([]);
     
     useEffect(() => {
-      const loadImage = async () => {
-        await API.get("/images/" + roomId + "/getRoomImages", {
-          headers: { Authorization: "Bearer " + token },
-        })
+      const loadImages = async () => {
+        await imageUrls.forEach(item =>{
+          axios.get(item)
           .then((response) => response.data)
           .then((data) => {
             if (data !== null) {
-              data.forEach(item => {
-                let base64Image = item.imageBase64;
-                let type = item.type;
-                let name = item.title;
-                let file = {
-                  data : `data:${type};base64,${base64Image}`,
-                  file : {
-                    name : name,
-                    type : type, 
-                  }
-                }
-                currentRoomImages.push(file);
-                console.log(fileObjects);
-              });
-              setFileObjects(currentRoomImages);
-              setCurrentRoomImages([]) 
+              console.log(data);
+              currentRoomImages.push(data);
             }
           })
           .catch((error) => console.log(error));
+        });
       };
-      if(roomId!==0 && roomId!==undefined){
-        loadImage();
-        console.log("zdarova")
+      if(imageUrls!==undefined){
+        console.log("urls");
+        console.log(imageUrls);
+        loadImages();
       }
-      
-    }, [open]);
+      setFileObjects(currentRoomImages);
+    }, [open]); 
+
    
     async function saveImages(){
       console.log(roomId)
@@ -71,8 +59,8 @@ export default function BaseImageDialog({
       let name = item.file.name;
       let request = {
         FileBase64 : base64Image,
-        Title : name,
-        Type : type,
+        FileName : name,
+        FileExtension : type
       }
       requestFiles.push(request);
     });
@@ -99,8 +87,8 @@ export default function BaseImageDialog({
       
         const request = {
            ImageBase64 : base64Image,
-           Title : name,
-           Type : type,
+           FileName : name,
+           FileExtension : type,
          }
         
         const setImageToHotel = async () => {
@@ -127,7 +115,7 @@ export default function BaseImageDialog({
     return (
     <DropzoneDialogBase
     acceptedFiles={['image/*']}
-    filesLimit = {filesLimit}
+    filesLimit = {8}
     
     cancelButtonText={"cancel"}
     submitButtonText={"submit"}

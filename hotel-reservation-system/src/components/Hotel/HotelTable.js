@@ -98,7 +98,6 @@ export default function HotelTable() {
       )
         .then((response) => response.data)
         .then((data) => {
-          console.log(data);
           setHotels(data.item1);
           setMaxNumberOfHotels(data.item2);
         })
