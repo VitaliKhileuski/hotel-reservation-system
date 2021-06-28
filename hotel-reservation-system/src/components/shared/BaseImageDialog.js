@@ -16,56 +16,87 @@ export default function BaseImageDialog({
     const [fileObjects, setFileObjects] = useState([]);
     const token = localStorage.getItem('token');
     const [requestFiles,setRequestFiles] = useState([]);
-    const [currentRoomImages,setCurrentRoomImages] = useState([]);
+    const [flag,setFlag] = useState(true);
+    const [currentImages,setCurrentImages] = useState([]);
     
-    useEffect(() => {
-      const loadImages = async () => {
-        await imageUrls.forEach(item =>{
-          axios.get(item)
-          .then((response) => response.data)
-          .then((data) => {
-            if (data !== null) {
-              console.log(data);
-              currentRoomImages.push(data);
-            }
-          })
-          .catch((error) => console.log(error));
-        });
-      };
-      if(imageUrls!==undefined){
-        console.log("urls");
-        console.log(imageUrls);
-        loadImages();
+    useEffect(async() => {
+      if(currentImages.length!==0){
+        setFileObjects(currentImages);
       }
-      setFileObjects(currentRoomImages);
-    }, [open]); 
+      else{
+      if(open===false){
+        setFileObjects([])
+      }
+      if(imageUrls!==undefined){
+       await loadImages();      
+      } 
+      }
+        
+    }, [open]);
 
-   
+
+    useEffect(() => {
+      setFlag(true)
+      if(imageUrls!==undefined && imageUrls.length===fileObjects.length){
+        console.log("equals");
+      }
+    }, [flag]);
+
+
     async function saveImages(){
       console.log(roomId)
       if(roomId!==undefined){
       await saveImagesForRoom();
       }
       else{
-        saveImagesForHotel();
+       await saveImagesForHotel();
       }
     }
+    const loadImages = async() => {
+      await imageUrls.forEach(async(item) => {
+       await GetImage(item);
+       });
+     };
 
+    const GetImage = async(item) => {
+      await axios.get(item)
+       .then((response) => response.data)
+       .then((data) => {
+         if (data !== null) {
+           let file =  {
+             data: `data:${data.contentType};base64,${data.fileContents}`,
+             file : {
+               name : data.fileDownloadName,
+               type : data.contentType,
+             },
+             id : data.id
+           }
+
+           fileObjects.push(file);
+           console.log("pushed");
+           console.log(fileObjects);
+           if(fileObjects.length===imageUrls.length){
+             setCurrentImages(fileObjects);
+           }
+           setFlag(false);
+         }
+       })
+       .catch((error) => console.log(error));
+     }
 
    async function saveImagesForRoom(){
-    fileObjects.forEach(item => {
-      let base64Image = item.data.split(',')[1];
-      let type = item.file.type;
-      let name = item.file.name;
-      let request = {
-        FileBase64 : base64Image,
-        FileName : name,
-        FileExtension : type
-      }
-      requestFiles.push(request);
-    });
+       fileObjects.forEach(item => {
+       let base64Image = item.data.split(',')[1];
+       let type = item.file.type;
+       let name = item.file.name;
+       let request = {
+         FileBase64: base64Image,
+         FileName: name,
+         FileExtension: type
+       };
+       requestFiles.push(request);
+     });
 
-    console.log(requestFiles);
     
     const setImagesToRoom = async () => {
       await API.post("/images/" + roomId + '/setRoomImages',requestFiles, {
@@ -74,8 +105,8 @@ export default function BaseImageDialog({
     };
     setImagesToRoom();
     setRequestFiles([]);
+    setCurrentImages(fileObjects);
     setFileObjects([]);
-    setCurrentRoomImages([]);
     handleClose();
    }
    
@@ -110,6 +141,7 @@ export default function BaseImageDialog({
                 if (index > -1) {
                 fileObjects.splice(index, 1);
                 }
+                
     }
 
     return (

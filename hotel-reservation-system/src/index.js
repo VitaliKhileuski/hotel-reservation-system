@@ -7,9 +7,9 @@ import storage from "./storage/storage";
 
 ReactDOM.render(
   <Provider store={storage}>
-    <React.StrictMode>
+    <>
       <App />
-    </React.StrictMode>
+    </>
   </Provider>,
   document.getElementById("root")
 );
