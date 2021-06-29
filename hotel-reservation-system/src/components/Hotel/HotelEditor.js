@@ -7,11 +7,10 @@ import Typography from "@material-ui/core/Typography";
 import { Box, Button } from "@material-ui/core";
 import AddHotelForm from "./AddHotelForm";
 import BaseAlert from "./../shared/BaseAlert";
-import RoomTable from "./RoomTable";
+import RoomTable from "./../Room/RoomTable";
 import ServiceTable from "./ServiceTable";
 import { useSelector } from "react-redux";
 import BaseImageDialog from './../shared/BaseImageDialog'
-import HotelListItem from "../HotelListItem";
 import Grid from "@material-ui/core/Grid";
 import API from './../../api'
 
@@ -66,6 +65,11 @@ export default function HotelEditor(props) {
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [filesLimit, setFilesLimit] = useState(0)
   const [roomId, setRoomId] = useState();
+  let content = [
+  `${hotel.name}`,
+  `country: ${hotel.location.country}`,
+  `city: ${hotel.location.city}`,
+  `street: ${hotel.location.street} ${hotel.location.buildingNumber}`,];
   const role = useSelector((state) => state.role);
 
   const handleChange = (event, newValue) => {
@@ -92,7 +96,7 @@ export default function HotelEditor(props) {
   function handleCloseImageDialog(){
     setImageDialogOpen(false);
   }
-  function updateMainInfo(){
+ async function updateMainInfo(){
     const GetHotel = async () => {
       await API.get("/hotels/" + hotel.id)
         .then((response) => response.data)
@@ -103,7 +107,8 @@ export default function HotelEditor(props) {
           console.log(error.response.data.Message);
         });
     };
-    GetHotel();
+   await GetHotel();
+   toRoomSection();
   }
 
   useEffect(() => {
@@ -129,7 +134,7 @@ export default function HotelEditor(props) {
             direction="row"
             justify="space-around"
             alignItems="center">
-          {role==='Admin' ? <Grid item lg={6}>
+          {role==='Admin' ? <Grid item lg={12}>
           <AddHotelForm
           toRoomSection={toRoomSection}
           hotel={hotel}
@@ -139,16 +144,6 @@ export default function HotelEditor(props) {
           </AddHotelForm>
               </Grid> : ''
         }
-        <Grid  item lg={role==='Admin' ? 6 : 12}>
-        <HotelListItem hotel = {hotel}></HotelListItem>
-        <Button
-        variant="contained"
-        color="primary"
-        onClick= {() => callImageDialog()}>
-          Upload hotel image
-        </Button>
-        </Grid>
-        
           </Grid>
         
       </TabPanel>

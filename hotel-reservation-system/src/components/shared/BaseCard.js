@@ -20,43 +20,41 @@ const useStyles = makeStyles({
   },
   media: {
     height: 170,
+    
   },
 });
 
-export default function RoomListItem({ room }) {
+export default function RoomListItem({ imageUrls,contentRows,clickAction }) {
   const classes = useStyles();
   const history = useHistory();
   const adminId = useSelector((state) => state.userId);
   const token = localStorage.getItem("token");
-  
+  console.log(imageUrls)
   return (
-    <Card className={classes.root}>
+    <Card className={classes.root} onClick = {clickAction}>
       <CardActionArea>
-        {room.imageUrls.length===0 ?
+        { imageUrls===undefined || imageUrls.length===0 ?
          <CardMedia
          image = {defaultImage}
          className={classes.media}>
         </CardMedia>
         :  <Carousel
         indicators ={false}>
-        {room.imageUrls.map((item, i) => (
+        {imageUrls.map((item, i) => (
           <CardMedia
             key={i}
             className={classes.media}
+            image = {item}
           >
-            <img
-            src={item}>
-            </img>
-
           </CardMedia>
         ))}
       </Carousel>}
         <CardContent>
-          <Typography variant="body2">room number:{room.roomNumber}</Typography>
-          <Typography variant="body2">beds number:{room.bedsNumber}</Typography>
-          <Typography variant="body2">
-            payment per day:{room.paymentPerDay}
-          </Typography>
+        {contentRows.map((content, i) => {
+          return (
+              <Typography variant="body2" key={i}>{content}</Typography>     
+          );
+        })}
         </CardContent>
       </CardActionArea>
     </Card>

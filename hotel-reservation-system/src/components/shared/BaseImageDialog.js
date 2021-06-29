@@ -10,7 +10,6 @@ export default function BaseImageDialog({
   imageUrls,
   hotelId,
   handleClose,
-  updateMainInfo,
   roomId,
 }) {
     const [fileObjects, setFileObjects] = useState([]);
@@ -20,7 +19,10 @@ export default function BaseImageDialog({
     const [currentImages,setCurrentImages] = useState([]);
     
     useEffect(async() => {
+      setFileObjects([]);
       if(currentImages.length!==0){
+       console.log("current images")
+        console.log(currentImages)
         setFileObjects(currentImages);
       }
       else{
@@ -38,28 +40,31 @@ export default function BaseImageDialog({
     useEffect(() => {
       setFlag(true)
       if(imageUrls!==undefined && imageUrls.length===fileObjects.length){
-        console.log("equals");
       }
     }, [flag]);
 
 
     async function saveImages(){
-      console.log(roomId)
+      mapImagesForRequest();
       if(roomId!==undefined){
       await saveImagesForRoom();
       }
       else{
        await saveImagesForHotel();
       }
+      if(fileObjects.length===0){
+        imageUrls = [];
+      }
     }
     const loadImages = async() => {
+      console.log(imageUrls)
       await imageUrls.forEach(async(item) => {
        await GetImage(item);
        });
      };
 
     const GetImage = async(item) => {
-      await axios.get(item)
+      await axios.get(item+'/imageInfo')
        .then((response) => response.data)
        .then((data) => {
          if (data !== null) {
@@ -73,7 +78,6 @@ export default function BaseImageDialog({
            }
 
            fileObjects.push(file);
-           console.log("pushed");
            console.log(fileObjects);
            if(fileObjects.length===imageUrls.length){
              setCurrentImages(fileObjects);
@@ -84,7 +88,7 @@ export default function BaseImageDialog({
        .catch((error) => console.log(error));
      }
 
-   async function saveImagesForRoom(){
+   async function mapImagesForRequest(){
        fileObjects.forEach(item => {
        let base64Image = item.data.split(',')[1];
        let type = item.file.type;
@@ -96,40 +100,37 @@ export default function BaseImageDialog({
        };
        requestFiles.push(request);
      });
+    }
 
-    
-    const setImagesToRoom = async () => {
-      await API.post("/images/" + roomId + '/setRoomImages',requestFiles, {
-        headers: { Authorization: "Bearer " + token },
-      }).catch((error) => console.log(error.response.data.message));
-    };
-    setImagesToRoom();
-    setRequestFiles([]);
-    setCurrentImages(fileObjects);
-    setFileObjects([]);
-    handleClose();
-   }
+    async function saveImagesForRoom(){
+      const setImagesToRoom = async () => {
+        await API.post("/images/" + roomId + '/setRoomImages',requestFiles, {
+          headers: { Authorization: "Bearer " + token },
+        }).catch((error) => console.log(error.response.data.message));
+      };
+      setImagesToRoom();
+      setRequestFiles([]);
+      setCurrentImages(fileObjects);
+      setFileObjects([]);
+      handleClose();
+    }
    
     async function saveImagesForHotel(){
-       if(hotelId!==undefined){
-        var base64Image = fileObjects[0].data.split(',')[1];
-        var type = fileObjects[0].file.type;
-        var name = fileObjects[0].file.name;
-      
-        const request = {
-           ImageBase64 : base64Image,
-           FileName : name,
-           FileExtension : type,
-         }
-        
-        const setImageToHotel = async () => {
-          await API.post("/images/" + hotelId+'/setHotelImage',request, {
+       if(hotelId!==undefined){   
+
+        const setImagesToHotel = async () => {
+          await API.post("/images/" + hotelId+'/setHotelImages',requestFiles, {
             headers: { Authorization: "Bearer " + token },
           }).catch((error) => console.log(error.response.data.message));
         };
-        setImageToHotel();
-        updateMainInfo();
+        setImagesToHotel();
+        console.log("file objects save")
+        console.log(fileObjects);
+        setCurrentImages(fileObjects);
+        console.log("current images save")
         setFileObjects([]);
+        setRequestFiles([]);
+        console.log(currentImages);
         handleClose();
        }
     }
@@ -141,14 +142,14 @@ export default function BaseImageDialog({
                 if (index > -1) {
                 fileObjects.splice(index, 1);
                 }
-                
+                console.log("delete");
+                console.log(fileObjects);
     }
 
     return (
     <DropzoneDialogBase
     acceptedFiles={['image/*']}
     filesLimit = {8}
-    
     cancelButtonText={"cancel"}
     submitButtonText={"submit"}
     fileObjects={fileObjects}

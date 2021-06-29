@@ -10,7 +10,7 @@ import TextField from "@material-ui/core/TextField";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import { makeStyles } from "@material-ui/core/styles";
 import API from "../api";
-import HotelList from "./HotelList";
+import HotelList from "./Hotel/HotelList"
 import Pagination from "@material-ui/lab/Pagination";
 import { Redirect, useHistory } from "react-router";
 
@@ -94,8 +94,8 @@ export default function Home() {
     )
       .then((response) => response.data)
       .then((data) => {
-        setHotels(data.item1);
-        setMaxPage(data.item2);
+        setHotels(data.items);
+        setMaxPage(data.numberOfPages);
       })
       .catch((error) => console.log(error));
   };

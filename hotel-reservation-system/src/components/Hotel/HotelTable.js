@@ -24,12 +24,8 @@ import BaseDeleteDialog from "./../shared/BaseDeleteDialog";
 import PersonAddIcon from "@material-ui/icons/PersonAdd";
 import PersonAddDisabledIcon from "@material-ui/icons/PersonAddDisabled";
 import HotelAdminDialog from "./HotelAdminDialog";
-import {
-  IS_LOGGED,
-  NAME,
-  ROLE,
-  USER_ID,
-} from "./../../storage/actions/actionTypes";
+import AddPhotoAlternateIcon from '@material-ui/icons/AddPhotoAlternate';
+import BaseImageDialog  from "../shared/BaseImageDialog";
 
 const useStyles = makeStyles({
   root: {
@@ -47,6 +43,7 @@ export default function HotelTable() {
   const history = useHistory();
   const role = useSelector((state) => state.role);
   const token = localStorage.getItem("token");
+  const [hotel,setHotel] = useState();
   const [hotels, setHotels] = useState([]);
   const classes = useStyles();
   const [page, setPage] = useState(0);
@@ -64,6 +61,8 @@ export default function HotelTable() {
   const [deleteAlertOpen, setDeleteAlertOpen] = useState(false);
   const [assignAdminAlertOpen, setAssignAdminAlertOpen] = useState(false);
   const [deleteAdminAlertOpen, setDeleteAdminAlertOpen] = useState(false);
+  const [imageDialogOpen,setImageDialogOpen] = useState(false);
+
 
   const isLogged = useSelector((state) => state.isLogged);
   const adminId = useSelector((state) => state.userId);
@@ -194,6 +193,13 @@ export default function HotelTable() {
   function callDeleteAdminAlert() {
     setDeleteAdminAlertOpen(true);
   }
+  function callImageDialog(hotel){
+    setHotel(hotel);
+    setImageDialogOpen(true);
+  }
+  function handleCloseImageDialog(){
+    setImageDialogOpen(false);
+  }
 
   const handleCloseAlert = (event, reason) => {
     if (reason === "clickaway") {
@@ -247,6 +253,7 @@ export default function HotelTable() {
                   <TableCell style={{ minWidth: 30 }} />
                   <TableCell style={{ minWidth: 30 }} />
                   <TableCell style={{ minWidth: 30 }} />
+                  <TableCell style={{minWidth : 30 }} />
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -286,6 +293,11 @@ export default function HotelTable() {
                       >
                         <PersonAddDisabledIcon></PersonAddDisabledIcon>
                       </IconButton>
+                      <IconButton
+                          color="inherit"
+                          onClick={() => callImageDialog(hotel)}>
+                          <AddPhotoAlternateIcon></AddPhotoAlternateIcon>
+                      </IconButton>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -321,6 +333,14 @@ export default function HotelTable() {
           handleClose={handleClose}
           form={flag === true ? component : form}
         ></BaseAddDialog>
+        {
+          hotel===undefined ? '' : <BaseImageDialog
+          hotelId = {hotel.id}
+           open = {imageDialogOpen}
+           handleClose = {() => handleCloseImageDialog()}
+           imageUrls ={hotel.imageUrls}
+            ></BaseImageDialog>
+        }
         <BaseDeleteDialog
           open={openDeleteDialog}
           handleCloseDeleteDialog={handleCloseDeleteDialog}

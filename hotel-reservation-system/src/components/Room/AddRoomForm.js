@@ -8,7 +8,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { Formik, Form, ErrorMessage, Field } from "formik";
 import * as Yup from "yup";
-import API from "./../../api/";
+import API from "../../api";
 
 const useStyles = makeStyles((theme) => ({
   root: {},
