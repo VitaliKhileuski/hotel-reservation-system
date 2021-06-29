@@ -1,12 +1,11 @@
 import { React, useEffect, useState } from "react";
 import { Box, Grid, Button } from "@material-ui/core";
-import BaseCard  from './../shared/BaseCard'
+import BaseCard from "./../shared/BaseCard";
 import { useHistory } from "react-router";
 
-export default function HotelList({toRoomsPage, hotels }) {
-  
+export default function HotelList({ toRoomsPage, hotels }) {
   const history = useHistory();
-  
+
   function toRoomsPage(hotelId) {
     history.push({
       pathname: "/rooms",
@@ -25,11 +24,14 @@ export default function HotelList({toRoomsPage, hotels }) {
             `country: ${hotelListItem.location.country}`,
             `city: ${hotelListItem.location.city}`,
             `street: ${hotelListItem.location.street} ${hotelListItem.location.buildingNumber}`,
-
-          ]
+          ];
           return (
             <>
-              <BaseCard imageUrls = {hotelListItem.imageUrls} contentRows = {content} clickAction={() => toRoomsPage(hotelListItem.id)} />
+              <BaseCard
+                imageUrls={hotelListItem.imageUrls}
+                contentRows={content}
+                clickAction={() => toRoomsPage(hotelListItem.id)}
+              />
             </>
           );
         })}

@@ -68,8 +68,7 @@ export default function AddRoomForm({
         headers: { Authorization: "Bearer " + token },
       })
         .then((response) => response.data)
-        .then((data) => {
-        })
+        .then((data) => {})
         .catch((error) => console.log(error.response.data.message));
     };
     if (room === undefined) {

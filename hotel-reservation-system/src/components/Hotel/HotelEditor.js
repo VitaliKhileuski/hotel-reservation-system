@@ -1,4 +1,4 @@
-import { React, useState, useEffect} from "react";
+import { React, useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { makeStyles } from "@material-ui/core/styles";
 import Tabs from "@material-ui/core/Tabs";
@@ -10,9 +10,9 @@ import BaseAlert from "./../shared/BaseAlert";
 import RoomTable from "./../Room/RoomTable";
 import ServiceTable from "./ServiceTable";
 import { useSelector } from "react-redux";
-import BaseImageDialog from './../shared/BaseImageDialog'
+import BaseImageDialog from "./../shared/BaseImageDialog";
 import Grid from "@material-ui/core/Grid";
-import API from './../../api'
+import API from "./../../api";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -63,13 +63,14 @@ export default function HotelEditor(props) {
   const [hotel, setHotel] = useState(props.location.state.hotel);
   const [updateAlertOpen, setUpdateAlertOpen] = useState(false);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
-  const [filesLimit, setFilesLimit] = useState(0)
+  const [filesLimit, setFilesLimit] = useState(0);
   const [roomId, setRoomId] = useState();
   let content = [
-  `${hotel.name}`,
-  `country: ${hotel.location.country}`,
-  `city: ${hotel.location.city}`,
-  `street: ${hotel.location.street} ${hotel.location.buildingNumber}`,];
+    `${hotel.name}`,
+    `country: ${hotel.location.country}`,
+    `city: ${hotel.location.city}`,
+    `street: ${hotel.location.street} ${hotel.location.buildingNumber}`,
+  ];
   const role = useSelector((state) => state.role);
 
   const handleChange = (event, newValue) => {
@@ -79,9 +80,8 @@ export default function HotelEditor(props) {
   function callUpdateAlert() {
     setUpdateAlertOpen(true);
   }
-    function callImageDialog(){
-      setImageDialogOpen(true);
-  
+  function callImageDialog() {
+    setImageDialogOpen(true);
   }
 
   const handleCloseUpdateAlert = (event, reason) => {
@@ -93,10 +93,10 @@ export default function HotelEditor(props) {
   function toRoomSection() {
     setValue(1);
   }
-  function handleCloseImageDialog(){
+  function handleCloseImageDialog() {
     setImageDialogOpen(false);
   }
- async function updateMainInfo(){
+  async function updateMainInfo() {
     const GetHotel = async () => {
       await API.get("/hotels/" + hotel.id)
         .then((response) => response.data)
@@ -107,12 +107,11 @@ export default function HotelEditor(props) {
           console.log(error.response.data.Message);
         });
     };
-   await GetHotel();
-   toRoomSection();
+    await GetHotel();
+    toRoomSection();
   }
 
-  useEffect(() => {
-  }, [hotel]);
+  useEffect(() => {}, [hotel]);
 
   return (
     <div className={classes.root}>
@@ -123,45 +122,46 @@ export default function HotelEditor(props) {
         aria-label="Vertical tabs example"
         className={classes.tabs}
       >
-        
         <Tab label="Main Info" />
         <Tab label="Rooms" />
         <Tab label="Services" />
       </Tabs>
-      
-        <TabPanel value={value} index={0}>
-          <Grid container
-            direction="row"
-            justify="space-around"
-            alignItems="center">
-          {role==='Admin' ? <Grid item lg={12}>
-          <AddHotelForm
-          toRoomSection={toRoomSection}
-          hotel={hotel}
-          callUpdateAlert={callUpdateAlert}
-          updateMainInfo ={() => updateMainInfo()}>
-            
-          </AddHotelForm>
-              </Grid> : ''
-        }
-          </Grid>
-        
+
+      <TabPanel value={value} index={0}>
+        <Grid
+          container
+          direction="row"
+          justify="space-around"
+          alignItems="center"
+        >
+          {role === "Admin" ? (
+            <Grid item lg={12}>
+              <AddHotelForm
+                toRoomSection={toRoomSection}
+                hotel={hotel}
+                callUpdateAlert={callUpdateAlert}
+                updateMainInfo={() => updateMainInfo()}
+              ></AddHotelForm>
+            </Grid>
+          ) : (
+            ""
+          )}
+        </Grid>
       </TabPanel>
-      
+
       <TabPanel className={classes.section} value={value} index={1}>
-        <RoomTable
-          hotelId={hotel.id}></RoomTable>
+        <RoomTable hotelId={hotel.id}></RoomTable>
       </TabPanel>
       <TabPanel className={classes.serviceSection} value={value} index={2}>
         <ServiceTable hotelId={hotel.id}></ServiceTable>
       </TabPanel>
       <BaseImageDialog
-      hotelId = {hotel.id}
-       open = {imageDialogOpen}
-       handleClose = {() => handleCloseImageDialog()}
-       updateMainInfo ={() => updateMainInfo()}
-       imageUrls ={hotel.imageUrls}
-        ></BaseImageDialog>
+        hotelId={hotel.id}
+        open={imageDialogOpen}
+        handleClose={() => handleCloseImageDialog()}
+        updateMainInfo={() => updateMainInfo()}
+        imageUrls={hotel.imageUrls}
+      ></BaseImageDialog>
       <BaseAlert
         open={updateAlertOpen}
         handleClose={handleCloseUpdateAlert}
@@ -170,4 +170,3 @@ export default function HotelEditor(props) {
     </div>
   );
 }
-

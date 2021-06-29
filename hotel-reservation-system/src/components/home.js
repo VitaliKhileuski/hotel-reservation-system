@@ -10,7 +10,7 @@ import TextField from "@material-ui/core/TextField";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import { makeStyles } from "@material-ui/core/styles";
 import API from "../api";
-import HotelList from "./Hotel/HotelList"
+import HotelList from "./Hotel/HotelList";
 import Pagination from "@material-ui/lab/Pagination";
 import { Redirect, useHistory } from "react-router";
 
@@ -162,7 +162,7 @@ export default function Home() {
           <Autocomplete
             id="combo-box-demo"
             options={countries}
-            onChange={(event, value) =>{
+            onChange={(event, value) => {
               console.log(value);
               setCurrentCountry(value);
             }}
@@ -184,7 +184,7 @@ export default function Home() {
             options={cities}
             getOptionLabel={(option) => option}
             onChange={(event, value) => setCity(value)}
-            disabled = {currentCountry===null ? true : false}
+            disabled={currentCountry === null ? true : false}
             style={{ width: 300 }}
             value={city}
             renderInput={(params) => (

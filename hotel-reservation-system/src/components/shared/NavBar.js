@@ -66,7 +66,6 @@ function NavBar() {
     dispatch({ type: IS_LOGGED, isLogged: false });
     dispatch({ type: NAME, name: "" });
     dispatch({ type: ROLE, role: "" });
-    
   };
   return (
     <div className={classes.root}>

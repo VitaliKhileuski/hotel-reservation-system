@@ -110,7 +110,7 @@ export default function AddHotelForm({
       });
   };
   function ValidateLocation(buildingNumber) {
-   buildingNumber =  buildingNumber.trim();
+    buildingNumber = buildingNumber.trim();
     setBuildingNumberLabelError("");
 
     if (buildingNumber === "") {
