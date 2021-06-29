@@ -1,0 +1,172 @@
+import { React, useState, useEffect } from "react";
+import PropTypes from "prop-types";
+import { makeStyles } from "@material-ui/core/styles";
+import Tabs from "@material-ui/core/Tabs";
+import Tab from "@material-ui/core/Tab";
+import Typography from "@material-ui/core/Typography";
+import { Box, Button } from "@material-ui/core";
+import AddHotelForm from "./AddHotelForm";
+import BaseAlert from "./../shared/BaseAlert";
+import RoomTable from "./../Room/RoomTable";
+import ServiceTable from "./ServiceTable";
+import { useSelector } from "react-redux";
+import BaseImageDialog from "./../shared/BaseImageDialog";
+import Grid from "@material-ui/core/Grid";
+import API from "./../../api";
+
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`vertical-tabpanel-${index}`}
+      aria-labelledby={`vertical-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box p={3}>
+          <Typography>{children}</Typography>
+        </Box>
+      )}
+    </div>
+  );
+}
+
+TabPanel.propTypes = {
+  children: PropTypes.node,
+  index: PropTypes.any.isRequired,
+  value: PropTypes.any.isRequired,
+};
+const useStyles = makeStyles((theme) => ({
+  root: {
+    flexGrow: 3,
+    backgroundColor: theme.palette.background.paper,
+    display: "flex",
+  },
+  section: {
+    width: "80%",
+    alignItems: "center",
+  },
+  serviceSection: {
+    width: "40%",
+  },
+  createRoomButton: {
+    marginTop: 10,
+  },
+}));
+
+export default function HotelEditor(props) {
+  const classes = useStyles();
+  const [value, setValue] = useState(0);
+  const [hotel, setHotel] = useState(props.location.state.hotel);
+  const [updateAlertOpen, setUpdateAlertOpen] = useState(false);
+  const [imageDialogOpen, setImageDialogOpen] = useState(false);
+  const [filesLimit, setFilesLimit] = useState(0);
+  const [roomId, setRoomId] = useState();
+  let content = [
+    `${hotel.name}`,
+    `country: ${hotel.location.country}`,
+    `city: ${hotel.location.city}`,
+    `street: ${hotel.location.street} ${hotel.location.buildingNumber}`,
+  ];
+  const role = useSelector((state) => state.role);
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
+
+  function callUpdateAlert() {
+    setUpdateAlertOpen(true);
+  }
+  function callImageDialog() {
+    setImageDialogOpen(true);
+  }
+
+  const handleCloseUpdateAlert = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setUpdateAlertOpen(false);
+  };
+  function toRoomSection() {
+    setValue(1);
+  }
+  function handleCloseImageDialog() {
+    setImageDialogOpen(false);
+  }
+  async function updateMainInfo() {
+    const GetHotel = async () => {
+      await API.get("/hotels/" + hotel.id)
+        .then((response) => response.data)
+        .then((data) => {
+          setHotel(data);
+        })
+        .catch((error) => {
+          console.log(error.response.data.Message);
+        });
+    };
+    await GetHotel();
+    toRoomSection();
+  }
+
+  useEffect(() => {}, [hotel]);
+
+  return (
+    <div className={classes.root}>
+      <Tabs
+        orientation="vertical"
+        value={value}
+        onChange={handleChange}
+        aria-label="Vertical tabs example"
+        className={classes.tabs}
+      >
+        <Tab label="Main Info" />
+        <Tab label="Rooms" />
+        <Tab label="Services" />
+      </Tabs>
+
+      <TabPanel value={value} index={0}>
+        <Grid
+          container
+          direction="row"
+          justify="space-around"
+          alignItems="center"
+        >
+          {role === "Admin" ? (
+            <Grid item lg={12}>
+              <AddHotelForm
+                toRoomSection={toRoomSection}
+                hotel={hotel}
+                callUpdateAlert={callUpdateAlert}
+                updateMainInfo={() => updateMainInfo()}
+              ></AddHotelForm>
+            </Grid>
+          ) : (
+            ""
+          )}
+        </Grid>
+      </TabPanel>
+
+      <TabPanel className={classes.section} value={value} index={1}>
+        <RoomTable hotelId={hotel.id}></RoomTable>
+      </TabPanel>
+      <TabPanel className={classes.serviceSection} value={value} index={2}>
+        <ServiceTable hotelId={hotel.id}></ServiceTable>
+      </TabPanel>
+      <BaseImageDialog
+        hotelId={hotel.id}
+        open={imageDialogOpen}
+        handleClose={() => handleCloseImageDialog()}
+        updateMainInfo={() => updateMainInfo()}
+        imageUrls={hotel.imageUrls}
+      ></BaseImageDialog>
+      <BaseAlert
+        open={updateAlertOpen}
+        handleClose={handleCloseUpdateAlert}
+        message={"hotel updated succesfully"}
+      ></BaseAlert>
+    </div>
+  );
+}
