@@ -29,7 +29,7 @@ const useStyles = makeStyles({
     width: "100%",
   },
   container: {
-    minHeight: 600,
+    minHeight: 500,
   },
   addHotelButton: {
     marginTop: 30,

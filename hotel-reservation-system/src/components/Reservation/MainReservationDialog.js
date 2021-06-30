@@ -7,6 +7,7 @@ import CloseIcon from "@material-ui/icons/Close";
 import Slide from "@material-ui/core/Slide";
 import BaseStepper from "./../shared/BaseStepper";
 import RoomDetails from "../Room/RoomDetails";
+import ServiceChoice from "../Service/ServiceChoise";
 
 const useStyles = makeStyles((theme) => ({
   appBar: {
@@ -24,7 +25,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 export default function MainReservationDialog({ open, handleClose, room }) {
   let roomDetailsСomponent = <RoomDetails room={room}></RoomDetails>;
-  let choiseOfServicesComponent = "Choose services";
+  let choiseOfServicesComponent = <ServiceChoice></ServiceChoice>;
   let paymentComponent = "Payment";
   const classes = useStyles();
   const [currentComponent, setCurrentComponent] =
