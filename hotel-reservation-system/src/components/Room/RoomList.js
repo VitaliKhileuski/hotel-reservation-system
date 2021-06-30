@@ -14,8 +14,10 @@ export default function RoomList({ rooms }) {
           ];
           return (
             <BaseCard
+              key={i}
               imageUrls={roomListItem.imageUrls}
               contentRows={content}
+              room={roomListItem}
             />
           );
         })}

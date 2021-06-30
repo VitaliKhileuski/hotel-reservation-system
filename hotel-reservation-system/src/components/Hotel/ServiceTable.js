@@ -19,7 +19,7 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import API from "./../../api";
 import AddServiceForm from "./AddServiceForm";
 import BaseAlert from "./../shared/BaseAlert";
-import BaseAddDialog from "../shared/BaseAddDialog";
+import BaseDialog from "../shared/BaseDialog";
 import BaseDeleteDialog from "./../shared/BaseDeleteDialog";
 
 const useStyles = makeStyles({
@@ -199,11 +199,11 @@ export default function ServiceTable({ hotelId }) {
       >
         Create Service
       </Button>
-      <BaseAddDialog
+      <BaseDialog
         open={openDialog}
         handleClose={handleClose}
         form={form}
-      ></BaseAddDialog>
+      ></BaseDialog>
       <BaseDeleteDialog
         open={openDeleteDialog}
         handleCloseDeleteDialog={handleCloseDeleteDialog}

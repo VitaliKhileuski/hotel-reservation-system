@@ -18,7 +18,7 @@ import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
 import API from "./../../api";
 import BaseAlert from "./../shared/BaseAlert";
-import BaseAddDialog from "./../shared/BaseAddDialog";
+import BaseDialog from "../shared/BaseDialog";
 import AddHotelForm from "./AddHotelForm";
 import BaseDeleteDialog from "./../shared/BaseDeleteDialog";
 import PersonAddIcon from "@material-ui/icons/PersonAdd";
@@ -328,11 +328,12 @@ export default function HotelTable() {
         ) : (
           ""
         )}
-        <BaseAddDialog
+        <BaseDialog
+          title="create/update"
           open={open}
           handleClose={handleClose}
           form={flag === true ? component : form}
-        ></BaseAddDialog>
+        ></BaseDialog>
         {hotel === undefined ? (
           ""
         ) : (

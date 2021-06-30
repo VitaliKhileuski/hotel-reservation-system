@@ -12,6 +12,7 @@ import {
   CardMedia,
   Typography,
 } from "@material-ui/core";
+import MainReservationDialog from "../Reservation/MainReservationDialog";
 
 const useStyles = makeStyles({
   root: {
@@ -23,38 +24,64 @@ const useStyles = makeStyles({
   },
 });
 
-export default function RoomListItem({ imageUrls, contentRows, clickAction }) {
+export default function BaseCard({
+  imageUrls,
+  room,
+  contentRows,
+  clickAction,
+}) {
   const classes = useStyles();
+  const [reservationDialogOpen, setReservationDialogOpen] = useState(false);
   const history = useHistory();
-  const adminId = useSelector((state) => state.userId);
   const token = localStorage.getItem("token");
-  console.log(imageUrls);
+  console.log(room);
+
+  function callReservationDialog() {
+    console.log("click");
+    setReservationDialogOpen(true);
+  }
+  function handleCloseReservationDialog() {
+    setReservationDialogOpen(false);
+  }
   return (
-    <Card className={classes.root} onClick={clickAction}>
-      <CardActionArea>
-        {imageUrls === undefined || imageUrls.length === 0 ? (
-          <CardMedia image={defaultImage} className={classes.media}></CardMedia>
-        ) : (
-          <Carousel indicators={false}>
-            {imageUrls.map((item, i) => (
-              <CardMedia
-                key={i}
-                className={classes.media}
-                image={item}
-              ></CardMedia>
-            ))}
-          </Carousel>
-        )}
-        <CardContent>
-          {contentRows.map((content, i) => {
-            return (
-              <Typography variant="body2" key={i}>
-                {content}
-              </Typography>
-            );
-          })}
-        </CardContent>
-      </CardActionArea>
-    </Card>
+    <>
+      <Card
+        className={classes.root}
+        onClick={room !== undefined ? callReservationDialog : clickAction}
+      >
+        <CardActionArea>
+          {imageUrls === undefined || imageUrls.length === 0 ? (
+            <CardMedia
+              image={defaultImage}
+              className={classes.media}
+            ></CardMedia>
+          ) : (
+            <Carousel indicators={false}>
+              {imageUrls.map((item, i) => (
+                <CardMedia
+                  key={i}
+                  className={classes.media}
+                  image={item}
+                ></CardMedia>
+              ))}
+            </Carousel>
+          )}
+          <CardContent>
+            {contentRows.map((content, i) => {
+              return (
+                <Typography variant="body2" key={i}>
+                  {content}
+                </Typography>
+              );
+            })}
+          </CardContent>
+        </CardActionArea>
+      </Card>
+      <MainReservationDialog
+        handleClose={() => handleCloseReservationDialog()}
+        open={reservationDialogOpen}
+        room={room}
+      ></MainReservationDialog>
+    </>
   );
 }
