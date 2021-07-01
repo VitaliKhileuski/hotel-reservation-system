@@ -8,6 +8,8 @@ import Slide from "@material-ui/core/Slide";
 import BaseStepper from "./../shared/BaseStepper";
 import RoomDetails from "../Room/RoomDetails";
 import ServiceChoice from "../Service/ServiceChoise";
+import DateFilter from "../Filters/DateFilter";
+import Payment from "./Payment";
 
 const useStyles = makeStyles((theme) => ({
   appBar: {
@@ -17,21 +19,44 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: theme.spacing(2),
     flex: 1,
   },
+  dateFilter: {
+    display: "flex",
+    justifyContent: "center",
+  },
 }));
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="down" ref={ref} {...props} />;
 });
-
-export default function MainReservationDialog({ open, handleClose, room }) {
+export default function MainReservationDialog({
+  open,
+  handleClose,
+  room,
+  checkInDate,
+  checkOutDate,
+}) {
+  const [flag, setFlag] = useState(true);
+  const [selectedServices, setSelectedServices] = useState([]);
   let roomDetailsСomponent = <RoomDetails room={room}></RoomDetails>;
-  let choiseOfServicesComponent = <ServiceChoice></ServiceChoice>;
-  let paymentComponent = "Payment";
+  let choiseOfServicesComponent = (
+    <ServiceChoice
+      oldSelectedServices={selectedServices}
+      getSelectedServices={getSelectedServices}
+    ></ServiceChoice>
+  );
+  let paymentComponent = (
+    <Payment selectedServices={selectedServices} room={room}></Payment>
+  );
   const classes = useStyles();
   const [currentComponent, setCurrentComponent] =
     useState(roomDetailsСomponent);
 
+  console.log(checkOutDate);
   useEffect(() => {}, [currentComponent]);
+
+  function getSelectedServices(selectedServices) {
+    setSelectedServices(selectedServices);
+  }
 
   function getStepComponent(step) {
     switch (step) {
@@ -50,6 +75,11 @@ export default function MainReservationDialog({ open, handleClose, room }) {
   }
   function changeStep(step) {
     console.log(step);
+    if (step === 0) {
+      setFlag(true);
+    } else {
+      setFlag(false);
+    }
     getStepComponent(step);
   }
   function close() {
@@ -80,7 +110,17 @@ export default function MainReservationDialog({ open, handleClose, room }) {
         </Toolbar>
       </AppBar>
       {currentComponent}
-      <BaseStepper changeStep={changeStep}></BaseStepper>
+      <div className={classes.dateFilter}>
+        {flag === true ? (
+          <DateFilter
+            checkInDate={checkInDate}
+            checkOutDate={checkOutDate}
+          ></DateFilter>
+        ) : (
+          ""
+        )}
+        <BaseStepper changeStep={changeStep}></BaseStepper>
+      </div>
     </Dialog>
   );
 }

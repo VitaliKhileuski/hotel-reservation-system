@@ -18,10 +18,13 @@ const useStyles = makeStyles({
   },
 });
 
-export default function CheckboxesTags() {
+export default function ServiceChoice({
+  oldSelectedServices,
+  getSelectedServices,
+}) {
   const classes = useStyles();
   const [services, setServices] = useState([]);
-  const [selectedServices, setSelectedServices] = useState([]);
+  const [selectedServices, setSelectedServices] = useState(oldSelectedServices);
   useEffect(() => {
     const loadServices = async () => {
       await API.get("/services")
@@ -34,7 +37,9 @@ export default function CheckboxesTags() {
     loadServices();
   }, []);
   useEffect(() => {
-    console.log("service choice rerender");
+    if (selectedServices.length !== 0) {
+      getSelectedServices(selectedServices);
+    }
   }, [selectedServices]);
 
   return (
@@ -45,7 +50,9 @@ export default function CheckboxesTags() {
         id="checkboxes-tags-demo"
         options={services}
         disableCloseOnSelect
+        defaultValue={selectedServices}
         getOptionLabel={(option) => option.name}
+        getOptionSelected={(option, value) => option.name === value.name}
         onChange={(event, value) => setSelectedServices(value)}
         renderTags={(options, getTagProps) =>
           options

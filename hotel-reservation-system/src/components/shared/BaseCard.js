@@ -29,12 +29,15 @@ export default function BaseCard({
   room,
   contentRows,
   clickAction,
+  checkInDate,
+  checkOutDate,
 }) {
   const classes = useStyles();
   const [reservationDialogOpen, setReservationDialogOpen] = useState(false);
   const history = useHistory();
   const token = localStorage.getItem("token");
   console.log(room);
+  console.log(checkOutDate);
 
   function callReservationDialog() {
     console.log("click");
@@ -81,6 +84,8 @@ export default function BaseCard({
         handleClose={() => handleCloseReservationDialog()}
         open={reservationDialogOpen}
         room={room}
+        checkInDate={checkInDate}
+        checkOutDate={checkOutDate}
       ></MainReservationDialog>
     </>
   );

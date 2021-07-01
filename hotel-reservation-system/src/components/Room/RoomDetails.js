@@ -11,6 +11,7 @@ import {
 } from "@material-ui/core";
 import BaseCard from "./../shared/BaseCard";
 import BaseDialog from "../shared/BaseDialog";
+import DateFilter from "../Filters/DateFilter";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -20,10 +21,11 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "space-around",
   },
   gridList: {
-    width: "50%",
-    height: "80%",
+    width: "60%",
+    height: "85%",
   },
   text: {},
+  dateFilter: {},
 }));
 
 export default function RoomDetails({ room }) {
@@ -49,6 +51,7 @@ export default function RoomDetails({ room }) {
           </GridListTile>
         ))}
       </GridList>
+
       <div className={classes.text}>
         <Typography variant="h4">room number: {room.roomNumber}</Typography>
         <Typography variant="h4">number of beds: {room.bedsNumber}</Typography>

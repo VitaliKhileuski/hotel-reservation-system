@@ -212,7 +212,11 @@ export default function Home() {
           </Button>
         </Grid>
       </Grid>
-      <HotelList hotels={hotels}></HotelList>
+      <HotelList
+        hotels={hotels}
+        checkInDate={checkInDate}
+        checkOutDate={checkOutDate}
+      ></HotelList>
       <Pagination
         className={classes.pagination}
         page={page}

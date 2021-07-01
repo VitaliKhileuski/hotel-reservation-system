@@ -16,6 +16,13 @@ export default function RoomsPage(props) {
   const [rooms, setRooms] = useState([]);
   console.log(props);
   const [hotelId, setHotelId] = useState(props.location.state.hotelId);
+  const [checkInDate, setCheckInDate] = useState(
+    props.location.state.checkInDate
+  );
+  const [checkOutDate, setCheckOutDate] = useState(
+    props.location.state.checkOutDate
+  );
+  console.log(props);
   const [page, setPage] = useState(0);
   const [numberOfPages, setNumberOfPages] = useState(0);
   const pageSize = 8;
@@ -26,7 +33,11 @@ export default function RoomsPage(props) {
       await API.get(
         "/rooms/" +
           hotelId +
-          "/pages?PageNumber=" +
+          "?checkInDate=" +
+          checkInDate.toJSON() +
+          "&checkOutDate=" +
+          checkOutDate.toJSON() +
+          "&PageNumber=" +
           page +
           "&PageSize=" +
           pageSize
@@ -40,7 +51,10 @@ export default function RoomsPage(props) {
         .catch((error) => console.log(error.response.data.message));
     };
     loadRooms();
+    console.log(rooms);
   }, [page]);
+  console.log("rooms page");
+  console.log(checkOutDate);
 
   const changePage = (event, value) => {
     setPage(value);
@@ -48,7 +62,11 @@ export default function RoomsPage(props) {
 
   return (
     <>
-      <RoomList rooms={rooms}></RoomList>
+      <RoomList
+        rooms={rooms}
+        checkInDate={checkInDate}
+        checkOutDate={checkOutDate}
+      ></RoomList>
       <Pagination
         className={classes.pagination}
         page={page}
