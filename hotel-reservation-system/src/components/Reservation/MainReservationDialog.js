@@ -10,6 +10,7 @@ import RoomDetails from "../Room/RoomDetails";
 import ServiceChoice from "../Service/ServiceChoise";
 import DateFilter from "../Filters/DateFilter";
 import Payment from "./Payment";
+import { checkUtils } from "@material-ui/pickers/_shared/hooks/useUtils";
 
 const useStyles = makeStyles((theme) => ({
   appBar: {
@@ -37,6 +38,8 @@ export default function MainReservationDialog({
 }) {
   const [flag, setFlag] = useState(true);
   const [selectedServices, setSelectedServices] = useState([]);
+  const [checkIn,setCheckIn] = useState(checkInDate);
+  const [checkOut,setCheckOut] = useState(checkOutDate);
   let roomDetailsСomponent = <RoomDetails room={room}></RoomDetails>;
   let choiseOfServicesComponent = (
     <ServiceChoice
@@ -44,8 +47,9 @@ export default function MainReservationDialog({
       getSelectedServices={getSelectedServices}
     ></ServiceChoice>
   );
+  let numberOfDays  = Math.round((Math.abs(checkIn-checkOut))/(1000*3600*24))
   let paymentComponent = (
-    <Payment selectedServices={selectedServices} room={room}></Payment>
+    <Payment selectedServices={selectedServices} room={room} numberOfDays ={numberOfDays}></Payment>
   );
   const classes = useStyles();
   const [currentComponent, setCurrentComponent] =
@@ -86,6 +90,12 @@ export default function MainReservationDialog({
     setCurrentComponent(roomDetailsСomponent);
     handleClose();
   }
+  function changeDates(checkIn,checkOut){
+    console.log(checkIn);
+    console.log(checkOut);
+    setCheckIn(checkIn);
+    setCheckOut(checkOut);
+  }
 
   return (
     <Dialog
@@ -113,8 +123,10 @@ export default function MainReservationDialog({
       <div className={classes.dateFilter}>
         {flag === true ? (
           <DateFilter
-            checkInDate={checkInDate}
-            checkOutDate={checkOutDate}
+            roomId = {room.id}
+            checkInDate={checkIn}
+            checkOutDate={checkOut}
+            changeDates={changeDates}
           ></DateFilter>
         ) : (
           ""

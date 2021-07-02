@@ -80,7 +80,7 @@ export default function RoomTable({ hotelId }) {
       await API.get(
         "/rooms/" +
           hotelId +
-          "/pages?PageNumber=" +
+          "/?PageNumber=" +
           pageForRequest +
           "&PageSize=" +
           rowsPerPage

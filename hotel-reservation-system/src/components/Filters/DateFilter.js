@@ -6,15 +6,53 @@ import {
   KeyboardDatePicker,
 } from "@material-ui/pickers";
 import { Grid, Typography } from "@material-ui/core";
-
+import API from "../../api";
 const useStyles = makeStyles((theme) => ({
   root: {},
 }));
 
-export default function DateFilter({ checkInDate, checkOutDate }) {
+export default function DateFilter({roomId, checkInDate, checkOutDate, changeDates }) {
   const classes = useStyles();
   console.log(checkOutDate);
+  const [checkIn,setCheckIn] = useState(checkInDate);
+  const [checkOut,setCheckOut] = useState(checkOutDate);
+
+  useEffect(() => {
+    if (roomId !== undefined) {
+      
+    }
+  }, []);
+  const checkPlace = async () => {
+    await API.get(
+      "/rooms/" +
+        roomId +
+        "/isEmpty" +
+        "?checkInDate=" +
+      checkIn.toJSON() +
+      "&checkOutDate=" +
+      checkOut.toJSON()
+    )
+      .then((response) => response.data)
+      .then((data) => {
+        console.log(data);
+      })
+      .catch((error) => console.log(error.response.data.message));
+  };
+
+  const handleDateCheckInChange = (date) => {
+    setCheckIn(date);
+    changeDates(date,checkOut);
+    checkPlace();
+
+  };
+  const handleDateCheckOutChange = (date) => {
+    setCheckOut(date);
+    changeDates(checkIn,date);
+    checkPlace();
+  };
+
   return (
+    
     <MuiPickersUtilsProvider utils={DateFnsUtils}>
       <Grid>
         <Typography variant="h6">Check in Date</Typography>
@@ -24,8 +62,8 @@ export default function DateFilter({ checkInDate, checkOutDate }) {
           variant="inline"
           inputVariant="outlined"
           format="MM/dd/yyyy"
-          value={checkInDate}
-          //onChange={handleDateCheckInChange}
+          value={checkIn}
+          onChange={handleDateCheckInChange}
           KeyboardButtonProps={{
             "aria-label": "change date",
           }}
@@ -35,12 +73,12 @@ export default function DateFilter({ checkInDate, checkOutDate }) {
         <Typography variant="h6">Check out date</Typography>
         <KeyboardDatePicker
           disableToolbar
-          minDate={new Date(Date.now() + 24 * 60 * 60 * 1000)}
+          minDate={new Date(checkIn.getTime()+1000*60*60*24)}
           variant="inline"
           format="MM/dd/yyyy"
           inputVariant="outlined"
-          value={checkOutDate}
-          //onChange={handleDateCheckOutChange}
+          value={checkOut}
+          onChange={handleDateCheckOutChange}
           KeyboardButtonProps={{
             "aria-label": "change date",
           }}

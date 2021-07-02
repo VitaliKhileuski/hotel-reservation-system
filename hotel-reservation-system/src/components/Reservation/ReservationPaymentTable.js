@@ -25,8 +25,18 @@ export default function ReservationPaymentTable({
   numberOfDays,
 }) {
   const classes = useStyles();
+  
   function ccyFormat(num) {
     return `${num.toFixed(2)}`;
+  }
+  function calculateTotalSum(){
+    let sum  = 0;
+    selectedServices.map(item => {
+      sum+=item.payment*item.quantity;
+    })
+    sum+=room.paymentPerDay*numberOfDays;
+    console.log(sum)
+    return ccyFormat(sum);
   }
 
   return (
@@ -41,7 +51,7 @@ export default function ReservationPaymentTable({
           </TableRow>
           <TableRow>
             <TableCell>Facility</TableCell>
-            <TableCell align="right">quantity.</TableCell>
+            <TableCell align="right">Quantity</TableCell>
             <TableCell align="right">Sum</TableCell>
           </TableRow>
         </TableHead>
@@ -56,8 +66,8 @@ export default function ReservationPaymentTable({
           {selectedServices.map((service) => (
             <TableRow key={service.name}>
               <TableCell>{service.name}</TableCell>
-              <TableCell align="right">{1}</TableCell>
-              <TableCell align="right">{ccyFormat(service.payment)}</TableCell>
+              <TableCell align="right">{service.quantity}</TableCell>
+              <TableCell align="right">{ccyFormat(service.payment*service.quantity)}</TableCell>
             </TableRow>
           ))}
 
@@ -67,7 +77,7 @@ export default function ReservationPaymentTable({
           <TableRow></TableRow>
           <TableRow>
             <TableCell colSpan={2}>Total</TableCell>
-            <TableCell align="right">10</TableCell>
+            <TableCell align="right">{calculateTotalSum()}</TableCell>
           </TableRow>
         </TableBody>
       </Table>
