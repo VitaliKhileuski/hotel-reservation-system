@@ -21,8 +21,8 @@ import AddServiceForm from "./AddServiceForm";
 import BaseAlert from "./../shared/BaseAlert";
 import BaseDialog from "../shared/BaseDialog";
 import BaseDeleteDialog from "./../shared/BaseDeleteDialog";
-import AddIcon from '@material-ui/icons/Add';
-import RemoveIcon from '@material-ui/icons/Remove';
+import AddIcon from "@material-ui/icons/Add";
+import RemoveIcon from "@material-ui/icons/Remove";
 
 const useStyles = makeStyles({
   root: {
@@ -54,7 +54,6 @@ export default function ServiceTable({ hotelId, serviceList }) {
   const [deleteAlertOpen, setDeleteAlertOpen] = useState(false);
   const [updateAlertOpen, setUpdateAlertOpen] = useState(false);
 
-
   let form = (
     <AddServiceForm
       handleClose={() => handleClose()}
@@ -68,7 +67,7 @@ export default function ServiceTable({ hotelId, serviceList }) {
     if (hotelId === undefined) {
       setServices(serviceList);
     }
-  }, [serviceList,service]);
+  }, [serviceList, service]);
 
   useEffect(() => {
     if (hotelId !== undefined) {
@@ -119,31 +118,30 @@ export default function ServiceTable({ hotelId, serviceList }) {
   function handleCloseDeleteDialog() {
     setOpenDeleteDialog(false);
   }
-  function increaseQuantity(service){  
+  function increaseQuantity(service) {
     var newService = {
-      id : service.id,
-      name : service.name,
-      payment : service.payment,
-      quantity : service.quantity++
-    } 
-    setService(newService);     
-  }
-  function reduceQuantity(service){
-    if(service.quantity!==1){
-    var newService = {
-      id : service.id,
-      name : service.name,
-      payment : service.payment,
-      quantity : service.quantity--
-    } 
+      id: service.id,
+      name: service.name,
+      payment: service.payment,
+      quantity: service.quantity++,
+    };
     setService(newService);
-  }    
+  }
+  function reduceQuantity(service) {
+    if (service.quantity !== 1) {
+      var newService = {
+        id: service.id,
+        name: service.name,
+        payment: service.payment,
+        quantity: service.quantity--,
+      };
+      setService(newService);
+    }
   }
   const handleCloseAlert = (event, reason) => {
     if (reason === "clickaway") {
       return;
     }
-
 
     setAddAlertOpen(false);
     setDeleteAlertOpen(false);
@@ -195,12 +193,14 @@ export default function ServiceTable({ hotelId, serviceList }) {
                   Payment
                 </TableCell>
                 {hotelId === undefined ? (
-                  
-                  <TableCell align="right" style={{minWidth : 50}}>Quantity</TableCell>
-                ) : ""
-                }
-                <TableCell/>
-                <TableCell/>
+                  <TableCell align="right" style={{ minWidth: 50 }}>
+                    Quantity
+                  </TableCell>
+                ) : (
+                  ""
+                )}
+                <TableCell />
+                <TableCell />
               </TableRow>
             </TableHead>
             <TableBody>
@@ -210,15 +210,21 @@ export default function ServiceTable({ hotelId, serviceList }) {
                   <TableCell align="right">{service.payment}</TableCell>
                   {hotelId === undefined ? (
                     <>
-                    <TableCell align="right">{service.quantity}</TableCell>
-                    <TableCell>
-                      <IconButton onClick ={() => increaseQuantity(service)} color="inherit">
-                        <AddIcon></AddIcon>
-                      </IconButton>
-                      <IconButton onClick ={() => reduceQuantity(service)} color="inherit">
-                        <RemoveIcon></RemoveIcon>
-                      </IconButton>
-                    </TableCell>
+                      <TableCell align="right">{service.quantity}</TableCell>
+                      <TableCell>
+                        <IconButton
+                          onClick={() => increaseQuantity(service)}
+                          color="inherit"
+                        >
+                          <AddIcon></AddIcon>
+                        </IconButton>
+                        <IconButton
+                          onClick={() => reduceQuantity(service)}
+                          color="inherit"
+                        >
+                          <RemoveIcon></RemoveIcon>
+                        </IconButton>
+                      </TableCell>
                     </>
                   ) : (
                     <TableCell>

@@ -32,7 +32,7 @@ function getSteps() {
   return ["Room details", "Choose services", "Payment"];
 }
 
-export default function BaseStepper({ changeStep }) {
+export default function BaseStepper({ changeStep, isValidInfo }) {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
   const steps = getSteps();
@@ -79,6 +79,7 @@ export default function BaseStepper({ changeStep }) {
 
             {activeStep !== steps.length - 1 ? (
               <Button
+                disabled={isValidInfo === false}
                 variant="contained"
                 color="primary"
                 onClick={handleNext}

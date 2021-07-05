@@ -10,47 +10,48 @@ import Paper from "@material-ui/core/Paper";
 
 const useStyles = makeStyles({
   table: {
-    maxWidth: "60%",
+    maxWidth: "80%",
     minHeight: "70%",
+    margin: 20,
   },
 });
-
-// function subtotal(items) {
-//   return items.map(({ price }) => price).reduce((sum, i) => sum + i, 0);
-// }
 
 export default function ReservationPaymentTable({
   selectedServices,
   room,
-  numberOfDays,
+  checkInDate,
+  checkOutDate,
 }) {
   const classes = useStyles();
-  
+  let numberOfDays = Math.round(
+    Math.abs(checkInDate - checkOutDate) / (1000 * 3600 * 24)
+  );
   function ccyFormat(num) {
     return `${num.toFixed(2)}`;
   }
-  function calculateTotalSum(){
-    let sum  = 0;
-    selectedServices.map(item => {
-      sum+=item.payment*item.quantity;
-    })
-    sum+=room.paymentPerDay*numberOfDays;
-    console.log(sum)
+  function calculateTotalSum() {
+    let sum = 0;
+    selectedServices.map((item) => {
+      sum += item.payment * item.quantity;
+    });
+    sum += room.paymentPerDay * numberOfDays;
+    console.log(sum);
     return ccyFormat(sum);
   }
 
   return (
-    <TableContainer component={Paper}>
+    <TableContainer>
       <Table className={classes.table} aria-label="spanning table">
         <TableHead>
           <TableRow>
-            <TableCell align="center" colSpan={2}>
+            <TableCell align="center" colSpan={3}>
               Details
             </TableCell>
             <TableCell align="right">Price</TableCell>
           </TableRow>
           <TableRow>
             <TableCell>Facility</TableCell>
+            <TableCell align="right">Payment</TableCell>
             <TableCell align="right">Quantity</TableCell>
             <TableCell align="right">Sum</TableCell>
           </TableRow>
@@ -58,6 +59,7 @@ export default function ReservationPaymentTable({
         <TableBody>
           <TableRow key={1}>
             <TableCell>Payment for room</TableCell>
+            <TableCell align="right">{ccyFormat(room.paymentPerDay)}</TableCell>
             <TableCell align="right">{numberOfDays}</TableCell>
             <TableCell align="right">
               {ccyFormat(room.paymentPerDay * numberOfDays)}
@@ -66,13 +68,16 @@ export default function ReservationPaymentTable({
           {selectedServices.map((service) => (
             <TableRow key={service.name}>
               <TableCell>{service.name}</TableCell>
+              <TableCell align="right">{ccyFormat(service.payment)}</TableCell>
               <TableCell align="right">{service.quantity}</TableCell>
-              <TableCell align="right">{ccyFormat(service.payment*service.quantity)}</TableCell>
+              <TableCell align="right">
+                {ccyFormat(service.payment * service.quantity)}
+              </TableCell>
             </TableRow>
           ))}
 
           <TableRow>
-            <TableCell rowSpan={2} />
+            <TableCell rowSpan={3} />
           </TableRow>
           <TableRow></TableRow>
           <TableRow>

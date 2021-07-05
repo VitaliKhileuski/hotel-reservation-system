@@ -38,8 +38,9 @@ export default function MainReservationDialog({
 }) {
   const [flag, setFlag] = useState(true);
   const [selectedServices, setSelectedServices] = useState([]);
-  const [checkIn,setCheckIn] = useState(checkInDate);
-  const [checkOut,setCheckOut] = useState(checkOutDate);
+  const [checkIn, setCheckIn] = useState(checkInDate);
+  const [checkOut, setCheckOut] = useState(checkOutDate);
+  const [isValidInfo, setIsValidInfo] = useState(true);
   let roomDetailsСomponent = <RoomDetails room={room}></RoomDetails>;
   let choiseOfServicesComponent = (
     <ServiceChoice
@@ -47,16 +48,21 @@ export default function MainReservationDialog({
       getSelectedServices={getSelectedServices}
     ></ServiceChoice>
   );
-  let numberOfDays  = Math.round((Math.abs(checkIn-checkOut))/(1000*3600*24))
+
   let paymentComponent = (
-    <Payment selectedServices={selectedServices} room={room} numberOfDays ={numberOfDays}></Payment>
+    <Payment
+      selectedServices={selectedServices}
+      room={room}
+      checkInDate={checkIn}
+      checkOutDate={checkOut}
+    ></Payment>
   );
   const classes = useStyles();
   const [currentComponent, setCurrentComponent] =
     useState(roomDetailsСomponent);
 
   console.log(checkOutDate);
-  useEffect(() => {}, [currentComponent]);
+  useEffect(() => {}, [currentComponent, isValidInfo]);
 
   function getSelectedServices(selectedServices) {
     setSelectedServices(selectedServices);
@@ -90,11 +96,13 @@ export default function MainReservationDialog({
     setCurrentComponent(roomDetailsСomponent);
     handleClose();
   }
-  function changeDates(checkIn,checkOut){
-    console.log(checkIn);
-    console.log(checkOut);
+  function changeDates(checkIn, checkOut) {
     setCheckIn(checkIn);
     setCheckOut(checkOut);
+  }
+  function checkValidInfo(isValid) {
+    setIsValidInfo(isValid);
+    console.log(isValid);
   }
 
   return (
@@ -121,17 +129,21 @@ export default function MainReservationDialog({
       </AppBar>
       {currentComponent}
       <div className={classes.dateFilter}>
-        {flag === true ? (
+        {flag === true && room !== undefined ? (
           <DateFilter
-            roomId = {room.id}
+            roomId={room.id}
             checkInDate={checkIn}
             checkOutDate={checkOut}
             changeDates={changeDates}
+            isValidInfo={checkValidInfo}
           ></DateFilter>
         ) : (
           ""
         )}
-        <BaseStepper changeStep={changeStep}></BaseStepper>
+        <BaseStepper
+          changeStep={changeStep}
+          isValidInfo={isValidInfo}
+        ></BaseStepper>
       </div>
     </Dialog>
   );

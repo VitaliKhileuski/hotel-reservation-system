@@ -30,18 +30,18 @@ export default function ServiceChoice({
       await API.get("/services")
         .then((response) => response.data)
         .then((data) => {
-          if (data !== undefined){
-            data.map(item => {
+          if (data !== undefined) {
+            data.map((item) => {
               var itemWithQuantity = {
-                id : item.id,
-                name : item.name,
-                payment : item.payment,
-                quantity : 1
-              }
+                id: item.id,
+                name: item.name,
+                payment: item.payment,
+                quantity: 1,
+              };
               services.push(itemWithQuantity);
-            })
-            console.log(services)
-          };
+            });
+            console.log(services);
+          }
         })
         .catch((error) => console.log(error));
     };
