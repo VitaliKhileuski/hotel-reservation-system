@@ -17,6 +17,7 @@ import {
   NAME,
   ROLE,
   USER_ID,
+  EMAIL
 } from "../../storage/actions/actionTypes.js";
 
 const useStyles = makeStyles((theme) => ({
@@ -92,6 +93,7 @@ export default function Register() {
           dispatch({ type: NAME, name: jwt.firstname });
           dispatch({ type: ROLE, role: jwt.role });
           dispatch({ type: USER_ID, userId: jwt.id });
+          dispatch({ type: EMAIL, userId: jwt.email });
           console.log(response);
         }
       })

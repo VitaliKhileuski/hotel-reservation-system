@@ -15,6 +15,7 @@ import {
   IS_LOGGED,
   NAME,
   ROLE,
+  EMAIL,
   USER_ID,
 } from "../../storage/actions/actionTypes.js";
 
@@ -92,10 +93,16 @@ export default function Login() {
           localStorage.setItem("token", response.data[0]);
           localStorage.setItem("refreshToken", response.data[1]);
           const jwt = JSON.parse(atob(response.data[0].split(".")[1]));
+          console.log(jwt);
+          console.log("jwt");
+          console.log(jwt.email);
           dispatch({ type: IS_LOGGED, isLogged: true });
           dispatch({ type: NAME, name: jwt.firstname });
+          dispatch({ type: EMAIL, email: jwt.email });
           dispatch({ type: ROLE, role: jwt.role });
           dispatch({ type: USER_ID, userId: jwt.id });
+          
+          
         }
       })
       .catch((error) => {

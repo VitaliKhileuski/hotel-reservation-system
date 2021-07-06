@@ -33,7 +33,7 @@ export default function ServiceChoice({
           if (data !== undefined) {
             data.map((item) => {
               var itemWithQuantity = {
-                id: item.id,
+                Serviceid: item.id,
                 name: item.name,
                 payment: item.payment,
                 quantity: 1,

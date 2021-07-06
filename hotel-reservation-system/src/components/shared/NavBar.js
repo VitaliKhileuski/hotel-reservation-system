@@ -17,7 +17,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { useSelector } from "react-redux";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import { useDispatch } from "react-redux";
-import { IS_LOGGED, NAME, ROLE } from "./../../storage/actions/actionTypes";
+import { IS_LOGGED, NAME, EMAIL, ROLE } from "./../../storage/actions/actionTypes";
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
@@ -66,6 +66,7 @@ function NavBar() {
     dispatch({ type: IS_LOGGED, isLogged: false });
     dispatch({ type: NAME, name: "" });
     dispatch({ type: ROLE, role: "" });
+    dispatch({ type: EMAIL, email: "" });
   };
   return (
     <div className={classes.root}>

@@ -1,5 +1,5 @@
 import initialState from "../initialState";
-import { IS_LOGGED, ROLE, NAME, USER_ID } from "../actions/actionTypes.js";
+import { IS_LOGGED, ROLE, NAME,EMAIL, USER_ID } from "../actions/actionTypes.js";
 
 export default function authentication(state = initialState, action) {
   switch (action.type) {
@@ -11,6 +11,8 @@ export default function authentication(state = initialState, action) {
       return { ...state, name: action.name };
     case USER_ID:
       return { ...state, userId: action.userId };
+    case EMAIL:
+      return { ...state, email: action.email };
     default:
       return state;
   }

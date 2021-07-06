@@ -11,7 +11,7 @@ import {
   Redirect,
 } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { IS_LOGGED, NAME, ROLE, USER_ID } from "./storage/actions/actionTypes";
+import { IS_LOGGED, NAME, ROLE,EMAIL, USER_ID } from "./storage/actions/actionTypes";
 import HotelTable from "./components/Hotel/HotelTable";
 import HotelEditor from "./components/Hotel/HotelEditor";
 import RoomsPage from "./components/Room/RoomsPage";
@@ -62,6 +62,7 @@ export default function App() {
     localStorage.removeItem("token");
     dispatch({ type: IS_LOGGED, isLogged: false });
     dispatch({ type: ROLE, role: "" });
+    dispatch({ type: EMAIL, role: "" });
   }
 
   useEffect(() => {

@@ -20,11 +20,8 @@ import RoomDetails from "../Room/RoomDetails";
 import ServiceChoice from "../Service/ServiceChoise";
 import DateFilter from "../Filters/DateFilter";
 import ReservationPaymentTable from "./ReservationPaymentTable";
-import {
-  loadCaptchaEnginge,
-  LoadCanvasTemplate,
-  validateCaptcha,
-} from "react-simple-captcha";
+import { validate } from "@material-ui/pickers";
+import OrderConfirmation from "./OrderConfirmation";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -50,14 +47,8 @@ export default function Payment({
   checkInDate,
   checkOutDate,
 }) {
-  const [checked, setChecked] = useState(false);
-  const [email, setEmail] = useState("");
-  const classes = useStyles();
-  useEffect(() => {
-    loadCaptchaEnginge(5);
-  }, []);
 
-  function CreateOrder() {}
+  const classes = useStyles();
 
   return (
     <Grid
@@ -76,41 +67,11 @@ export default function Payment({
         ></ReservationPaymentTable>
       </Grid>
       <Grid item lg={6}>
-        <Paper className={classes.paper}>
-          <Grid
-            className={classes.paperGrid}
-            spacing={5}
-            container
-            direction="column"
-            justify="space-around"
-            alignItems="center"
-          >
-            <Grid item xs={12}>
-              <Typography>
-                check in date: {checkInDate.toLocaleDateString("en-GB")}
-              </Typography>
-              <Typography>
-                check in date: {checkOutDate.toLocaleDateString("en-GB")}
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <TextField label="write your email"></TextField>
-            </Grid>
-            <Grid item xs={12}>
-              <LoadCanvasTemplate />
-              <TextField label="write a captcha"></TextField>
-            </Grid>
-            <Grid item xs={12}>
-              <FormControlLabel
-                control={<Checkbox name="checkedB" color="primary" />}
-                label="I agree with the information I entered"
-              />
-            </Grid>
-            <Button variant="contained" color="primary">
-              Order
-            </Button>
-          </Grid>
-        </Paper>
+        <OrderConfirmation
+        selectedServices={selectedServices}
+        room={room}
+        checkInDate={checkInDate}
+        checkOutDate={checkOutDate}></OrderConfirmation>
       </Grid>
     </Grid>
   );

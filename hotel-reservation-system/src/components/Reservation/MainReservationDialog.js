@@ -61,8 +61,9 @@ export default function MainReservationDialog({
   const [currentComponent, setCurrentComponent] =
     useState(roomDetailsСomponent);
 
-  console.log(checkOutDate);
-  useEffect(() => {}, [currentComponent, isValidInfo]);
+  useEffect(() => {
+    
+  }, [currentComponent, isValidInfo]);
 
   function getSelectedServices(selectedServices) {
     setSelectedServices(selectedServices);
