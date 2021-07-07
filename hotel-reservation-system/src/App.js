@@ -22,6 +22,7 @@ import HotelTable from "./components/Hotel/HotelTable";
 import HotelEditor from "./components/Hotel/HotelEditor";
 import RoomsPage from "./components/Room/RoomsPage";
 import createAuthRefreshInterceptor from "axios-auth-refresh";
+import OrderTable from './components/Reservation/OrderTable'
 
 export default function App() {
   const dispatch = useDispatch();
@@ -90,6 +91,7 @@ export default function App() {
           <Route path="/register" component={Register} />
           <Route path="/home" component={Home} />
           <Route path="/ownedHotels" component={HotelTable}></Route>
+          <Route path="/orders" component={OrderTable}></Route>
           <Route
             path="/hotelEditor"
             render={(props) => <HotelEditor {...props} />}

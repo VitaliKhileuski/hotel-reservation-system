@@ -42,7 +42,6 @@ export default function AddHotelForm({
   updateMainInfo,
 }) {
   const classes = useStyles();
-  const [users, setUsers] = useState([]);
   const [showAlert, setShowAlert] = useState(false);
   const token = localStorage.getItem("token");
   const [buildingNumberLabelError, setBuildingNumberLabelError] = useState("");
@@ -57,6 +56,7 @@ export default function AddHotelForm({
     street: hotel === undefined ? "" : hotel.location.street,
     buildingNumber: hotel === undefined ? "" : hotel.location.buildingNumber,
   };
+  
   const validationSchema = Yup.object().shape({
     name: Yup.string().required("name is required").trim(),
     country: Yup.string().required("country is required").trim(),

@@ -104,6 +104,7 @@ export default function ServiceTable({ hotelId, serviceList }) {
     setPage(0);
     SetPageForRequest(1);
   };
+  
   function OpenAddServiceDialog(service) {
     setService(service);
     setOpenDialog(true);
@@ -111,13 +112,16 @@ export default function ServiceTable({ hotelId, serviceList }) {
   function handleClose() {
     setOpenDialog(false);
   }
+  
   function callDeleteDialog(serviceId) {
     setServiceId(serviceId);
     setOpenDeleteDialog(true);
   }
+
   function handleCloseDeleteDialog() {
     setOpenDeleteDialog(false);
   }
+
   function increaseQuantity(service) {
     var newService = {
       id: service.id,

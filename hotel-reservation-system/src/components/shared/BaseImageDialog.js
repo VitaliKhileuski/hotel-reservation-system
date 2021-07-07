@@ -1,10 +1,8 @@
 import { React, useState, useEffect } from "react";
 import { DropzoneDialogBase } from "material-ui-dropzone";
-import { USER_ID } from "./../../storage/actions/actionTypes";
-import { useSelector } from "react-redux";
 import API from "./../../api";
 import axios from "axios";
-import { set } from "date-fns";
+
 
 export default function BaseImageDialog({
   open,
@@ -17,23 +15,14 @@ export default function BaseImageDialog({
   const token = localStorage.getItem("token");
   const [requestFiles, setRequestFiles] = useState([]);
   const [flag, setFlag] = useState(false);
-  const [currentImages, setCurrentImages] = useState([]);
-  const [tempImages, setTempImages] = useState([]);
+  const [tempImages,setTempImages] = useState([])
 
   useEffect(async () => {
-    if (open === true) {
-      setFileObjects([]);
-      if (currentImages.length !== 0) {
-        setFileObjects(currentImages);
-      } else {
-        if (open === false) {
-          setFileObjects([]);
+    setTempImages([])
+    setFileObjects([]);
+    if (imageUrls !== undefined) {
+        await loadImages();
         }
-        if (imageUrls !== undefined) {
-          await loadImages();
-        }
-      }
-    }
   }, [open]);
 
   useEffect(() => {
@@ -57,12 +46,12 @@ export default function BaseImageDialog({
   const loadImages = async () => {
     await imageUrls.forEach(async (item) => {
       await GetImage(item);
-      if (fileObjects.length !== 0) {
+      
         if (flag === true) {
           setFlag(false);
         } else {
           setFlag(true);
-        }
+        
         console.log(fileObjects);
         console.log(`flag ${flag}`);
       }
@@ -85,10 +74,12 @@ export default function BaseImageDialog({
           };
 
           tempImages.push(file);
-          if (tempImages.length === imageUrls.length) {
-            setCurrentImages(tempImages);
-            setFileObjects(tempImages);
-          }
+            setFileObjects(tempImages)
+            if (flag === true) {
+              setFlag(false);
+            } else {
+              setFlag(true);
+            }
         }
       })
       .catch((error) => console.log(error));
@@ -116,7 +107,6 @@ export default function BaseImageDialog({
     };
     setImagesToRoom();
     setRequestFiles([]);
-    setCurrentImages(fileObjects);
     setFileObjects([]);
     handleClose();
   }
@@ -131,11 +121,8 @@ export default function BaseImageDialog({
       setImagesToHotel();
       console.log("file objects save");
       console.log(fileObjects);
-      setCurrentImages(fileObjects);
-      console.log("current images save");
       setFileObjects([]);
       setRequestFiles([]);
-      console.log(currentImages);
       handleClose();
     }
   }
@@ -158,7 +145,10 @@ export default function BaseImageDialog({
       fileObjects={fileObjects}
       maxFileSize={5000000}
       open={open}
-      onClose={() => handleClose()}
+      onClose={() =>{
+        handleClose();
+      }
+    } 
       onSave={() => saveImages()}
       onAdd={(newFileObjs) => {
         console.log(...newFileObjs);

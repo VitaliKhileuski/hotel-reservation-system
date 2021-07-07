@@ -1,0 +1,175 @@
+import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
+import { makeStyles } from '@material-ui/core/styles';
+import Box from '@material-ui/core/Box';
+import Collapse from '@material-ui/core/Collapse';
+import IconButton from '@material-ui/core/IconButton';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import {TableContainer, TablePagination} from '@material-ui/core';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import Typography from '@material-ui/core/Typography';
+import Paper from '@material-ui/core/Paper';
+import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
+import { useStyles } from '@material-ui/pickers/views/Calendar/SlideTransition';
+import API from './../../api'
+
+const useRowStyles = makeStyles({
+  root: {
+    '& > *': {
+      borderBottom: 'unset',
+    },
+  },
+  table : {
+      margin : 40
+  }
+});
+
+
+export default function OrderTable() {
+
+    const [orders,setOrders] = useState([])
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [pageForRequest, SetPageForRequest] = useState(0);
+    const [maxNumberOfOrders, setMaxNumberOfOrders] = useState(0);
+    const token = localStorage.getItem("token");
+     
+    useEffect(() => {
+        const loadOrders = async () => {
+          await API.get(
+            "/orders?PageNumber=" +
+              pageForRequest +
+              "&PageSize=" +
+              rowsPerPage,
+            {
+              headers: { Authorization: "Bearer " + token },
+            }
+          )
+            .then((response) => response.data)
+            .then((data) => {
+                console.log(data);
+              setOrders(data.items);
+              setMaxNumberOfOrders(data.numberOfItems);
+            })
+            .catch((error) => console.log(error.response.data.Message));
+        };
+        loadOrders();
+      }, [rowsPerPage, page]);
+      
+      const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+        SetPageForRequest(newPage + 1);
+        console.log(newPage);
+      };
+    
+      const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(+event.target.value);
+        setPage(0);
+        SetPageForRequest(1);
+      };
+
+
+    console.log(orders);
+    const [open, setOpen] = React.useState(false);
+    const classes = useStyles()
+  return (
+      <>
+    <TableContainer component={Paper} className={classes.table}>
+      <Table aria-label="collapsible table">
+        <TableHead>
+          <TableRow>
+            <TableCell />
+            <TableCell align="right" style={{ minWidth: 170 }}>
+                    Order date
+                  </TableCell>
+                  <TableCell align="right" style={{ minWidth: 170 }}>
+                    Check in date
+                  </TableCell>
+                  <TableCell align="right" style={{ minWidth: 170 }}>
+                    Check out date
+                  </TableCell>
+                  <TableCell align="right" style={{ minWidth: 170 }}>
+                    Number of days
+                  </TableCell>
+                  <TableCell align="right" style={{ minWidth: 170 }}>
+                    Full Price
+                  </TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+        {orders.map((order) => (
+                  <>
+                  <TableRow key={order.id}>
+                      <TableCell/>
+                    <TableCell>
+                    <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
+                    {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                    </IconButton>
+                    </TableCell>
+                    <TableCell align="right">{order.dateOrdered}</TableCell>
+                    <TableCell align="right">{order.startDate}</TableCell>
+                    <TableCell align="right">{order.endDate}</TableCell>
+                    <TableCell align="right">{order.numberOfDays}</TableCell>
+                    <TableCell align="right">{order.fullPrice}</TableCell>
+                  </TableRow>
+                  
+                  <TableRow>
+                  <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+                    <Collapse in={open} timeout="auto" unmountOnExit>
+                      <Box margin={1}>
+                        <Typography variant="h6" gutterBottom component="div">
+                          Services
+                        </Typography>
+                        <Table size="small" aria-label="purchases">
+                          <TableHead>
+                            <TableRow>
+                            <TableCell align="right" style={{ minWidth: 170 }}>
+                                    Name
+                                </TableCell>
+                                <TableCell align="right" style={{ minWidth: 170 }}>
+                                    Payment
+                                </TableCell>
+                                <TableCell align="right" style={{ minWidth: 170 }}>
+                                    Quantity
+                                </TableCell>
+                                <TableCell align="right" style={{ minWidth: 170 }}>
+                                    Full price
+                                </TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {order.services.map((service) => (
+                              <TableRow key={service.id}>
+                                <TableCell align="right">{service.name}</TableCell>
+                                <TableCell align="right">{service.payment}</TableCell>
+                                <TableCell align="right">{service.quantity}</TableCell>
+                                <TableCell align="right">{service.fullPrice}</TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </Box>
+                    </Collapse>
+                  </TableCell>
+                </TableRow>
+                </>
+                ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+    <TablePagination
+    rowsPerPageOptions={[5, 10, 50]}
+    component="div"
+    count={maxNumberOfOrders}
+    rowsPerPage={rowsPerPage}
+    page={page}
+    onChangePage={handleChangePage}
+    onChangeRowsPerPage={handleChangeRowsPerPage}
+  />
+  </>
+  );
+}

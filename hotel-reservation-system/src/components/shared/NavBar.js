@@ -115,6 +115,11 @@ function NavBar() {
                           id="menu-list-grow"
                           onKeyDown={handleListKeyDown}
                         >
+                          <Link to="/orders" className={classes.link}>
+                              <MenuItem onClick={handleClose}>
+                                Orders
+                              </MenuItem>
+                            </Link>
                           {role !== "User" ? (
                             <Link to="/ownedHotels" className={classes.link}>
                               <MenuItem onClick={handleClose}>
