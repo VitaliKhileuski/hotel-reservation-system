@@ -4,7 +4,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import Typography from "@material-ui/core/Typography";
-import { Box, Button } from "@material-ui/core";
+import { Box } from "@material-ui/core";
 import AddHotelForm from "./AddHotelForm";
 import BaseAlert from "./../shared/BaseAlert";
 import RoomTable from "./../Room/RoomTable";
@@ -63,8 +63,7 @@ export default function HotelEditor(props) {
   const [hotel, setHotel] = useState(props.location.state.hotel);
   const [updateAlertOpen, setUpdateAlertOpen] = useState(false);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
-  const [filesLimit, setFilesLimit] = useState(0);
-  const [roomId, setRoomId] = useState();
+
   let content = [
     `${hotel.name}`,
     `country: ${hotel.location.country}`,

@@ -9,9 +9,8 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 export default function BaseDeleteDialog({
   open,
   deleteItem,
-  handleCloseDeleteDialog,
-  title,
   message,
+  handleCloseDeleteDialog,
 }) {
   return (
     <Dialog
@@ -20,7 +19,7 @@ export default function BaseDeleteDialog({
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
     >
-      <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
+      <DialogTitle id="alert-dialog-title">Reservation</DialogTitle>
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
           {message}

@@ -20,7 +20,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="down" ref={ref} {...props} />;
 });
 
-export default function BaseAddDialog({ open, handleClose, form }) {
+export default function BaseDialog({ title, open, handleClose, form }) {
   const classes = useStyles();
 
   return (
@@ -32,7 +32,7 @@ export default function BaseAddDialog({ open, handleClose, form }) {
       <AppBar className={classes.appBar}>
         <Toolbar>
           <Typography variant="h6" className={classes.title}>
-            Create/Update
+            {title}
           </Typography>
           <IconButton
             edge="end"

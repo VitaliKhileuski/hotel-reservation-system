@@ -18,7 +18,7 @@ import {
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
 import API from "../../api";
-import BaseAddDialog from "../shared/BaseAddDialog";
+import BaseDialog from "../shared/BaseDialog";
 import AddRoomForm from "./AddRoomForm";
 import BaseDeleteDialog from "../shared/BaseDeleteDialog";
 import BaseAlert from "../shared/BaseAlert";
@@ -29,7 +29,7 @@ const useStyles = makeStyles({
     width: "100%",
   },
   container: {
-    minHeight: 600,
+    minHeight: 500,
   },
   addHotelButton: {
     marginTop: 30,
@@ -80,14 +80,13 @@ export default function RoomTable({ hotelId }) {
       await API.get(
         "/rooms/" +
           hotelId +
-          "/pages?PageNumber=" +
+          "/?PageNumber=" +
           pageForRequest +
           "&PageSize=" +
           rowsPerPage
       )
         .then((response) => response.data)
         .then((data) => {
-          console.log(data);
           setRooms(data.items);
           setMaxNumberOfRooms(data.numberOfItems);
         })
@@ -99,7 +98,6 @@ export default function RoomTable({ hotelId }) {
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
     SetPageForRequest(newPage + 1);
-    console.log(newPage);
   };
 
   const handleChangeRowsPerPage = (event) => {
@@ -115,7 +113,6 @@ export default function RoomTable({ hotelId }) {
     setOpenDialog(false);
   }
   function callDeleteDialog(roomId) {
-    console.log(roomId);
     setRoomId(roomId);
     setOpenDeleteDialog(true);
   }
@@ -225,11 +222,11 @@ export default function RoomTable({ hotelId }) {
       >
         Create room
       </Button>
-      <BaseAddDialog
+      <BaseDialog
         open={openDialog}
         handleClose={handleClose}
         form={form}
-      ></BaseAddDialog>
+      ></BaseDialog>
       <BaseDeleteDialog
         open={openDeleteDialog}
         handleCloseDeleteDialog={handleCloseDeleteDialog}

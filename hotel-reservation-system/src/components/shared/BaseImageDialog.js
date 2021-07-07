@@ -4,6 +4,7 @@ import { USER_ID } from "./../../storage/actions/actionTypes";
 import { useSelector } from "react-redux";
 import API from "./../../api";
 import axios from "axios";
+import { set } from "date-fns";
 
 export default function BaseImageDialog({
   open,
@@ -15,28 +16,30 @@ export default function BaseImageDialog({
   const [fileObjects, setFileObjects] = useState([]);
   const token = localStorage.getItem("token");
   const [requestFiles, setRequestFiles] = useState([]);
-  const [flag, setFlag] = useState(true);
+  const [flag, setFlag] = useState(false);
   const [currentImages, setCurrentImages] = useState([]);
+  const [tempImages, setTempImages] = useState([]);
 
   useEffect(async () => {
-    setFileObjects([]);
-    if (currentImages.length !== 0) {
-      console.log("current images");
-      console.log(currentImages);
-      setFileObjects(currentImages);
-    } else {
-      if (open === false) {
-        setFileObjects([]);
-      }
-      if (imageUrls !== undefined) {
-        await loadImages();
+    if (open === true) {
+      setFileObjects([]);
+      if (currentImages.length !== 0) {
+        setFileObjects(currentImages);
+      } else {
+        if (open === false) {
+          setFileObjects([]);
+        }
+        if (imageUrls !== undefined) {
+          await loadImages();
+        }
       }
     }
   }, [open]);
 
   useEffect(() => {
-    setFlag(true);
-    if (imageUrls !== undefined && imageUrls.length === fileObjects.length) {
+    if (open === true) {
+      console.log("rerender");
+      console.log(fileObjects);
     }
   }, [flag]);
 
@@ -52,9 +55,17 @@ export default function BaseImageDialog({
     }
   }
   const loadImages = async () => {
-    console.log(imageUrls);
     await imageUrls.forEach(async (item) => {
       await GetImage(item);
+      if (fileObjects.length !== 0) {
+        if (flag === true) {
+          setFlag(false);
+        } else {
+          setFlag(true);
+        }
+        console.log(fileObjects);
+        console.log(`flag ${flag}`);
+      }
     });
   };
 
@@ -73,12 +84,11 @@ export default function BaseImageDialog({
             id: data.id,
           };
 
-          fileObjects.push(file);
-          console.log(fileObjects);
-          if (fileObjects.length === imageUrls.length) {
-            setCurrentImages(fileObjects);
+          tempImages.push(file);
+          if (tempImages.length === imageUrls.length) {
+            setCurrentImages(tempImages);
+            setFileObjects(tempImages);
           }
-          setFlag(false);
         }
       })
       .catch((error) => console.log(error));

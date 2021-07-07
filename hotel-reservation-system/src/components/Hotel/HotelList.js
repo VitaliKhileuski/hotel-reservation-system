@@ -3,18 +3,26 @@ import { Box, Grid, Button } from "@material-ui/core";
 import BaseCard from "./../shared/BaseCard";
 import { useHistory } from "react-router";
 
-export default function HotelList({ toRoomsPage, hotels }) {
+export default function HotelList({
+  toRoomsPage,
+  hotels,
+  checkInDate,
+  checkOutDate,
+}) {
   const history = useHistory();
+  console.log("hotel list");
+  console.log(checkOutDate);
 
   function toRoomsPage(hotelId) {
     history.push({
       pathname: "/rooms",
       state: {
         hotelId,
+        checkInDate,
+        checkOutDate,
       },
     });
   }
-
   return (
     <Box p={4}>
       <Grid justify="center" alignItems="center" container spacing={0}>

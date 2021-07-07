@@ -2,7 +2,7 @@ import { React, useEffect, useState } from "react";
 import { Box, Grid, Button } from "@material-ui/core";
 import BaseCard from "./../shared/BaseCard";
 
-export default function RoomList({ rooms }) {
+export default function RoomList({ rooms, checkInDate, checkOutDate }) {
   return (
     <Box p={4}>
       <Grid justify="center" alignItems="center" container spacing={0}>
@@ -14,8 +14,12 @@ export default function RoomList({ rooms }) {
           ];
           return (
             <BaseCard
+              key={i}
               imageUrls={roomListItem.imageUrls}
               contentRows={content}
+              room={roomListItem}
+              checkInDate={checkInDate}
+              checkOutDate={checkOutDate}
             />
           );
         })}
