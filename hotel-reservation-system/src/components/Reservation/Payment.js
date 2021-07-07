@@ -47,7 +47,6 @@ export default function Payment({
   checkInDate,
   checkOutDate,
 }) {
-
   const classes = useStyles();
 
   return (
@@ -68,10 +67,11 @@ export default function Payment({
       </Grid>
       <Grid item lg={6}>
         <OrderConfirmation
-        selectedServices={selectedServices}
-        room={room}
-        checkInDate={checkInDate}
-        checkOutDate={checkOutDate}></OrderConfirmation>
+          selectedServices={selectedServices}
+          room={room}
+          checkInDate={checkInDate}
+          checkOutDate={checkOutDate}
+        ></OrderConfirmation>
       </Grid>
     </Grid>
   );

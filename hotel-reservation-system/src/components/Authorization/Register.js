@@ -17,7 +17,7 @@ import {
   NAME,
   ROLE,
   USER_ID,
-  EMAIL
+  EMAIL,
 } from "../../storage/actions/actionTypes.js";
 
 const useStyles = makeStyles((theme) => ({

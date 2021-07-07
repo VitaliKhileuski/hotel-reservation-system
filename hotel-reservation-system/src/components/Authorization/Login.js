@@ -101,8 +101,6 @@ export default function Login() {
           dispatch({ type: EMAIL, email: jwt.email });
           dispatch({ type: ROLE, role: jwt.role });
           dispatch({ type: USER_ID, userId: jwt.id });
-          
-          
         }
       })
       .catch((error) => {

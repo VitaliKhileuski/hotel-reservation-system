@@ -11,7 +11,13 @@ import {
   Redirect,
 } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { IS_LOGGED, NAME, ROLE,EMAIL, USER_ID } from "./storage/actions/actionTypes";
+import {
+  IS_LOGGED,
+  NAME,
+  ROLE,
+  EMAIL,
+  USER_ID,
+} from "./storage/actions/actionTypes";
 import HotelTable from "./components/Hotel/HotelTable";
 import HotelEditor from "./components/Hotel/HotelEditor";
 import RoomsPage from "./components/Room/RoomsPage";
@@ -19,7 +25,6 @@ import createAuthRefreshInterceptor from "axios-auth-refresh";
 
 export default function App() {
   const dispatch = useDispatch();
-  const role = useSelector((state) => state.role);
 
   const refreshAuthLogic = async (failedRequest) =>
     await API.put("/account/refreshTokenVerification", {
@@ -44,7 +49,6 @@ export default function App() {
       const token = localStorage.getItem("token");
       updateStorage(token);
       let result;
-
       try {
         result = await API.get("/account/tokenVerification", {
           headers: {
