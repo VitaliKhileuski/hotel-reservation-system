@@ -70,7 +70,7 @@ export default function ServiceTable({ hotelId, serviceList }) {
   }, [serviceList, service]);
 
   useEffect(() => {
-    if (hotelId !== undefined) {
+    if (!!hotelId) {
       const loadServices = async () => {
         await API.get(
           "/services/" +
@@ -104,7 +104,7 @@ export default function ServiceTable({ hotelId, serviceList }) {
     setPage(0);
     SetPageForRequest(1);
   };
-  
+
   function OpenAddServiceDialog(service) {
     setService(service);
     setOpenDialog(true);
@@ -112,7 +112,7 @@ export default function ServiceTable({ hotelId, serviceList }) {
   function handleClose() {
     setOpenDialog(false);
   }
-  
+
   function callDeleteDialog(serviceId) {
     setServiceId(serviceId);
     setOpenDeleteDialog(true);
@@ -123,7 +123,7 @@ export default function ServiceTable({ hotelId, serviceList }) {
   }
 
   function increaseQuantity(service) {
-    var newService = {
+    let newService = {
       id: service.id,
       name: service.name,
       payment: service.payment,
@@ -131,9 +131,10 @@ export default function ServiceTable({ hotelId, serviceList }) {
     };
     setService(newService);
   }
+
   function reduceQuantity(service) {
     if (service.quantity !== 1) {
-      var newService = {
+      let newService = {
         id: service.id,
         name: service.name,
         payment: service.payment,
@@ -161,13 +162,13 @@ export default function ServiceTable({ hotelId, serviceList }) {
     setDeleteAlertOpen(true);
   }
   function slice(services) {
-    if (hotelId === undefined) {
+    if (!!hotelId) {
+      return services;
+    } else {
       return services.slice(
         page * rowsPerPage,
         page * rowsPerPage + rowsPerPage
       );
-    } else {
-      return services;
     }
   }
 
@@ -196,12 +197,12 @@ export default function ServiceTable({ hotelId, serviceList }) {
                 <TableCell align="right" style={{ minWidth: 100 }}>
                   Payment
                 </TableCell>
-                {hotelId === undefined ? (
+                {!!hotelId ? (
+                  ""
+                ) : (
                   <TableCell align="right" style={{ minWidth: 50 }}>
                     Quantity
                   </TableCell>
-                ) : (
-                  ""
                 )}
                 <TableCell />
                 <TableCell />
@@ -212,7 +213,22 @@ export default function ServiceTable({ hotelId, serviceList }) {
                 <TableRow key={service.id}>
                   <TableCell align="right">{service.name}</TableCell>
                   <TableCell align="right">{service.payment}</TableCell>
-                  {hotelId === undefined ? (
+                  {!!hotelId ? (
+                    <TableCell>
+                      <IconButton
+                        color="inherit"
+                        onClick={() => OpenAddServiceDialog(service)}
+                      >
+                        <EditIcon></EditIcon>
+                      </IconButton>
+                      <IconButton
+                        color="inherit"
+                        onClick={() => callDeleteDialog(service.id)}
+                      >
+                        <DeleteIcon></DeleteIcon>
+                      </IconButton>
+                    </TableCell>
+                  ) : (
                     <>
                       <TableCell align="right">{service.quantity}</TableCell>
                       <TableCell>
@@ -230,21 +246,6 @@ export default function ServiceTable({ hotelId, serviceList }) {
                         </IconButton>
                       </TableCell>
                     </>
-                  ) : (
-                    <TableCell>
-                      <IconButton
-                        color="inherit"
-                        onClick={() => OpenAddServiceDialog(service)}
-                      >
-                        <EditIcon></EditIcon>
-                      </IconButton>
-                      <IconButton
-                        color="inherit"
-                        onClick={() => callDeleteDialog(service.id)}
-                      >
-                        <DeleteIcon></DeleteIcon>
-                      </IconButton>
-                    </TableCell>
                   )}
                 </TableRow>
               ))}
@@ -254,16 +255,14 @@ export default function ServiceTable({ hotelId, serviceList }) {
         <TablePagination
           rowsPerPageOptions={[5, 10, 50]}
           component="div"
-          count={hotelId === undefined ? services.length : maxNumberOfServices}
+          count={!!hotelId ? maxNumberOfServices : services.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onChangePage={handleChangePage}
           onChangeRowsPerPage={handleChangeRowsPerPage}
         />
       </Paper>
-      {hotelId === undefined ? (
-        ""
-      ) : (
+      {!!hotelId ? (
         <>
           <Button
             variant="contained"
@@ -303,6 +302,8 @@ export default function ServiceTable({ hotelId, serviceList }) {
             message={"service updated succesfully"}
           ></BaseAlert>
         </>
+      ) : (
+        ""
       )}
     </>
   );

@@ -85,7 +85,7 @@ export default function Register() {
     api
       .post("/account/register", request)
       .then((response) => {
-        if (response !== undefined && response.data !== undefined) {
+        if (!!response && !!response.data) {
           localStorage.setItem("token", response.data[0]);
           localStorage.setItem("refreshToken", response.data[1]);
           const jwt = JSON.parse(atob(response.data[0].split(".")[1]));
@@ -98,7 +98,7 @@ export default function Register() {
         }
       })
       .catch((error) => {
-        if (error.response !== undefined) {
+        if (!!error.response) {
           setEmailErrorLabel(error.response.data.Message);
           console.log(error.response.data.Message);
           console.log(error.response.data);

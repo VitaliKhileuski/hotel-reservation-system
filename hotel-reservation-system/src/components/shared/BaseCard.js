@@ -50,7 +50,7 @@ export default function BaseCard({
     <>
       <Card
         className={classes.root}
-        onClick={room !== undefined ? callReservationDialog : clickAction}
+        onClick={!!room ? callReservationDialog : clickAction}
       >
         <CardActionArea>
           {imageUrls === undefined || imageUrls.length === 0 ? (
@@ -81,7 +81,7 @@ export default function BaseCard({
         </CardActionArea>
       </Card>
       <MainReservationDialog
-        handleClose={() => handleCloseReservationDialog()}
+        handleClose={handleCloseReservationDialog}
         open={reservationDialogOpen}
         room={room}
         checkInDate={checkInDate}

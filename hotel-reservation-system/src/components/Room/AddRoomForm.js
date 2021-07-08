@@ -43,9 +43,9 @@ export default function AddRoomForm({
   const token = localStorage.getItem("token");
 
   const initialValues = {
-    roomNumber: room === undefined ? "" : room.roomNumber,
-    bedsNumber: room === undefined ? "" : room.bedsNumber,
-    paymentPerDay: room === undefined ? "" : room.paymentPerDay,
+    roomNumber: !!room ? room.roomNumber : "",
+    bedsNumber: !!room ? room.bedsNumber : "",
+    paymentPerDay: !!room ? room.paymentPerDay : "",
   };
   const validationSchema = Yup.object().shape({
     roomNumber: Yup.string().required("room Number is required").trim(),
@@ -71,15 +71,15 @@ export default function AddRoomForm({
         .then((data) => {})
         .catch((error) => console.log(error.response.data.message));
     };
-    if (room === undefined) {
-      await CreateRoom();
-      handleClose();
-      callAddAlert();
-    } else {
+    if (!!room) {
       await UpdateRoom(request);
       handleClose();
       callUpdateAlert();
       console.log("update");
+    } else {
+      await CreateRoom();
+      handleClose();
+      callAddAlert();
     }
 
     setShowAlert(true);

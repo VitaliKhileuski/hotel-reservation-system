@@ -46,17 +46,17 @@ export default function AddHotelForm({
   const token = localStorage.getItem("token");
   const [buildingNumberLabelError, setBuildingNumberLabelError] = useState("");
   const [buildingNumber, setBuildingNumber] = useState(
-    hotel === undefined ? "" : hotel.location.buildingNumber
+    !!hotel ? hotel.location.buildingNumber : ""
   );
 
   const initialValues = {
-    name: hotel === undefined ? "" : hotel.name,
-    country: hotel === undefined ? "" : hotel.location.country,
-    city: hotel === undefined ? "" : hotel.location.city,
-    street: hotel === undefined ? "" : hotel.location.street,
-    buildingNumber: hotel === undefined ? "" : hotel.location.buildingNumber,
+    name: !!hotel ? hotel.name : "",
+    country: !!hotel ? hotel.location.country : "",
+    city: !!hotel ? hotel.location.city : "",
+    street: !!hotel ? hotel.location.street : "",
+    buildingNumber: !!hotel ? hotel.location.buildingNumber : "",
   };
-  
+
   const validationSchema = Yup.object().shape({
     name: Yup.string().required("name is required").trim(),
     country: Yup.string().required("country is required").trim(),
@@ -88,10 +88,10 @@ export default function AddHotelForm({
           setBuildingNumberLabelError(error.response.data.Message);
         });
     };
-    if (hotel === undefined) {
-      await CreateHotel();
-    } else {
+    if (!!hotel) {
       await UpdateHotel(request);
+    } else {
+      await CreateHotel();
     }
   };
 

@@ -3,7 +3,6 @@ import { DropzoneDialogBase } from "material-ui-dropzone";
 import API from "./../../api";
 import axios from "axios";
 
-
 export default function BaseImageDialog({
   open,
   imageUrls,
@@ -15,14 +14,14 @@ export default function BaseImageDialog({
   const token = localStorage.getItem("token");
   const [requestFiles, setRequestFiles] = useState([]);
   const [flag, setFlag] = useState(false);
-  const [tempImages,setTempImages] = useState([])
+  const [tempImages, setTempImages] = useState([]);
 
   useEffect(async () => {
-    setTempImages([])
+    setTempImages([]);
     setFileObjects([]);
-    if (imageUrls !== undefined) {
-        await loadImages();
-        }
+    if (!!imageUrls) {
+      await loadImages();
+    }
   }, [open]);
 
   useEffect(() => {
@@ -34,7 +33,7 @@ export default function BaseImageDialog({
 
   async function saveImages() {
     mapImagesForRequest();
-    if (roomId !== undefined) {
+    if (!!roomId) {
       await saveImagesForRoom();
     } else {
       await saveImagesForHotel();
@@ -46,12 +45,12 @@ export default function BaseImageDialog({
   const loadImages = async () => {
     await imageUrls.forEach(async (item) => {
       await GetImage(item);
-      
-        if (flag === true) {
-          setFlag(false);
-        } else {
-          setFlag(true);
-        
+
+      if (flag === true) {
+        setFlag(false);
+      } else {
+        setFlag(true);
+
         console.log(fileObjects);
         console.log(`flag ${flag}`);
       }
@@ -74,12 +73,12 @@ export default function BaseImageDialog({
           };
 
           tempImages.push(file);
-            setFileObjects(tempImages)
-            if (flag === true) {
-              setFlag(false);
-            } else {
-              setFlag(true);
-            }
+          setFileObjects(tempImages);
+          if (flag === true) {
+            setFlag(false);
+          } else {
+            setFlag(true);
+          }
         }
       })
       .catch((error) => console.log(error));
@@ -112,7 +111,7 @@ export default function BaseImageDialog({
   }
 
   async function saveImagesForHotel() {
-    if (hotelId !== undefined) {
+    if (!!hotelId) {
       const setImagesToHotel = async () => {
         await API.post("/images/" + hotelId + "/setHotelImages", requestFiles, {
           headers: { Authorization: "Bearer " + token },
@@ -128,7 +127,7 @@ export default function BaseImageDialog({
   }
 
   function deleteFile(file) {
-    var index = fileObjects.indexOf(file);
+    let index = fileObjects.indexOf(file);
     if (index > -1) {
       fileObjects.splice(index, 1);
     }
@@ -145,10 +144,9 @@ export default function BaseImageDialog({
       fileObjects={fileObjects}
       maxFileSize={5000000}
       open={open}
-      onClose={() =>{
+      onClose={() => {
         handleClose();
-      }
-    } 
+      }}
       onSave={() => saveImages()}
       onAdd={(newFileObjs) => {
         console.log(...newFileObjs);

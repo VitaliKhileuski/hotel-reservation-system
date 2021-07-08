@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
   },
   gridList: {
     width: "60%",
-    height: "85%",
+    height: "100%",
   },
   text: {},
   dateFilter: {},
@@ -44,13 +44,17 @@ export default function RoomDetails({ room }) {
 
   return (
     <div className={classes.root}>
-      <GridList cellHeight="200" className={classes.gridList} cols={3}>
-        {room.imageUrls.map((image) => (
-          <GridListTile key={image} cols={1}>
-            <img onClick={() => zoomImage(image)} src={image} />
-          </GridListTile>
-        ))}
-      </GridList>
+      {room.imageUrls !== null && room.imageUrls.length !== 0 ? (
+        <GridList cellHeight="200" className={classes.gridList} cols={3}>
+          {room.imageUrls.map((image) => (
+            <GridListTile key={image} cols={1}>
+              <img onClick={() => zoomImage(image)} src={image} />
+            </GridListTile>
+          ))}
+        </GridList>
+      ) : (
+        <Typography>No images</Typography>
+      )}
 
       <div className={classes.text}>
         <Typography variant="h4">room number: {room.roomNumber}</Typography>
@@ -62,7 +66,7 @@ export default function RoomDetails({ room }) {
       <BaseDialog
         title="Image"
         open={imageDialogOpen}
-        handleClose={() => closeImageDialog()}
+        handleClose={closeImageDialog}
         form={element}
       ></BaseDialog>
     </div>

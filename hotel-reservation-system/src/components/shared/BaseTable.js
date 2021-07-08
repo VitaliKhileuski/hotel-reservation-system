@@ -39,7 +39,7 @@ const useStyles = makeStyles({
   },
 });
 
-export default function HotelTable({rows}) {
+export default function HotelTable({ rows }) {
   const history = useHistory();
   const role = useSelector((state) => state.role);
   const token = localStorage.getItem("token");
@@ -233,15 +233,11 @@ export default function HotelTable({rows}) {
             <Table stickyHeader aria-label="sticky table">
               <TableHead>
                 <TableRow>
-                {columns.map((column, i) => (
-                <TableCell
-                  key={i}
-                  align="right"
-                  style={{ minWidth: 170 }}
-                >
-                  {column}
-                </TableCell>
-              ))}
+                  {columns.map((column, i) => (
+                    <TableCell key={i} align="right" style={{ minWidth: 170 }}>
+                      {column}
+                    </TableCell>
+                  ))}
                   <TableCell style={{ minWidth: 30 }} />
                   <TableCell style={{ minWidth: 30 }} />
                   <TableCell style={{ minWidth: 30 }} />
@@ -328,15 +324,15 @@ export default function HotelTable({rows}) {
           handleClose={handleClose}
           form={flag === true ? component : form}
         ></BaseDialog>
-        {hotel === undefined ? (
-          ""
-        ) : (
+        {!!hotel ? (
           <BaseImageDialog
             hotelId={hotel.id}
             open={imageDialogOpen}
             handleClose={() => handleCloseImageDialog()}
             imageUrls={hotel.imageUrls}
           ></BaseImageDialog>
+        ) : (
+          ""
         )}
         <BaseDeleteDialog
           open={openDeleteDialog}

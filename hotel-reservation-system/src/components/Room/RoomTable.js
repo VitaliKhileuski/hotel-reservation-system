@@ -238,7 +238,7 @@ export default function RoomTable({ hotelId }) {
         roomId={roomId}
         open={imageDialogOpen}
         handleClose={() => handleCloseImageDialog()}
-        imageUrls={room === undefined ? undefined : room.imageUrls}
+        imageUrls={!!room ? room.imageUrls : undefined}
         filesLimit={5}
       ></BaseImageDialog>
       <BaseAlert

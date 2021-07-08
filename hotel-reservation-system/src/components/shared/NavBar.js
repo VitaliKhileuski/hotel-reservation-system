@@ -1,6 +1,6 @@
 import { React, useState, useRef, useEffect } from "react";
 import "./../../css/App.css";
-import { Link, Redirect } from "react-router-dom";
+import { Link, Redirect, useHistory } from "react-router-dom";
 import {
   AppBar,
   Button,
@@ -37,8 +37,9 @@ const useStyles = makeStyles((theme) => ({
     textDecoration: "none",
   },
 }));
-function NavBar() {
+export default function NavBar() {
   const dispatch = useDispatch();
+  const history = useHistory();
   const [open, setOpen] = useState(false);
   const anchorRef = useRef(null);
   const classes = useStyles();
@@ -64,6 +65,11 @@ function NavBar() {
       setOpen(false);
     }
   }
+  function toHomePage() {
+    history.push({
+      pathname: "/home",
+    });
+  }
 
   const Logout = () => {
     localStorage.removeItem("refreshToken");
@@ -77,7 +83,12 @@ function NavBar() {
     <div className={classes.root}>
       <AppBar position="static">
         <Toolbar>
-          <Typography align="left" variant="h6" className={classes.title}>
+          <Typography
+            onClick={toHomePage}
+            align="left"
+            variant="h6"
+            className={classes.title}
+          >
             Hotels
           </Typography>
           {isLogged ? (
@@ -116,10 +127,8 @@ function NavBar() {
                           onKeyDown={handleListKeyDown}
                         >
                           <Link to="/orders" className={classes.link}>
-                              <MenuItem onClick={handleClose}>
-                                Orders
-                              </MenuItem>
-                            </Link>
+                            <MenuItem onClick={handleClose}>Orders</MenuItem>
+                          </Link>
                           {role !== "User" ? (
                             <Link to="/ownedHotels" className={classes.link}>
                               <MenuItem onClick={handleClose}>
@@ -163,4 +172,3 @@ function NavBar() {
     </div>
   );
 }
-export default NavBar;

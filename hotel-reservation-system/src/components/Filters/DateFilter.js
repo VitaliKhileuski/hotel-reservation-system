@@ -8,9 +8,6 @@ import {
 import { Grid, Typography } from "@material-ui/core";
 import API from "../../api";
 import RoomIsOccupiedAlert from "../Reservation/RoomIsOccupiedAlert";
-const useStyles = makeStyles((theme) => ({
-  root: {},
-}));
 
 export default function DateFilter({
   roomId,
@@ -19,15 +16,11 @@ export default function DateFilter({
   changeDates,
   isValidInfo,
 }) {
-  const classes = useStyles();
   console.log(checkOutDate);
   const [checkIn, setCheckIn] = useState(checkInDate);
   const [checkOut, setCheckOut] = useState(checkOutDate);
   const [roomIsOccupiedAlertOpen, setRoomIsOccupiedAlertOpen] = useState(false);
-  useEffect(() => {
-    if (roomId !== undefined) {
-    }
-  }, [checkIn, checkOut]);
+
   const checkPlace = async (checkIn, checkOut) => {
     await API.get(
       "/rooms/" +

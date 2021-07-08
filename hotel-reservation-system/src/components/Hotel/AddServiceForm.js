@@ -40,15 +40,13 @@ export default function AddServiceForm({
 }) {
   const classes = useStyles();
   const [showAlert, setShowAlert] = useState(false);
-  const [serviceName, setServiceName] = useState(
-    service === undefined ? "" : service.name
-  );
+  const [serviceName, setServiceName] = useState(!!service ? service.name : "");
   const token = localStorage.getItem("token");
   const [serviceNameErrorLabel, setServiceNameErrorLabel] = useState("");
 
   const initialValues = {
-    name: service === undefined ? "" : service.name,
-    payment: service === undefined ? "" : service.payment,
+    name: !!service ? service.name : "",
+    payment: !!service ? service.payment : "",
   };
   const validationSchema = Yup.object().shape({
     payment: Yup.number("payment must be a number").required(
@@ -77,10 +75,10 @@ export default function AddServiceForm({
           setServiceNameErrorLabel(error.response.data.Message);
         });
     };
-    if (service === undefined) {
-      await CreateService();
-    } else {
+    if (!!service) {
       await UpdateService(request);
+    } else {
+      await CreateService();
     }
   };
 

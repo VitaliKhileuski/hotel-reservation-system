@@ -50,7 +50,7 @@ export default function HotelAdminDialog({
       })
         .then((response) => response.data)
         .then((data) => {
-          if (data !== undefined) setUsers(data);
+          if (!!data) setUsers(data);
         })
         .catch((error) => console.log(error));
     };
@@ -62,7 +62,7 @@ export default function HotelAdminDialog({
         .then((response) => response.data)
         .then((data) => {
           console.log(data);
-          if (data !== undefined) setUsers(data);
+          if (!!data) setUsers(data);
         })
         .catch((error) => console.log(error));
     };
@@ -80,7 +80,7 @@ export default function HotelAdminDialog({
     })
       .then((response) => response.data)
       .then((data) => {})
-      .catch((error) => console.log(error.response.data.message));
+      .catch((error) => console.log(error.response));
   };
 
   const DeleteHotelAdmin = async () => {

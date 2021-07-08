@@ -334,15 +334,15 @@ export default function HotelTable() {
           handleClose={handleClose}
           form={flag === true ? component : form}
         ></BaseDialog>
-        {hotel === undefined ? (
-          ""
-        ) : (
+        {!!hotel ? (
           <BaseImageDialog
             hotelId={hotel.id}
             open={imageDialogOpen}
             handleClose={() => handleCloseImageDialog()}
             imageUrls={hotel.imageUrls}
           ></BaseImageDialog>
+        ) : (
+          ""
         )}
         <BaseDeleteDialog
           open={openDeleteDialog}

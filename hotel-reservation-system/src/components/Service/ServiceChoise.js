@@ -30,9 +30,9 @@ export default function ServiceChoice({
       await API.get("/services")
         .then((response) => response.data)
         .then((data) => {
-          if (data !== undefined) {
+          if (!!data) {
             data.map((item) => {
-              var itemWithQuantity = {
+              let itemWithQuantity = {
                 Serviceid: item.id,
                 name: item.name,
                 payment: item.payment,

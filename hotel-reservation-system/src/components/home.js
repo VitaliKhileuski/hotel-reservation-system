@@ -54,7 +54,7 @@ export default function Home() {
       await API.get("/locations/countries")
         .then((response) => response.data)
         .then((data) => {
-          if (data !== undefined) setCountries(data);
+          if (!!data) setCountries(data);
         })
         .catch((error) => console.log(error));
     };
@@ -66,7 +66,7 @@ export default function Home() {
       await API.get("/locations/cities/" + currentCountry)
         .then((response) => response.data)
         .then((data) => {
-          if (data !== undefined) setCities(data);
+          if (!!data) setCities(data);
         })
         .catch((error) => console.log(error));
     };

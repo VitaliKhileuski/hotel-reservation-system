@@ -61,8 +61,6 @@ export default function MainReservationDialog({
   const [currentComponent, setCurrentComponent] =
     useState(roomDetailsСomponent);
 
-  useEffect(() => {}, [currentComponent, isValidInfo]);
-
   function getSelectedServices(selectedServices) {
     setSelectedServices(selectedServices);
   }
@@ -119,7 +117,7 @@ export default function MainReservationDialog({
           <IconButton
             edge="end"
             color="inherit"
-            onClick={() => close()}
+            onClick={close}
             aria-label="close"
           >
             <CloseIcon />
@@ -128,7 +126,7 @@ export default function MainReservationDialog({
       </AppBar>
       {currentComponent}
       <div className={classes.dateFilter}>
-        {flag === true && room !== undefined ? (
+        {flag === true && !!room ? (
           <DateFilter
             roomId={room.id}
             checkInDate={checkIn}

@@ -22,7 +22,7 @@ import HotelTable from "./components/Hotel/HotelTable";
 import HotelEditor from "./components/Hotel/HotelEditor";
 import RoomsPage from "./components/Room/RoomsPage";
 import createAuthRefreshInterceptor from "axios-auth-refresh";
-import OrderTable from './components/Reservation/OrderTable'
+import OrderTable from "./components/Reservation/OrderTable";
 
 export default function App() {
   const dispatch = useDispatch();
