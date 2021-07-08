@@ -5,6 +5,8 @@ import {
   NAME,
   EMAIL,
   USER_ID,
+  CHECK_IN_DATE,
+  CHECK_OUT_DATE
 } from "../actions/actionTypes.js";
 
 export default function authentication(state = initialState, action) {
@@ -19,6 +21,10 @@ export default function authentication(state = initialState, action) {
       return { ...state, userId: action.userId };
     case EMAIL:
       return { ...state, email: action.email };
+    case CHECK_IN_DATE:
+      return {...state, checkInDate : action.checkInDate};
+    case CHECK_OUT_DATE: 
+      return {...state,checkOutDate : action.checkOutDate};
     default:
       return state;
   }

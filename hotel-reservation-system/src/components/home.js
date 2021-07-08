@@ -13,6 +13,8 @@ import API from "../api";
 import HotelList from "./Hotel/HotelList";
 import Pagination from "@material-ui/lab/Pagination";
 import { Redirect, useHistory } from "react-router";
+import { useDispatch } from "react-redux";
+import {CHECK_IN_DATE,CHECK_OUT_DATE} from './../storage/actions/actionTypes'
 
 const useStyles = makeStyles((theme) => ({
   option: {
@@ -48,7 +50,8 @@ export default function Home() {
   const [maxPage, setMaxPage] = useState(1);
   const pageSize = 8;
   const history = useHistory();
-
+  const dispatch = useDispatch();
+  
   useEffect(() => {
     const loadCountries = async () => {
       await API.get("/locations/countries")
@@ -60,7 +63,7 @@ export default function Home() {
     };
     loadCountries();
   }, []);
-
+  
   useEffect(() => {
     const loadCities = async () => {
       await API.get("/locations/cities/" + currentCountry)
@@ -77,31 +80,38 @@ export default function Home() {
     setCity("");
   }, [currentCountry]);
 
-  const getFilteredHotels = async () => {
-    await API.get(
-      "/hotels?checkInDate=" +
-        checkInDate.toJSON() +
-        "&checkOutDate=" +
-        checkOutDate.toJSON() +
-        "&country=" +
-        currentCountry +
-        "&city=" +
-        city +
-        "&PageNumber=" +
-        page +
-        "&PageSize=" +
-        pageSize
-    )
-      .then((response) => response.data)
-      .then((data) => {
-        setHotels(data.items);
-        setMaxPage(data.numberOfPages);
-      })
-      .catch((error) => console.log(error));
-  };
+   async function SearchFilteredHotels(){
+    dispatch({ type: CHECK_IN_DATE, checkInDate: checkInDate });
+    dispatch({ type: CHECK_OUT_DATE, checkInDate: checkOutDate });
+
+    const getFilteredHotels = async () => { 
+      await API.get(
+        "/hotels?checkInDate=" +
+          checkInDate.toJSON() +
+          "&checkOutDate=" +
+          checkOutDate.toJSON() +
+          "&country=" +
+          currentCountry +
+          "&city=" +
+          city +
+          "&PageNumber=" +
+          page +
+          "&PageSize=" +
+          pageSize
+      )
+        .then((response) => response.data)
+        .then((data) => {
+          setHotels(data.items);
+          setMaxPage(data.numberOfPages);
+        })
+        .catch((error) => console.log(error));
+    };
+    getFilteredHotels();
+  }
+  
 
   useEffect(() => {
-    getFilteredHotels();
+    SearchFilteredHotels();
   }, [page]);
 
   const classes = useStyles();
@@ -206,7 +216,7 @@ export default function Home() {
             variant="contained"
             color="primary"
             size="large"
-            onClick={getFilteredHotels}
+            onClick={SearchFilteredHotels}
           >
             Search
           </Button>
