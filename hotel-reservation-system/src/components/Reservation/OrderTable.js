@@ -38,6 +38,12 @@ export default function OrderTable() {
     const [maxNumberOfOrders, setMaxNumberOfOrders] = useState(0);
     const token = localStorage.getItem("token");
      
+
+
+    function ccyFormat(num) {
+      return `${num.toFixed(2)}`;
+    }
+
     useEffect(() => {
         const loadOrders = async () => {
           await API.get(
@@ -104,17 +110,17 @@ export default function OrderTable() {
         {orders.map((order) => (
                   <>
                   <TableRow key={order.id}>
-                      <TableCell/>
+                      
                     <TableCell>
                     <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
                     {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                     </IconButton>
                     </TableCell>
-                    <TableCell align="right">{order.dateOrdered}</TableCell>
-                    <TableCell align="right">{order.startDate}</TableCell>
-                    <TableCell align="right">{order.endDate}</TableCell>
+                    <TableCell align="right">{new Date(order.dateOrdered).toLocaleDateString("en-GB")}</TableCell>
+                    <TableCell align="right">{new Date(order.startDate).toLocaleDateString("en-GB")}</TableCell>
+                    <TableCell align="right">{new Date(order.endDate).toLocaleDateString("en-GB")}</TableCell>
                     <TableCell align="right">{order.numberOfDays}</TableCell>
-                    <TableCell align="right">{order.fullPrice}</TableCell>
+                    <TableCell align="right">{ccyFormat(order.fullPrice)}</TableCell>
                   </TableRow>
                   
                   <TableRow>
@@ -144,12 +150,54 @@ export default function OrderTable() {
                           <TableBody>
                             {order.services.map((service) => (
                               <TableRow key={service.id}>
-                                <TableCell align="right">{service.name}</TableCell>
-                                <TableCell align="right">{service.payment}</TableCell>
+                                <TableCell align="right">{service.service.name}</TableCell>
+                                <TableCell align="right">{ccyFormat(service.service.payment)}</TableCell>
                                 <TableCell align="right">{service.quantity}</TableCell>
-                                <TableCell align="right">{service.fullPrice}</TableCell>
+                                <TableCell align="right">{ccyFormat(service.service.payment*service.quantity)}</TableCell>
                               </TableRow>
                             ))}
+                          </TableBody>
+                        </Table>
+                      </Box>
+                    </Collapse>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+                    <Collapse in={open} timeout="auto" unmountOnExit>
+                      <Box margin={1}>
+                        <Typography variant="h6" gutterBottom component="div">
+                          Hotel
+                        </Typography>
+                        <Table size="small" aria-label="purchases">
+                          <TableHead>
+                            <TableRow>
+                            <TableCell align="right" style={{ minWidth: 170 }}>
+                                    Name
+                                </TableCell>
+                            <TableCell align="right" style={{ minWidth: 170 }}>
+                                    Country
+                                </TableCell>
+                                <TableCell align="right" style={{ minWidth: 170 }}>
+                                    City
+                                </TableCell>
+                                <TableCell align="right" style={{ minWidth: 170 }}>
+                                    Street
+                                </TableCell>
+                                <TableCell align="right" style={{ minWidth: 170 }}>
+                                    Building number
+                                </TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            
+                              <TableRow key={order.room.hotel.id}>
+                                <TableCell align="right">{order.room.hotel.name}</TableCell>
+                                <TableCell align="right">{order.room.hotel.location.country}</TableCell>
+                                <TableCell align="right">{order.room.hotel.location.city}</TableCell>
+                                <TableCell align="right">{order.room.hotel.location.street}</TableCell>
+                                <TableCell align="right">{order.room.hotel.location.buildingNumber}</TableCell>
+                              </TableRow>
                           </TableBody>
                         </Table>
                       </Box>
