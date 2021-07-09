@@ -18,6 +18,7 @@ import {
   EMAIL,
   USER_ID,
 } from "./storage/actions/actionTypes";
+import RouteList from "./Routing/RouteList";
 import HotelTable from "./components/Hotel/HotelTable";
 import HotelEditor from "./components/Hotel/HotelEditor";
 import RoomsPage from "./components/Room/RoomsPage";
@@ -67,7 +68,8 @@ export default function App() {
     localStorage.removeItem("token");
     dispatch({ type: IS_LOGGED, isLogged: false });
     dispatch({ type: ROLE, role: "" });
-    dispatch({ type: EMAIL, role: "" });
+    dispatch({ type: EMAIL, email: "" });
+    dispatch({ type: NAME, name: "" });
   }
 
   useEffect(() => {
@@ -76,29 +78,18 @@ export default function App() {
 
   async function updateStorage(token) {
     const jwt = JSON.parse(atob(token.split(".")[1]));
-    dispatch({ type: NAME, name: jwt.firstname });
     dispatch({ type: IS_LOGGED, isLogged: true });
-    dispatch({ type: ROLE, role: jwt.role });
     dispatch({ type: USER_ID, userId: jwt.id });
+    dispatch({ type: NAME, name: jwt.firstname });
+    dispatch({ type: EMAIL, email: jwt.email });
+    dispatch({ type: ROLE, role: jwt.role });
   }
 
   return (
     <Router>
       <div className="App">
         <NavBar />
-        <Switch>
-          <Route path="/login" component={Login} />
-          <Route path="/register" component={Register} />
-          <Route path="/home" component={Home} />
-          <Route path="/ownedHotels" component={HotelTable}></Route>
-          <Route path="/orders" component={OrderTable}></Route>
-          <Route
-            path="/hotelEditor"
-            render={(props) => <HotelEditor {...props} />}
-          />
-          <Route path="/rooms" render={(props) => <RoomsPage {...props} />} />
-          <Redirect to="/home" />
-        </Switch>
+        <RouteList></RouteList>
       </div>
     </Router>
   );

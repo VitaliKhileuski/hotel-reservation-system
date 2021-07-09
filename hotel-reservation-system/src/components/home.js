@@ -13,8 +13,12 @@ import API from "../api";
 import HotelList from "./Hotel/HotelList";
 import Pagination from "@material-ui/lab/Pagination";
 import { Redirect, useHistory } from "react-router";
-import { useDispatch } from "react-redux";
-import {CHECK_IN_DATE,CHECK_OUT_DATE} from './../storage/actions/actionTypes'
+import { useDispatch, useSelector } from "react-redux";
+import {
+  CHECK_IN_DATE,
+  CHECK_OUT_DATE,
+} from "./../storage/actions/actionTypes";
+import DateFilter from "./Filters/DateFilter";
 
 const useStyles = makeStyles((theme) => ({
   option: {
@@ -42,16 +46,20 @@ export default function Home() {
   const [cities, setCities] = useState([]);
   const [currentCountry, setCurrentCountry] = useState("");
   const [hotels, setHotels] = useState([]);
-  const [checkInDate, setCheckInDate] = useState(new Date(Date.now()));
-  const [checkOutDate, setCheckOutDate] = useState(
-    new Date(Date.now() + 2 * 24 * 60 * 60 * 1000)
+  const [isValidDates, setIsValidDates] = useState(true);
+  const [checkInDate, setCheckInDate] = useState(
+    useSelector((state) => state.checkInDate)
   );
+  const [checkOutDate, setCheckOutDate] = useState(
+    useSelector((state) => state.checkOutDate)
+  );
+  useSelector((state) => console.log(state));
   const [page, setPage] = useState(1);
   const [maxPage, setMaxPage] = useState(1);
   const pageSize = 8;
   const history = useHistory();
   const dispatch = useDispatch();
-  
+
   useEffect(() => {
     const loadCountries = async () => {
       await API.get("/locations/countries")
@@ -63,7 +71,7 @@ export default function Home() {
     };
     loadCountries();
   }, []);
-  
+
   useEffect(() => {
     const loadCities = async () => {
       await API.get("/locations/cities/" + currentCountry)
@@ -80,11 +88,11 @@ export default function Home() {
     setCity("");
   }, [currentCountry]);
 
-   async function SearchFilteredHotels(){
+  async function SearchFilteredHotels() {
     dispatch({ type: CHECK_IN_DATE, checkInDate: checkInDate });
-    dispatch({ type: CHECK_OUT_DATE, checkInDate: checkOutDate });
+    dispatch({ type: CHECK_OUT_DATE, checkOutDate: checkOutDate });
 
-    const getFilteredHotels = async () => { 
+    const getFilteredHotels = async () => {
       await API.get(
         "/hotels?checkInDate=" +
           checkInDate.toJSON() +
@@ -108,14 +116,19 @@ export default function Home() {
     };
     getFilteredHotels();
   }
-  
+  function changeDates(checkInDate, checkOutDate) {
+    setCheckInDate(checkInDate);
+    setCheckOutDate(checkOutDate);
+  }
+  function isValidInfo(isValid) {
+    setIsValidDates(isValid);
+  }
 
   useEffect(() => {
     SearchFilteredHotels();
   }, [page]);
 
   const classes = useStyles();
-  const tommorow = new Date(Date.now() + 24 * 60 * 60 * 1000);
   const handleDateCheckInChange = (date) => {
     setCheckInDate(date);
   };
@@ -135,38 +148,12 @@ export default function Home() {
         justify="center"
         alignItems="flex-start"
       >
-        <MuiPickersUtilsProvider utils={DateFnsUtils}>
-          <Grid>
-            <Typography variant="h6">Check in Date</Typography>
-            <KeyboardDatePicker
-              disableToolbar
-              disablePast
-              variant="inline"
-              inputVariant="outlined"
-              format="MM/dd/yyyy"
-              value={checkInDate}
-              onChange={handleDateCheckInChange}
-              KeyboardButtonProps={{
-                "aria-label": "change date",
-              }}
-            />
-          </Grid>
-          <Grid>
-            <Typography variant="h6">Check out date</Typography>
-            <KeyboardDatePicker
-              disableToolbar
-              minDate={tommorow}
-              variant="inline"
-              format="MM/dd/yyyy"
-              inputVariant="outlined"
-              value={checkOutDate}
-              onChange={handleDateCheckOutChange}
-              KeyboardButtonProps={{
-                "aria-label": "change date",
-              }}
-            />
-          </Grid>
-        </MuiPickersUtilsProvider>
+        <DateFilter
+          checkInDate={checkInDate}
+          checkOutDate={checkOutDate}
+          changeDates={changeDates}
+          isValidInfo={isValidInfo}
+        ></DateFilter>
         <Grid>
           <Typography variant="h6">What place do you want to visit?</Typography>
           <Autocomplete
@@ -216,6 +203,7 @@ export default function Home() {
             variant="contained"
             color="primary"
             size="large"
+            disabled={!isValidDates}
             onClick={SearchFilteredHotels}
           >
             Search

@@ -126,6 +126,18 @@ export default function NavBar() {
                           id="menu-list-grow"
                           onKeyDown={handleListKeyDown}
                         >
+                          <Link to="/userProfile" className={classes.link}>
+                            <MenuItem onClick={handleClose}>
+                              User profile
+                            </MenuItem>
+                          </Link>
+                          {role === "Admin" ? (
+                            <Link to="/users" className={classes.link}>
+                              <MenuItem onClick={handleClose}>Users</MenuItem>
+                            </Link>
+                          ) : (
+                            ""
+                          )}
                           <Link to="/orders" className={classes.link}>
                             <MenuItem onClick={handleClose}>Orders</MenuItem>
                           </Link>

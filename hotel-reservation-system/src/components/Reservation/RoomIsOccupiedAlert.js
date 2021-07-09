@@ -8,41 +8,44 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import { useHistory } from "react-router";
 
 export default function RoomIsOccupiedAlert({ open, handleClose }) {
-{
-  const history = useHistory();
-  function searchOtherHotelsWithUserDates(){
-    history.push({
-      pathname: "/home",
-      state: {
-      },
-    });
-  }
+  {
+    const history = useHistory();
+    function searchOtherHotelsWithUserDates() {
+      history.push({
+        pathname: "/home",
+        state: {},
+      });
+    }
 
-  return (
-    <div>
-      <Dialog
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">Room is occupied</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Room on this date is already occupied.Please, choose another date or
-            we can search for other hotels for your new date.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} color="primary">
-            Choose another date
-          </Button>
-          <Button onClick={searchOtherHotelsWithUserDates} color="primary" autoFocus>
-            Search for other hotels
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </div>
-  );
-}
+    return (
+      <div>
+        <Dialog
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">Room is occupied</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              Room on this date is already occupied.Please, choose another date
+              or we can search for other hotels for your new date.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose} color="primary">
+              Choose another date
+            </Button>
+            <Button
+              onClick={searchOtherHotelsWithUserDates}
+              color="primary"
+              autoFocus
+            >
+              Search for other hotels
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </div>
+    );
+  }
 }

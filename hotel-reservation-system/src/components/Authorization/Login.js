@@ -97,10 +97,10 @@ export default function Login() {
           console.log("jwt");
           console.log(jwt.email);
           dispatch({ type: IS_LOGGED, isLogged: true });
+          dispatch({ type: USER_ID, userId: jwt.id });
           dispatch({ type: NAME, name: jwt.firstname });
           dispatch({ type: EMAIL, email: jwt.email });
           dispatch({ type: ROLE, role: jwt.role });
-          dispatch({ type: USER_ID, userId: jwt.id });
         }
       })
       .catch((error) => {

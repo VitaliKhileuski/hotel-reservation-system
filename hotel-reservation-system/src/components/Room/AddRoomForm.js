@@ -69,7 +69,7 @@ export default function AddRoomForm({
       })
         .then((response) => response.data)
         .then((data) => {})
-        .catch((error) => console.log(error.response.data.message));
+        .catch((error) => console.log(error.response.data.Message));
     };
     if (!!room) {
       await UpdateRoom(request);

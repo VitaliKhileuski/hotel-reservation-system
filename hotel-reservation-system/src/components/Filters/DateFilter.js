@@ -8,6 +8,11 @@ import {
 import { Grid, Typography } from "@material-ui/core";
 import API from "../../api";
 import RoomIsOccupiedAlert from "../Reservation/RoomIsOccupiedAlert";
+import {
+  CHECK_IN_DATE,
+  CHECK_OUT_DATE,
+} from "./../../storage/actions/actionTypes";
+import { useDispatch } from "react-redux";
 
 export default function DateFilter({
   roomId,
@@ -16,7 +21,7 @@ export default function DateFilter({
   changeDates,
   isValidInfo,
 }) {
-  console.log(checkOutDate);
+  const dispatch = useDispatch();
   const [checkIn, setCheckIn] = useState(checkInDate);
   const [checkOut, setCheckOut] = useState(checkOutDate);
   const [roomIsOccupiedAlertOpen, setRoomIsOccupiedAlertOpen] = useState(false);
@@ -44,19 +49,27 @@ export default function DateFilter({
   };
 
   const handleDateCheckInChange = (date) => {
+    dispatch({ type: CHECK_IN_DATE, checkInDate: date });
     setCheckIn(date);
     changeDates(date, checkOut);
     if (date < checkOut) {
-      checkPlace(date, checkOut);
+      isValidInfo(true);
+      if (!!roomId) {
+        checkPlace(date, checkOut);
+      }
     } else {
       isValidInfo(false);
     }
   };
   const handleDateCheckOutChange = (date) => {
+    dispatch({ type: CHECK_OUT_DATE, checkOutDate: date });
     setCheckOut(date);
     changeDates(checkIn, date);
     if (date > checkIn) {
-      checkPlace(checkIn, date);
+      isValidInfo(true);
+      if (!!roomId) {
+        checkPlace(checkIn, date);
+      }
     } else {
       isValidInfo(false);
     }

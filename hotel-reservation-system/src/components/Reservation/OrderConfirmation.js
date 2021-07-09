@@ -46,7 +46,7 @@ export default function OrderConfirmation({
   checkInDate,
   checkOutDate,
 }) {
-  const [checked, setChecked] = useState(true);
+  const [checked, setChecked] = useState(false);
   const history = useHistory();
   const [email, setEmail] = useState();
   const [emailErrorLabel, setEmailErrorLabel] = useState("");
@@ -54,6 +54,9 @@ export default function OrderConfirmation({
   const dispatch = useDispatch();
   const isLogged = useSelector((state) => state.isLogged);
   let userEmail = useSelector((state) => state.email);
+  console.log(checked);
+  console.log(emailErrorLabel);
+  console.log(email);
 
   const [messageDialogOpen, SetMessageDialogOpen] = useState(false);
   const messageForGuest = (
@@ -134,11 +137,7 @@ export default function OrderConfirmation({
     console.log(userEmail);
     if (userEmail === "" || userEmail === undefined) {
       await createUser();
-      console.log("dispatches");
       userEmail = email;
-      dispatch({ type: NAME, name: "user" });
-      dispatch({ type: IS_LOGGED, isLogged: true });
-      dispatch({ type: ROLE, role: "User" });
     }
     const request = {
       StartDate: checkInDate,
@@ -201,6 +200,7 @@ export default function OrderConfirmation({
             variant="contained"
             onClick={сreateOrder}
             color="primary"
+            disabled={!checked || emailErrorLabel !== "" || email === ""}
           >
             Order
           </Button>

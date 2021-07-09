@@ -40,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Register() {
+export default function Register({ user }) {
   const dispatch = useDispatch();
   const isLogged = useSelector((state) => state.isLogged);
   const classes = useStyles();
@@ -78,7 +78,6 @@ export default function Register() {
       Email: email,
       Name: values.firstName,
       SurName: values.lastName,
-      UserName: values.userName,
       PhoneNumber: values.phone,
       Password: values.password,
     };
@@ -90,10 +89,11 @@ export default function Register() {
           localStorage.setItem("refreshToken", response.data[1]);
           const jwt = JSON.parse(atob(response.data[0].split(".")[1]));
           dispatch({ type: IS_LOGGED, isLogged: true });
+          dispatch({ type: USER_ID, userId: jwt.id });
+          dispatch({ type: EMAIL, email: jwt.email });
           dispatch({ type: NAME, name: jwt.firstname });
           dispatch({ type: ROLE, role: jwt.role });
-          dispatch({ type: USER_ID, userId: jwt.id });
-          dispatch({ type: EMAIL, userId: jwt.email });
+
           console.log(response);
         }
       })
