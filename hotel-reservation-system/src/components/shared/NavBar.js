@@ -47,6 +47,7 @@ export default function NavBar() {
   const role = useSelector((state) => state.role);
 
   const name = useSelector((state) => state.name);
+  useSelector((state) => console.log(state));
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen);
     console.log(role);

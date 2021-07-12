@@ -22,9 +22,20 @@ export default function UserProfile({}) {
   const token = localStorage.getItem("token");
   const [updateUserDialogOpen, setUpdateUserDialogOpen] = useState(false);
   const [changePasswordDialogOpen, setChangePasswordOpen] = useState(false);
-  const updateUserForm = <UpdateUserForm user={user}></UpdateUserForm>;
-  const changePasswordForm = <ChangePasswordForm></ChangePasswordForm>;
-  useSelector((state) => console.log(state));
+  const updateUserForm = (
+    <UpdateUserForm
+      changeFlag={changeflagForRerender}
+      handleClose={handlecloseUpdateUserDialog}
+      user={user}
+    ></UpdateUserForm>
+  );
+  const changePasswordForm = (
+    <ChangePasswordForm
+      user={user}
+      handleClose={handlecloseChangePassword}
+    ></ChangePasswordForm>
+  );
+  const [flagForRerender, setFlagForRerender] = useState(false);
   useEffect(async () => {
     const loadUser = async () => {
       await API.get("/users/" + userId, {
@@ -37,16 +48,21 @@ export default function UserProfile({}) {
         })
         .catch((error) => console.log(error.response.data.message));
     };
-    if (!!userId) {
+    if (!!userId && flagForRerender === false) {
       await loadUser();
+      setFlagForRerender(true);
     }
-  }, [userId]);
+  }, [userId, updateUserDialogOpen, flagForRerender]);
 
   function handlecloseUpdateUserDialog() {
     setUpdateUserDialogOpen(false);
   }
   function handlecloseChangePassword() {
     setChangePasswordOpen(false);
+  }
+
+  function changeflagForRerender() {
+    setFlagForRerender(false);
   }
 
   function editProfile() {

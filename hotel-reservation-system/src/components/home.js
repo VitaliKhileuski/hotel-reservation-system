@@ -53,7 +53,6 @@ export default function Home() {
   const [checkOutDate, setCheckOutDate] = useState(
     useSelector((state) => state.checkOutDate)
   );
-  useSelector((state) => console.log(state));
   const [page, setPage] = useState(1);
   const [maxPage, setMaxPage] = useState(1);
   const pageSize = 8;

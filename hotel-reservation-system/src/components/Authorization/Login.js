@@ -66,7 +66,7 @@ export default function Login() {
   }
   function ValidatePassword(password) {
     setPasswordErrorLabel("");
-    const passwordRegex = /^(?=.*[0-9])(?=.*[a-z])/;
+    const passwordRegex = /^(?=.*[0-9])(?=.*[a-zA-Z])/;
     const flag = passwordRegex.test(password);
     if (!flag) {
       setPasswordErrorLabel(

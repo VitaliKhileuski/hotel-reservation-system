@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function UpdateUserForm({ user }) {
+export default function UpdateUserForm({ changeFlag, handleClose, user }) {
   console.log(user);
   const dispatch = useDispatch();
   const isLogged = useSelector((state) => state.isLogged);
@@ -76,7 +76,14 @@ export default function UpdateUserForm({ user }) {
       .put("/users/" + user.id, request, {
         headers: { Authorization: "Bearer " + token },
       })
-      .then((response) => {})
+      .then((response) => response.data)
+      .then((data) => {
+        localStorage.setItem("token", data.token);
+        dispatch({ type: EMAIL, email: request.Email });
+        dispatch({ type: NAME, name: request.Name });
+        changeFlag();
+        handleClose();
+      })
       .catch((error) => {
         if (!!error.response) {
           setEmailErrorLabel(error.response.data.Message);

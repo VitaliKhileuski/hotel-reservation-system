@@ -10,7 +10,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { Formik, Form, ErrorMessage, Field } from "formik";
 import * as Yup from "yup";
-import api from "./../../api/";
+import API from "./../../api/";
 import { useDispatch, useSelector } from "react-redux";
 import {
   IS_LOGGED,
@@ -40,30 +40,97 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Register({ user }) {
+export default function ChangePasswordForm({ user, handleClose }) {
   const dispatch = useDispatch();
   const classes = useStyles();
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [passwordErrorLabel, setPasswordErrorLabel] = useState("");
+  const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
   const initialValues = {
-    password: "",
+    newPassword: "",
     passwordConfirm: "",
   };
+  let token = localStorage.getItem("token");
+
+  function ValidatePassword(password) {
+    setPasswordErrorLabel("");
+    const passwordRegex = /^(?=.*[0-9])(?=.*[a-zA-Z])/;
+    const flag = passwordRegex.test(password);
+    if (!flag) {
+      setPasswordErrorLabel(
+        "password should contains numbers and latin letters"
+      );
+    }
+    if (password === "") {
+      setPasswordErrorLabel("password is required");
+    }
+    if (password.length < 8) {
+      setPasswordErrorLabel("minimum characters should be 8");
+    }
+    setCurrentPassword(password);
+  }
+
   const validationSchema = Yup.object().shape({
-    password: Yup.string()
+    newPassword: Yup.string()
       .min(8, "Minimum characters should be 8")
+      .notOneOf(
+        [currentPassword],
+        "new password must be different from the previous one"
+      )
       .required("password is required")
       .matches(
-        /^(?=.*[0-9])(?=.*[a-z])/,
+        /^(?=.*[0-9])(?=.*[a-zA-Z])/,
         "password should contains numbers and latin letters"
       ),
     passwordConfirm: Yup.string()
-      .oneOf([Yup.ref("password"), null], "Passwords must match")
-      .required("Required"),
+      .oneOf([Yup.ref("newPassword"), null], "Passwords must match")
+      .required("password is required"),
   });
-  const onSubmit = (values) => {
-    const request = {
-      Password: values.password,
+  const onSubmit = async (values) => {
+    const password = {
+      Password: currentPassword,
     };
+    const newPassword = {
+      Password: values.newPassword,
+    };
+
+    let result = await checkPassword(password);
+    if (result) {
+      await updatePassword(newPassword);
+    }
   };
+
+  const updatePassword = async (request) => {
+    API.put("/users/" + user.id, request, {
+      headers: { Authorization: "Bearer " + token },
+    })
+      .then((response) => response.data)
+      .then((data) => {
+        handleClose();
+      })
+      .catch((error) => {
+        if (!!error.response) {
+          console.log(error.response.data.Message);
+          console.log(error.response.data);
+        }
+      });
+  };
+
+  async function checkPassword(password) {
+    let result;
+    await API.post("/account/checkPassword", password, {
+      headers: { Authorization: "Bearer " + token },
+    })
+      .then((response) => response.data)
+      .then((data) => {
+        result = data;
+        if (data === false) {
+          setPasswordErrorLabel("password is incorrect");
+        }
+      })
+      .catch((error) => console.log(error.response.data.message));
+    return result;
+  }
 
   return (
     <Container component="main" maxWidth="xs">
@@ -83,12 +150,14 @@ export default function Register({ user }) {
                     variant="outlined"
                     required
                     fullWidth
-                    name="password"
-                    label="Password"
-                    error={props.errors.password && props.touched.password}
-                    helperText={<ErrorMessage name="password" />}
+                    name="currentPassword"
+                    label="Current password"
+                    value={currentPassword}
+                    onChange={(e) => ValidatePassword(e.target.value)}
+                    error={passwordErrorLabel !== ""}
+                    helperText={passwordErrorLabel}
                     type="password"
-                    id="password"
+                    id="currentPassword"
                     autoComplete="current-password"
                   />
                 </Grid>
@@ -98,8 +167,8 @@ export default function Register({ user }) {
                     variant="outlined"
                     required
                     fullWidth
-                    name="password"
-                    label="new Password"
+                    name="newPassword"
+                    label="New password"
                     error={
                       props.errors.newPassword && props.touched.newPassword
                     }

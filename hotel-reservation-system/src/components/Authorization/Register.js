@@ -66,7 +66,7 @@ export default function Register({ user }) {
       .min(8, "Minimum characters should be 8")
       .required("password is required")
       .matches(
-        /^(?=.*[0-9])(?=.*[a-z])/,
+        /^(?=.*[0-9])(?=.*[a-zA-Z])/,
         "password should contains numbers and latin letters"
       ),
     passwordConfirm: Yup.string()
