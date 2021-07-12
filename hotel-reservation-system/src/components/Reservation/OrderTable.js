@@ -19,6 +19,7 @@ import API from "./../../api";
 import ZoomInIcon from "@material-ui/icons/ZoomIn";
 import BaseDialog from "../shared/BaseDialog";
 import RoomDetails from "../Room/RoomDetails";
+import { useSelector } from "react-redux";
 
 const useRowStyles = makeStyles({
   root: {
@@ -41,6 +42,7 @@ function Row(props) {
   const [roomDetailsOpen, setRoomDetailsOpen] = useState(false);
   const [room, setRoom] = useState();
   let component = <RoomDetails room={room}></RoomDetails>;
+  let role = useSelector((state) => state.role);
 
   function openRoomDetails(room) {
     console.log(room);
@@ -184,6 +186,53 @@ function Row(props) {
           </Collapse>
         </TableCell>
       </TableRow>
+      {role !== "User" ? (
+        <TableRow>
+          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
+            <Collapse in={open} timeout="auto" unmountOnExit>
+              <Box margin={1}>
+                <Typography variant="h6" gutterBottom component="div">
+                  Customer
+                </Typography>
+                <Table size="small" aria-label="purchases">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell align="right" style={{ minWidth: 170 }}>
+                        Email
+                      </TableCell>
+                      <TableCell align="right" style={{ minWidth: 170 }}>
+                        Name
+                      </TableCell>
+                      <TableCell align="right" style={{ minWidth: 170 }}>
+                        Surname
+                      </TableCell>
+                      <TableCell align="right" style={{ minWidth: 170 }}>
+                        PhomeNumber
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    <TableRow key={order.customer.id}>
+                      <TableCell align="right">
+                        {order.customer.email}
+                      </TableCell>
+                      <TableCell align="right">{order.customer.name}</TableCell>
+                      <TableCell align="right">
+                        {order.customer.surname}
+                      </TableCell>
+                      <TableCell align="right">
+                        {order.customer.phoneNumber}
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </Box>
+            </Collapse>
+          </TableCell>
+        </TableRow>
+      ) : (
+        ""
+      )}
       <BaseDialog
         open={roomDetailsOpen}
         title="Room details"

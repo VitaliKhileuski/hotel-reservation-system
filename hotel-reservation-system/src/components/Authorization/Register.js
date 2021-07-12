@@ -40,12 +40,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Register({ user }) {
+export default function Register() {
   const dispatch = useDispatch();
   const isLogged = useSelector((state) => state.isLogged);
   const classes = useStyles();
   const [emailErrorLabel, setEmailErrorLabel] = useState("");
   const [email, setEmail] = useState("");
+  let role = useSelector((state) => state.role);
   const phoneRegExp =
     /^\+((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
   const initialValues = {
@@ -118,7 +119,7 @@ export default function Register({ user }) {
     }
     setEmail(email);
   }
-  if (isLogged) {
+  if (isLogged && role != "Admin") {
     return <Redirect to="/home"></Redirect>;
   } else
     return (

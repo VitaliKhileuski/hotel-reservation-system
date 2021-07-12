@@ -13,7 +13,7 @@ import HotelEditor from "./../components/Hotel/HotelEditor";
 import RoomsPage from "./../components/Room/RoomsPage";
 import OrderTable from "./../components/Reservation/OrderTable";
 import UserProfile from "./../components/User/UserProfile";
-
+import UserTable from "../components/User/UserTable";
 export default function App() {
   return (
     <Switch>
@@ -28,6 +28,7 @@ export default function App() {
         render={(props) => <HotelEditor {...props} />}
       />
       <Route path="/rooms" render={(props) => <RoomsPage {...props} />} />
+      <Route path="/users" component={UserTable}></Route>
       <Redirect to="/home" />
     </Switch>
   );
