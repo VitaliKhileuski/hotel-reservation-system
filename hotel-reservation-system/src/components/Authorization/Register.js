@@ -40,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Register() {
+export default function Register({ handleClose }) {
   const dispatch = useDispatch();
   const isLogged = useSelector((state) => state.isLogged);
   const classes = useStyles();
@@ -85,17 +85,20 @@ export default function Register() {
     api
       .post("/account/register", request)
       .then((response) => {
-        if (!!response && !!response.data) {
-          localStorage.setItem("token", response.data[0]);
-          localStorage.setItem("refreshToken", response.data[1]);
-          const jwt = JSON.parse(atob(response.data[0].split(".")[1]));
-          dispatch({ type: IS_LOGGED, isLogged: true });
-          dispatch({ type: USER_ID, userId: jwt.id });
-          dispatch({ type: EMAIL, email: jwt.email });
-          dispatch({ type: NAME, name: jwt.firstname });
-          dispatch({ type: ROLE, role: jwt.role });
-
-          console.log(response);
+        if (role !== "Admin") {
+          if (!!response && !!response.data) {
+            localStorage.setItem("token", response.data[0]);
+            localStorage.setItem("refreshToken", response.data[1]);
+            const jwt = JSON.parse(atob(response.data[0].split(".")[1]));
+            dispatch({ type: IS_LOGGED, isLogged: true });
+            dispatch({ type: USER_ID, userId: jwt.id });
+            dispatch({ type: EMAIL, email: jwt.email });
+            dispatch({ type: NAME, name: jwt.firstname });
+            dispatch({ type: ROLE, role: jwt.role });
+            console.log(response);
+          }
+        } else {
+          handleClose();
         }
       })
       .catch((error) => {
@@ -119,16 +122,20 @@ export default function Register() {
     }
     setEmail(email);
   }
-  if (isLogged && role != "Admin") {
+  if (isLogged && role !== "Admin") {
     return <Redirect to="/home"></Redirect>;
   } else
     return (
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <div className={classes.paper}>
-          <Typography component="h1" variant="h5">
-            Sign up
-          </Typography>
+          {role !== "Admin" ? (
+            <Typography component="h1" variant="h5">
+              Sign up
+            </Typography>
+          ) : (
+            ""
+          )}
           <Formik
             initialValues={initialValues}
             onSubmit={onSubmit}
@@ -238,13 +245,17 @@ export default function Register() {
                   color="primary"
                   className={classes.submit}
                 >
-                  Sign Up
+                  {role !== "Admin" ? "Sign up" : "Add user"}
                 </Button>
                 <Grid container justify="flex-end">
                   <Grid item>
-                    <Link to="/login" variant="body2">
-                      Already have an account? Sign in
-                    </Link>
+                    {role !== "Admin" ? (
+                      <Link to="/login" variant="body2">
+                        Already have an account? Sign in
+                      </Link>
+                    ) : (
+                      ""
+                    )}
                   </Grid>
                 </Grid>
               </Form>

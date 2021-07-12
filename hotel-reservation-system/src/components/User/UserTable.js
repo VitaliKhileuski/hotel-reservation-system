@@ -48,7 +48,7 @@ export default function UserTable({ hotelId }) {
   const [user, setUser] = useState();
   const [addUserDialogOpen, setAddUserDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const form = <Register></Register>;
+  const form = <Register handleClose={handleCloseAddUserDialog}></Register>;
 
   useEffect(() => {
     console.log(userId);
@@ -70,10 +70,14 @@ export default function UserTable({ hotelId }) {
         })
         .catch((error) => console.log(error.response.data.message));
     };
-    if (deleteDialogOpen === false && userId === undefined) {
+    if (
+      deleteDialogOpen === false &&
+      addUserDialogOpen === false &&
+      userId === undefined
+    ) {
       loadUsers();
     }
-  }, [rowsPerPage, page, deleteDialogOpen]);
+  }, [rowsPerPage, page, deleteDialogOpen, addUserDialogOpen]);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -146,7 +150,7 @@ export default function UserTable({ hotelId }) {
                   <TableCell align="right">{user.surname}</TableCell>
                   <TableCell align="right">{user.phoneNumber}</TableCell>
                   <TableCell>
-                    {user.role.name != "Admin" ? (
+                    {user.role.name !== "Admin" ? (
                       <IconButton
                         color="inherit"
                         onClick={() => deleteUserById(user.id)}
@@ -190,6 +194,7 @@ export default function UserTable({ hotelId }) {
         open={deleteDialogOpen}
       ></BaseDeleteDialog>
       <BaseDialog
+        title="Add User"
         open={addUserDialogOpen}
         form={form}
         handleClose={handleCloseAddUserDialog}

@@ -14,10 +14,7 @@ import HotelList from "./Hotel/HotelList";
 import Pagination from "@material-ui/lab/Pagination";
 import { Redirect, useHistory } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  CHECK_IN_DATE,
-  CHECK_OUT_DATE,
-} from "./../storage/actions/actionTypes";
+import { CHECK_IN_DATE, CHECK_OUT_DATE } from "../storage/actions/actionTypes";
 import DateFilter from "./Filters/DateFilter";
 
 const useStyles = makeStyles((theme) => ({
