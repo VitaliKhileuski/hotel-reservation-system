@@ -11,6 +11,7 @@ export default function BaseDeleteDialog({
   deleteItem,
   message,
   handleCloseDeleteDialog,
+  title,
 }) {
   return (
     <Dialog
@@ -19,7 +20,7 @@ export default function BaseDeleteDialog({
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
     >
-      <DialogTitle id="alert-dialog-title">Reservation</DialogTitle>
+      <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
           {message}

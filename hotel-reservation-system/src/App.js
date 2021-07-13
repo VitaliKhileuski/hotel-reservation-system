@@ -4,6 +4,7 @@ import Login from "./components/Authorization/Login";
 import Register from "./components/Authorization/Register";
 import Home from "./components/Home";
 import API from "./api";
+import { useHistory } from "react-router";
 import {
   BrowserRouter as Router,
   Switch,
@@ -27,6 +28,7 @@ import OrderTable from "./components/Reservation/OrderTable";
 
 export default function App() {
   const dispatch = useDispatch();
+  const history = useHistory();
 
   const refreshAuthLogic = async (failedRequest) =>
     await API.put("/account/refreshTokenVerification", {

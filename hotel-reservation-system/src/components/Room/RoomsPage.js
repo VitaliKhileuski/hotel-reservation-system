@@ -3,6 +3,7 @@ import RoomList from "./RoomList";
 import API from "./../../api";
 import Pagination from "@material-ui/lab/Pagination";
 import { makeStyles } from "@material-ui/core/styles";
+import { useSelector } from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
   pagination: {
@@ -27,13 +28,16 @@ export default function RoomsPage(props) {
   const [numberOfPages, setNumberOfPages] = useState(0);
   const pageSize = 8;
   const classes = useStyles();
+  let userId = useSelector((state) => state.userId);
 
   useEffect(() => {
     const loadRooms = async () => {
       await API.get(
         "/rooms/" +
           hotelId +
-          "?checkInDate=" +
+          "?userId=" +
+          userId +
+          "&checkInDate=" +
           checkInDate.toJSON() +
           "&checkOutDate=" +
           checkOutDate.toJSON() +
@@ -51,10 +55,7 @@ export default function RoomsPage(props) {
         .catch((error) => console.log(error.response.data.message));
     };
     loadRooms();
-    console.log(rooms);
-  }, [page]);
-  console.log("rooms page");
-  console.log(checkOutDate);
+  }, [page, userId]);
 
   const changePage = (event, value) => {
     setPage(value);

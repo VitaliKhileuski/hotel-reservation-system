@@ -13,6 +13,7 @@ import {
   Typography,
 } from "@material-ui/core";
 import MainReservationDialog from "../Reservation/MainReservationDialog";
+import { isLastDayOfMonth } from "date-fns";
 
 const useStyles = makeStyles({
   root: {
@@ -35,14 +36,27 @@ export default function BaseCard({
   const classes = useStyles();
   const [reservationDialogOpen, setReservationDialogOpen] = useState(false);
   const history = useHistory();
+  let islogged = useSelector((state) => state.isLogged);
   const token = localStorage.getItem("token");
   console.log(room);
   console.log(checkOutDate);
 
   function callReservationDialog() {
-    console.log("click");
+    console.log(islogged);
+    if (islogged) {
+      blockRoom();
+    }
     setReservationDialogOpen(true);
   }
+  const blockRoom = async () => {
+    await API.put("/rooms/" + room.id + "/block", {
+      headers: { Authorization: "Bearer " + token },
+    })
+      .then((response) => response.data)
+      .then((data) => {})
+      .catch((error) => console.log(error.response.data.message));
+  };
+
   function handleCloseReservationDialog() {
     setReservationDialogOpen(false);
   }

@@ -53,6 +53,8 @@ export default function Home() {
   const [page, setPage] = useState(1);
   const [maxPage, setMaxPage] = useState(1);
   const pageSize = 8;
+  let userId = useSelector((state) => state.userId);
+  let isLogged = useSelector((state) => state.isLogged);
   const history = useHistory();
   const dispatch = useDispatch();
 
@@ -88,9 +90,20 @@ export default function Home() {
     dispatch({ type: CHECK_IN_DATE, checkInDate: checkInDate });
     dispatch({ type: CHECK_OUT_DATE, checkOutDate: checkOutDate });
 
+  console.log("UID",userId)
+
     const getFilteredHotels = async () => {
+      var requestPart;
+      if (userId === "") {
+        requestPart = "";
+      } else {
+        requestPart = `/${userId}`;
+      }
       await API.get(
-        "/hotels?checkInDate=" +
+        "/hotels/page?" +
+          "userId=" +
+          userId +
+          "&checkInDate=" +
           checkInDate.toJSON() +
           "&checkOutDate=" +
           checkOutDate.toJSON() +
@@ -122,7 +135,7 @@ export default function Home() {
 
   useEffect(() => {
     SearchFilteredHotels();
-  }, [page]);
+  }, [page, userId]);
 
   const classes = useStyles();
   const handleDateCheckInChange = (date) => {
@@ -134,6 +147,7 @@ export default function Home() {
   const changePage = (event, value) => {
     setPage(value);
   };
+
 
   return (
     <>

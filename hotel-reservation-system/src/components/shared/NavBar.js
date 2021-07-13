@@ -22,6 +22,7 @@ import {
   NAME,
   EMAIL,
   ROLE,
+  USER_ID,
 } from "./../../storage/actions/actionTypes";
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -79,6 +80,7 @@ export default function NavBar() {
     dispatch({ type: NAME, name: "" });
     dispatch({ type: ROLE, role: "" });
     dispatch({ type: EMAIL, email: "" });
+    dispatch({ type: USER_ID, userId: "" });
   };
   return (
     <div className={classes.root}>
