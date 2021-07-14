@@ -1,10 +1,5 @@
 import { React, useEffect, useState } from "react";
-import {
-  MuiPickersUtilsProvider,
-  KeyboardDatePicker,
-} from "@material-ui/pickers";
 import Grid from "@material-ui/core/Grid";
-import DateFnsUtils from "@date-io/date-fns";
 import { Typography, Button } from "@material-ui/core";
 import TextField from "@material-ui/core/TextField";
 import Autocomplete from "@material-ui/lab/Autocomplete";
@@ -54,9 +49,8 @@ export default function Home() {
   const [maxPage, setMaxPage] = useState(1);
   const pageSize = 8;
   let userId = useSelector((state) => state.userId);
-  let isLogged = useSelector((state) => state.isLogged);
-  const history = useHistory();
   const dispatch = useDispatch();
+  let token = localStorage.getItem("token");
 
   useEffect(() => {
     const loadCountries = async () => {
@@ -90,15 +84,7 @@ export default function Home() {
     dispatch({ type: CHECK_IN_DATE, checkInDate: checkInDate });
     dispatch({ type: CHECK_OUT_DATE, checkOutDate: checkOutDate });
 
-  console.log("UID",userId)
-
     const getFilteredHotels = async () => {
-      var requestPart;
-      if (userId === "") {
-        requestPart = "";
-      } else {
-        requestPart = `/${userId}`;
-      }
       await API.get(
         "/hotels/page?" +
           "userId=" +
@@ -123,7 +109,12 @@ export default function Home() {
         })
         .catch((error) => console.log(error));
     };
-    getFilteredHotels();
+    if (!!token && !!userId) {
+      getFilteredHotels();
+    }
+    if (!token && !userId) {
+      getFilteredHotels();
+    }
   }
   function changeDates(checkInDate, checkOutDate) {
     setCheckInDate(checkInDate);
@@ -138,16 +129,9 @@ export default function Home() {
   }, [page, userId]);
 
   const classes = useStyles();
-  const handleDateCheckInChange = (date) => {
-    setCheckInDate(date);
-  };
-  const handleDateCheckOutChange = (date) => {
-    setCheckOutDate(date);
-  };
   const changePage = (event, value) => {
     setPage(value);
   };
-
 
   return (
     <>

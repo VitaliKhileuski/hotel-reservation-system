@@ -31,7 +31,6 @@ export default function ReservationPaymentTable({
   }
   function calculateTotalSum() {
     let sum = 0;
-    console.log("re");
     selectedServices.map((item) => {
       sum += item.payment * item.quantity;
     });

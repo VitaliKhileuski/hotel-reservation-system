@@ -19,6 +19,9 @@ import {
   USER_ID,
   EMAIL,
 } from "../../storage/actions/actionTypes.js";
+import { REGISTER_VALIDATION_SCHEMA } from "../../constants/ValidationSchemas";
+import { EMAIL_REGEX } from "../../constants/Regex";
+import { FillStorage } from "./TokenData";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -41,14 +44,13 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Register({ handleClose }) {
-  const dispatch = useDispatch();
   const isLogged = useSelector((state) => state.isLogged);
   const classes = useStyles();
+  const dispatch = useDispatch();
   const [emailErrorLabel, setEmailErrorLabel] = useState("");
   const [email, setEmail] = useState("");
   let role = useSelector((state) => state.role);
-  const phoneRegExp =
-    /^\+((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
+
   const initialValues = {
     lastName: "",
     firstName: "",
@@ -57,23 +59,6 @@ export default function Register({ handleClose }) {
     phone: "",
     passwordConfirm: "",
   };
-  const validationSchema = Yup.object().shape({
-    firstName: Yup.string().required("first name is required"),
-    lastName: Yup.string().required("last name is required"),
-    phone: Yup.string()
-      .required("phone number is required")
-      .matches(phoneRegExp, "enter valid phone"),
-    password: Yup.string()
-      .min(8, "Minimum characters should be 8")
-      .required("password is required")
-      .matches(
-        /^(?=.*[0-9])(?=.*[a-zA-Z])/,
-        "password should contains numbers and latin letters"
-      ),
-    passwordConfirm: Yup.string()
-      .oneOf([Yup.ref("password"), null], "Passwords must match")
-      .required("Required"),
-  });
   const onSubmit = (values) => {
     const request = {
       Email: email,
@@ -87,15 +72,7 @@ export default function Register({ handleClose }) {
       .then((response) => {
         if (role !== "Admin") {
           if (!!response && !!response.data) {
-            localStorage.setItem("token", response.data[0]);
-            localStorage.setItem("refreshToken", response.data[1]);
-            const jwt = JSON.parse(atob(response.data[0].split(".")[1]));
-            dispatch({ type: IS_LOGGED, isLogged: true });
-            dispatch({ type: USER_ID, userId: jwt.id });
-            dispatch({ type: EMAIL, email: jwt.email });
-            dispatch({ type: NAME, name: jwt.firstname });
-            dispatch({ type: ROLE, role: jwt.role });
-            console.log(response);
+            FillStorage(response.data[0], response.data[1], dispatch);
           }
         } else {
           handleClose();
@@ -111,9 +88,7 @@ export default function Register({ handleClose }) {
   };
   function ValidateEmail(email) {
     setEmailErrorLabel("");
-    const emailRegex =
-      /^[\w!#$%&'+-/=?^_`{|}~]+(.[\w!#$%&'+-/=?^_`{|}~]+)*@((([-\w]+.)+[a-zA-Z]{2,4})|(([0-9]{1,3}.){3}[0-9]{1,3}))$/;
-    const flag = emailRegex.test(email);
+    const flag = EMAIL_REGEX.test(email);
     if (!flag) {
       setEmailErrorLabel("invalid email");
     }
@@ -139,7 +114,7 @@ export default function Register({ handleClose }) {
           <Formik
             initialValues={initialValues}
             onSubmit={onSubmit}
-            validationSchema={validationSchema}
+            validationSchema={REGISTER_VALIDATION_SCHEMA}
           >
             {(props) => (
               <Form className={classes.form}>

@@ -6,7 +6,7 @@ import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import Chip from "@material-ui/core/chip";
 import API from "./../../api/";
-import ServiceTable from "./../Hotel/ServiceTable";
+import ServiceTable from "./ServiceTable";
 import { makeStyles } from "@material-ui/core/styles";
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;

@@ -130,7 +130,6 @@ export default function HotelTable({ rows }) {
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
     SetPageForRequest(newPage + 1);
-    console.log(newPage);
   };
 
   const handleChangeRowsPerPage = (event) => {

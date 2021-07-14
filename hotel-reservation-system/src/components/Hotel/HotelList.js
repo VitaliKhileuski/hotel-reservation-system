@@ -10,8 +10,6 @@ export default function HotelList({
   checkOutDate,
 }) {
   const history = useHistory();
-  console.log("hotel list");
-  console.log(checkOutDate);
 
   function toRoomsPage(hotelId) {
     history.push({

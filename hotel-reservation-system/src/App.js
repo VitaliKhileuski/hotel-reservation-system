@@ -1,30 +1,12 @@
 import { React, useEffect } from "react";
 import NavBar from "./components/shared/NavBar";
-import Login from "./components/Authorization/Login";
-import Register from "./components/Authorization/Register";
-import Home from "./components/Home";
 import API from "./api";
 import { useHistory } from "react-router";
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Redirect,
-} from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  IS_LOGGED,
-  NAME,
-  ROLE,
-  EMAIL,
-  USER_ID,
-} from "./storage/actions/actionTypes";
+import { BrowserRouter as Router } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import RouteList from "./Routing/RouteList";
-import HotelTable from "./components/Hotel/HotelTable";
-import HotelEditor from "./components/Hotel/HotelEditor";
-import RoomsPage from "./components/Room/RoomsPage";
 import createAuthRefreshInterceptor from "axios-auth-refresh";
-import OrderTable from "./components/Reservation/OrderTable";
+import { FillStorage, Logout } from "./components/Authorization/TokenData";
 
 export default function App() {
   const dispatch = useDispatch();
@@ -39,11 +21,11 @@ export default function App() {
         localStorage.setItem("refreshToken", tokenRefreshResponse.data[1]);
         failedRequest.response.config.headers["Authorization"] =
           "Bearer " + tokenRefreshResponse.data[0];
-        updateStorage(tokenRefreshResponse.data[0]);
+        FillStorage(tokenRefreshResponse.data[0], dispatch);
         return Promise.resolve();
       })
       .catch((error) => {
-        logout();
+        Logout(dispatch, history);
       });
 
   createAuthRefreshInterceptor(API, refreshAuthLogic);
@@ -51,7 +33,7 @@ export default function App() {
   async function tokenVerification() {
     if (localStorage.getItem("token") !== null) {
       const token = localStorage.getItem("token");
-      updateStorage(token);
+      FillStorage(token, dispatch);
       let result;
       try {
         result = await API.get("/account/tokenVerification", {
@@ -62,30 +44,13 @@ export default function App() {
         });
       } catch (e) {}
     } else {
-      logout();
+      Logout(dispatch, history);
     }
-  }
-  function logout() {
-    localStorage.removeItem("refreshToken");
-    localStorage.removeItem("token");
-    dispatch({ type: IS_LOGGED, isLogged: false });
-    dispatch({ type: ROLE, role: "" });
-    dispatch({ type: EMAIL, email: "" });
-    dispatch({ type: NAME, name: "" });
   }
 
   useEffect(() => {
     tokenVerification();
   }, []);
-
-  async function updateStorage(token) {
-    const jwt = JSON.parse(atob(token.split(".")[1]));
-    dispatch({ type: IS_LOGGED, isLogged: true });
-    dispatch({ type: USER_ID, userId: jwt.id });
-    dispatch({ type: NAME, name: jwt.firstname });
-    dispatch({ type: EMAIL, email: jwt.email });
-    dispatch({ type: ROLE, role: jwt.role });
-  }
 
   return (
     <Router>

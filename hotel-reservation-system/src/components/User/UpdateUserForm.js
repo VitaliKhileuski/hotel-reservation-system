@@ -42,7 +42,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function UpdateUserForm({ changeFlag, handleClose, user }) {
-  console.log(user);
   const dispatch = useDispatch();
   const isLogged = useSelector((state) => state.isLogged);
   const classes = useStyles();

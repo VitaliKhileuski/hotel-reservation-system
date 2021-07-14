@@ -50,9 +50,9 @@ export default function RoomTable({ hotelId }) {
   const [room, setRoom] = useState();
   const [currentRoomImages, setCurrentRoomImages] = useState([]);
 
-  const [addAlertOpen, setAddAlertOpen] = useState(false);
-  const [deleteAlertOpen, setDeleteAlertOpen] = useState(false);
-  const [updateAlertOpen, setUpdateAlertOpen] = useState(false);
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertSuccessStatus, setAlertSuccessStatus] = useState(true);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
 
   function callImageDialog(room) {
@@ -65,13 +65,12 @@ export default function RoomTable({ hotelId }) {
   function handleCloseImageDialog() {
     setImageDialogOpen(false);
   }
-  let form = (
+  const form = (
     <AddRoomForm
       handleClose={() => handleClose()}
       hotelId={hotelId}
       room={room}
-      callAddAlert={callAddAlert}
-      callUpdateAlert={callUpdateAlert}
+      callAlert={callAlert}
     ></AddRoomForm>
   );
 
@@ -124,30 +123,31 @@ export default function RoomTable({ hotelId }) {
       return;
     }
 
-    setAddAlertOpen(false);
-    setDeleteAlertOpen(false);
-    setUpdateAlertOpen(false);
+    setAlertOpen(false);
   };
-  function callAddAlert() {
-    setAddAlertOpen(true);
-  }
-  function callUpdateAlert() {
-    setUpdateAlertOpen(true);
-  }
-  function callDeleteAlert() {
-    setDeleteAlertOpen(true);
+
+  function callAlert(message, successStatus) {
+    setAlertMessage(message);
+    setAlertSuccessStatus(successStatus);
+    setAlertOpen(true);
   }
 
   async function deleteRoom() {
     const DeleteRoom = async () => {
       await API.delete("/rooms/" + roomId, {
         headers: { Authorization: "Bearer " + token },
-      }).catch((error) => console.log(error.response.data.message));
+      })
+        .then((response) => response.data)
+        .then((data) => {
+          callAlert("room deleted successfully", true);
+        })
+        .catch((error) =>
+          callAlert("something went wrong. Please, try again", false)
+        );
     };
 
     await DeleteRoom();
     handleCloseDeleteDialog();
-    callDeleteAlert();
   }
 
   return (
@@ -242,19 +242,10 @@ export default function RoomTable({ hotelId }) {
         filesLimit={5}
       ></BaseImageDialog>
       <BaseAlert
-        open={addAlertOpen}
+        open={alertOpen}
         handleClose={handleCloseAlert}
-        message={"room added successfully"}
-      ></BaseAlert>
-      <BaseAlert
-        open={deleteAlertOpen}
-        handleClose={handleCloseAlert}
-        message={"room deleted succesfully"}
-      ></BaseAlert>
-      <BaseAlert
-        open={updateAlertOpen}
-        handleClose={handleCloseAlert}
-        message={"room updated succesfully"}
+        message={alertMessage}
+        success={alertSuccessStatus}
       ></BaseAlert>
     </>
   );

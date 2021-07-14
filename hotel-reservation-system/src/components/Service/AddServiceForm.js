@@ -7,8 +7,8 @@ import Box from "@material-ui/core/Box";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { Formik, Form, ErrorMessage, Field } from "formik";
-import * as Yup from "yup";
 import API from "./../../api/";
+import { SERVICE_VALIDATION_SCHEMA } from "../../constants/ValidationSchemas";
 
 const useStyles = makeStyles((theme) => ({
   root: {},
@@ -35,11 +35,9 @@ export default function AddServiceForm({
   hotelId,
   service,
   handleClose,
-  callAddAlert,
-  callUpdateAlert,
+  callAlert,
 }) {
   const classes = useStyles();
-  const [showAlert, setShowAlert] = useState(false);
   const [serviceName, setServiceName] = useState(!!service ? service.name : "");
   const token = localStorage.getItem("token");
   const [serviceNameErrorLabel, setServiceNameErrorLabel] = useState("");
@@ -48,11 +46,6 @@ export default function AddServiceForm({
     name: !!service ? service.name : "",
     payment: !!service ? service.payment : "",
   };
-  const validationSchema = Yup.object().shape({
-    payment: Yup.number("payment must be a number").required(
-      "payment is required"
-    ),
-  });
 
   const onSubmit = async (values) => {
     const request = {
@@ -67,11 +60,9 @@ export default function AddServiceForm({
         .then((response) => response.data)
         .then((data) => {
           handleClose();
-          callAddAlert();
-          setShowAlert(true);
+          callAlert("service added successfully", true);
         })
         .catch((error) => {
-          console.log(error.response.data.message);
           setServiceNameErrorLabel(error.response.data.Message);
         });
     };
@@ -89,7 +80,7 @@ export default function AddServiceForm({
       .then((response) => response.data)
       .then((data) => {
         handleClose();
-        callUpdateAlert();
+        callAlert("service updated successfully", true);
       })
       .catch((error) => {
         console.log(error.response.data.Message);
@@ -114,7 +105,7 @@ export default function AddServiceForm({
           <Formik
             initialValues={initialValues}
             onSubmit={onSubmit}
-            validationSchema={validationSchema}
+            validationSchema={SERVICE_VALIDATION_SCHEMA}
           >
             {(props) => (
               <Form className={classes.form}>

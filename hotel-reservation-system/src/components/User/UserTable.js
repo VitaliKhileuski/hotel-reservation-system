@@ -51,7 +51,6 @@ export default function UserTable({ hotelId }) {
   const form = <Register handleClose={handleCloseAddUserDialog}></Register>;
 
   useEffect(() => {
-    console.log(userId);
     const loadUsers = async () => {
       await API.get(
         "/users/" +

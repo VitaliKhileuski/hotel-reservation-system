@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.secondary.main,
   },
   form: {
-    width: 400, // Fix IE 11 issue.
+    width: 400,
     marginTop: theme.spacing(1),
   },
   submit: {
@@ -34,8 +34,7 @@ export default function HotelAdminDialog({
   hotelId,
   message,
   handleClose,
-  callAssignAdminAlert,
-  callDeleteAdminAlert,
+  callAlert,
   assingFlag,
 }) {
   const classes = useStyles();
@@ -61,7 +60,6 @@ export default function HotelAdminDialog({
       })
         .then((response) => response.data)
         .then((data) => {
-          console.log(data);
           if (!!data) setUsers(data);
         })
         .catch((error) => console.log(error));
@@ -79,8 +77,12 @@ export default function HotelAdminDialog({
       headers: { Authorization: "Bearer " + token },
     })
       .then((response) => response.data)
-      .then((data) => {})
-      .catch((error) => console.log(error.response));
+      .then((data) => {
+        callAlert("hotel admin assigned successfully", true);
+      })
+      .catch((error) =>
+        callAlert("something went wrong. Please try again", false)
+      );
   };
 
   const DeleteHotelAdmin = async () => {
@@ -88,20 +90,22 @@ export default function HotelAdminDialog({
       headers: { Authorization: "Bearer " + token },
     })
       .then((response) => response.data)
-      .then((data) => {})
-      .catch((error) => console.log(error.response.data.message));
+      .then((data) => {
+        callAlert("hotel admin deleted successfully", true);
+      })
+      .catch((error) =>
+        callAlert("something went wrong. Please try again", false)
+      );
   };
 
   function updateHotelAdmin() {
     UpdateHotelAdmin();
     handleClose();
-    callAssignAdminAlert();
   }
 
   function deleteHotelAdmin() {
     DeleteHotelAdmin();
     handleClose();
-    callDeleteAdminAlert();
   }
   function actionWithAdmin() {
     if (assingFlag === true) {

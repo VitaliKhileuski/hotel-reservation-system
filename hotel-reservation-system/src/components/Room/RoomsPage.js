@@ -29,6 +29,7 @@ export default function RoomsPage(props) {
   const pageSize = 8;
   const classes = useStyles();
   let userId = useSelector((state) => state.userId);
+  let token = localStorage.getItem("token");
 
   useEffect(() => {
     const loadRooms = async () => {
@@ -54,7 +55,12 @@ export default function RoomsPage(props) {
         })
         .catch((error) => console.log(error.response.data.message));
     };
-    loadRooms();
+    if (!!token && !!userId) {
+      loadRooms();
+    }
+    if (!token && !userId) {
+      loadRooms();
+    }
   }, [page, userId]);
 
   const changePage = (event, value) => {

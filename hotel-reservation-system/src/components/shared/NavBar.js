@@ -17,13 +17,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { useSelector } from "react-redux";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import { useDispatch } from "react-redux";
-import {
-  IS_LOGGED,
-  NAME,
-  EMAIL,
-  ROLE,
-  USER_ID,
-} from "./../../storage/actions/actionTypes";
+import { Logout } from "../Authorization/TokenData";
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
@@ -73,15 +67,6 @@ export default function NavBar() {
     });
   }
 
-  const Logout = () => {
-    localStorage.removeItem("refreshToken");
-    localStorage.removeItem("token");
-    dispatch({ type: IS_LOGGED, isLogged: false });
-    dispatch({ type: NAME, name: "" });
-    dispatch({ type: ROLE, role: "" });
-    dispatch({ type: EMAIL, email: "" });
-    dispatch({ type: USER_ID, userId: "" });
-  };
   return (
     <div className={classes.root}>
       <AppBar position="static">
@@ -156,7 +141,7 @@ export default function NavBar() {
                           <MenuItem
                             onClick={(e) => {
                               handleClose(e);
-                              Logout();
+                              Logout(dispatch, history);
                             }}
                           >
                             Logout

@@ -18,6 +18,8 @@ import {
   EMAIL,
   USER_ID,
 } from "../../storage/actions/actionTypes.js";
+import { EMAIL_REGEX, PASSWORD_REGEX } from "../../constants/Regex";
+import { FillStorage, FillLocalStorage } from "./TokenData";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -31,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.secondary.main,
   },
   form: {
-    width: "100%", // Fix IE 11 issue.
+    width: "100%",
     marginTop: theme.spacing(1),
   },
   submit: {
@@ -41,6 +43,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Login() {
   const dispatch = useDispatch();
+  const classes = useStyles();
   const isLogged = useSelector((state) => state.isLogged);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -53,9 +56,8 @@ export default function Login() {
   };
   function ValidateEmail(email) {
     setEmailErrorLabel("");
-    const emailRegex =
-      /^[\w!#$%&'+-/=?^_`{|}~]+(.[\w!#$%&'+-/=?^_`{|}~]+)*@((([-\w]+.)+[a-zA-Z]{2,4})|(([0-9]{1,3}.){3}[0-9]{1,3}))$/;
-    const flag = emailRegex.test(email);
+
+    const flag = EMAIL_REGEX.test(email);
     if (!flag) {
       setEmailErrorLabel("invalid email");
     }
@@ -66,8 +68,7 @@ export default function Login() {
   }
   function ValidatePassword(password) {
     setPasswordErrorLabel("");
-    const passwordRegex = /^(?=.*[0-9])(?=.*[a-zA-Z])/;
-    const flag = passwordRegex.test(password);
+    const flag = PASSWORD_REGEX.test(password);
     if (!flag) {
       setPasswordErrorLabel(
         "password should contains numbers and latin letters"
@@ -76,8 +77,8 @@ export default function Login() {
     if (password === "") {
       setPasswordErrorLabel("password is required");
     }
-    if (password.length < 5) {
-      setPasswordErrorLabel("minimum characters should be 5");
+    if (password.length < 8) {
+      setPasswordErrorLabel("minimum characters should be 8");
     }
     setPassword(password);
   }
@@ -90,17 +91,9 @@ export default function Login() {
     API.post("/account/login", request)
       .then((response) => {
         if (!!response && !!response.data) {
-          localStorage.setItem("token", response.data[0]);
-          localStorage.setItem("refreshToken", response.data[1]);
-          const jwt = JSON.parse(atob(response.data[0].split(".")[1]));
-          console.log(jwt);
-          console.log("jwt");
-          console.log(jwt.email);
-          dispatch({ type: IS_LOGGED, isLogged: true });
-          dispatch({ type: USER_ID, userId: jwt.id });
-          dispatch({ type: NAME, name: jwt.firstname });
-          dispatch({ type: EMAIL, email: jwt.email });
-          dispatch({ type: ROLE, role: jwt.role });
+          console.log("asdfasdf");
+          FillLocalStorage(response.data[0], response.data[1]);
+          FillStorage(response.data[0], dispatch);
         }
       })
       .catch((error) => {
@@ -114,81 +107,81 @@ export default function Login() {
         }
       });
   };
-  const classes = useStyles();
+
   if (isLogged) {
     return <Redirect to="/home"></Redirect>;
-  } else
-    return (
-      <Container component="main" maxWidth="xs">
-        <CssBaseline />
-        <div className={classes.paper}>
-          <Typography component="h1" variant="h5">
-            Sign in
-          </Typography>
-          <Formik initialValues={initialValues} onSubmit={onSubmit}>
-            {(props) => (
-              <Form className={classes.form}>
-                <Field
-                  as={TextField}
-                  variant="outlined"
-                  margin="normal"
-                  required
-                  onClick={() => {
-                    setEmailErrorLabel("");
-                  }}
-                  value={email}
-                  onChange={(e) => ValidateEmail(e.target.value)}
-                  error={emailErrorLabel !== ""}
-                  helperText={emailErrorLabel}
-                  fullWidth
-                  id="email"
-                  label="Email Address"
-                  name="email"
-                  autoComplete="email"
-                  autoFocus
-                />
-                <Field
-                  as={TextField}
-                  variant="outlined"
-                  margin="normal"
-                  required
-                  fullWidth
-                  name="password"
-                  value={password}
-                  onChange={(e) => ValidatePassword(e.target.value)}
-                  error={passwordErrorLabel !== ""}
-                  helperText={passwordErrorLabel}
-                  label="Password"
-                  type="password"
-                  id="password"
-                  autoComplete="current-password"
-                />
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  color="primary"
-                  className={classes.submit}
-                >
-                  Sign In
-                </Button>
-                <Grid container>
-                  <Grid item xs>
-                    <Link to="/forgotPassword" variant="body2">
-                      Forgot password?
-                    </Link>
-                  </Grid>
-                  <Grid item>
-                    <Link to="/register" variant="body2">
-                      Don't have an account? Sign Up
-                    </Link>
-                  </Grid>
+  }
+  return (
+    <Container component="main" maxWidth="xs">
+      <CssBaseline />
+      <div className={classes.paper}>
+        <Typography component="h1" variant="h5">
+          Sign in
+        </Typography>
+        <Formik initialValues={initialValues} onSubmit={onSubmit}>
+          {(props) => (
+            <Form className={classes.form}>
+              <Field
+                as={TextField}
+                variant="outlined"
+                margin="normal"
+                required
+                onClick={() => {
+                  setEmailErrorLabel("");
+                }}
+                value={email}
+                onChange={(e) => ValidateEmail(e.target.value)}
+                error={emailErrorLabel !== ""}
+                helperText={emailErrorLabel}
+                fullWidth
+                id="email"
+                label="Email Address"
+                name="email"
+                autoComplete="email"
+                autoFocus
+              />
+              <Field
+                as={TextField}
+                variant="outlined"
+                margin="normal"
+                required
+                fullWidth
+                name="password"
+                value={password}
+                onChange={(e) => ValidatePassword(e.target.value)}
+                error={passwordErrorLabel !== ""}
+                helperText={passwordErrorLabel}
+                label="Password"
+                type="password"
+                id="password"
+                autoComplete="current-password"
+              />
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                color="primary"
+                className={classes.submit}
+              >
+                Sign In
+              </Button>
+              <Grid container>
+                <Grid item xs>
+                  <Link to="/forgotPassword" variant="body2">
+                    Forgot password?
+                  </Link>
                 </Grid>
-              </Form>
-            )}
-          </Formik>
-        </div>
-        <Box mt={8}></Box>
-      </Container>
-    );
+                <Grid item>
+                  <Link to="/register" variant="body2">
+                    Don't have an account? Sign Up
+                  </Link>
+                </Grid>
+              </Grid>
+            </Form>
+          )}
+        </Formik>
+      </div>
+      <Box mt={8}></Box>
+    </Container>
+  );
 }

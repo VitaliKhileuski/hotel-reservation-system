@@ -54,9 +54,6 @@ export default function OrderConfirmation({
   const dispatch = useDispatch();
   const isLogged = useSelector((state) => state.isLogged);
   let userEmail = useSelector((state) => state.email);
-  console.log(checked);
-  console.log(emailErrorLabel);
-  console.log(email);
 
   const [messageDialogOpen, SetMessageDialogOpen] = useState(false);
   const messageForGuest = (
@@ -134,7 +131,6 @@ export default function OrderConfirmation({
 
   async function сreateOrder() {
     if (checked === true && emailErrorLabel === "") console.log("email");
-    console.log(userEmail);
     if (userEmail === "" || userEmail === undefined) {
       await createUser();
       userEmail = email;

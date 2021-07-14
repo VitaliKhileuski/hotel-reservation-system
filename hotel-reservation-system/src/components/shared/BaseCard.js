@@ -1,7 +1,6 @@
 import { React, useState, useEffect } from "react";
 import API from "./../../api";
 import { useSelector } from "react-redux";
-import { useHistory } from "react-router";
 import Carousel from "react-material-ui-carousel";
 import defaultImage from "./../../img/room.jpg";
 import {
@@ -13,7 +12,6 @@ import {
   Typography,
 } from "@material-ui/core";
 import MainReservationDialog from "../Reservation/MainReservationDialog";
-import { isLastDayOfMonth } from "date-fns";
 
 const useStyles = makeStyles({
   root: {
@@ -35,7 +33,6 @@ export default function BaseCard({
 }) {
   const classes = useStyles();
   const [reservationDialogOpen, setReservationDialogOpen] = useState(false);
-  const history = useHistory();
   let islogged = useSelector((state) => state.isLogged);
   const token = localStorage.getItem("token");
   console.log(room);

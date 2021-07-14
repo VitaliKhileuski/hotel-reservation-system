@@ -1,6 +1,4 @@
 import { React, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { Redirect, useHistory } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import {
   Paper,
@@ -16,11 +14,11 @@ import {
 } from "@material-ui/core";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
-import API from "./../../api";
+import API from "../../api";
 import AddServiceForm from "./AddServiceForm";
-import BaseAlert from "./../shared/BaseAlert";
+import BaseAlert from "../shared/BaseAlert";
 import BaseDialog from "../shared/BaseDialog";
-import BaseDeleteDialog from "./../shared/BaseDeleteDialog";
+import BaseDeleteDialog from "../shared/BaseDeleteDialog";
 import AddIcon from "@material-ui/icons/Add";
 import RemoveIcon from "@material-ui/icons/Remove";
 
@@ -50,17 +48,16 @@ export default function ServiceTable({ hotelId, serviceList }) {
   const [serviceId, setServiceId] = useState(0);
   const [service, setService] = useState();
 
-  const [addAlertOpen, setAddAlertOpen] = useState(false);
-  const [deleteAlertOpen, setDeleteAlertOpen] = useState(false);
-  const [updateAlertOpen, setUpdateAlertOpen] = useState(false);
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertSuccessStatus, setAlertSuccessStatus] = useState(true);
 
   let form = (
     <AddServiceForm
       handleClose={() => handleClose()}
       hotelId={hotelId}
       service={service}
-      callAddAlert={callAddAlert}
-      callUpdateAlert={callUpdateAlert}
+      callAlert={callAlert}
     ></AddServiceForm>
   );
   useEffect(() => {
@@ -82,8 +79,6 @@ export default function ServiceTable({ hotelId, serviceList }) {
         )
           .then((response) => response.data)
           .then((data) => {
-            console.log(data);
-            console.log(data);
             setServices(data.item1);
             setMaxNumberOfServices(data.item2);
           })
@@ -143,24 +138,19 @@ export default function ServiceTable({ hotelId, serviceList }) {
       setService(newService);
     }
   }
+  function callAlert(message, successStatus) {
+    setAlertMessage(message);
+    setAlertSuccessStatus(successStatus);
+    setAlertOpen(true);
+  }
+
   const handleCloseAlert = (event, reason) => {
     if (reason === "clickaway") {
       return;
     }
-
-    setAddAlertOpen(false);
-    setDeleteAlertOpen(false);
-    setUpdateAlertOpen(false);
+    setAlertOpen(false);
   };
-  function callAddAlert() {
-    setAddAlertOpen(true);
-  }
-  function callUpdateAlert() {
-    setUpdateAlertOpen(true);
-  }
-  function callDeleteAlert() {
-    setDeleteAlertOpen(true);
-  }
+
   function slice(services) {
     if (!!hotelId) {
       return services;
@@ -176,12 +166,18 @@ export default function ServiceTable({ hotelId, serviceList }) {
     const DeleteService = async () => {
       await API.delete("/services/" + serviceId, {
         headers: { Authorization: "Bearer " + token },
-      }).catch((error) => console.log(error.response.data.message));
+      })
+        .then((response) => response.data)
+        .then((data) => {
+          callAlert("service deleted successfully", true);
+        })
+        .catch((error) =>
+          callAlert("something went wrong. Please try again.", false)
+        );
     };
 
     await DeleteService();
     handleCloseDeleteDialog();
-    callDeleteAlert();
   }
 
   return (
@@ -287,19 +283,10 @@ export default function ServiceTable({ hotelId, serviceList }) {
             message={"service will be permanently deleted"}
           ></BaseDeleteDialog>
           <BaseAlert
-            open={addAlertOpen}
+            open={alertOpen}
             handleClose={handleCloseAlert}
-            message={"service added successfully"}
-          ></BaseAlert>
-          <BaseAlert
-            open={deleteAlertOpen}
-            handleClose={handleCloseAlert}
-            message={"service deleted succesfully"}
-          ></BaseAlert>
-          <BaseAlert
-            open={updateAlertOpen}
-            handleClose={handleCloseAlert}
-            message={"service updated succesfully"}
+            message={alertMessage}
+            success={alertSuccessStatus}
           ></BaseAlert>
         </>
       ) : (

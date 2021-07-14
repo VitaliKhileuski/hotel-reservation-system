@@ -8,7 +8,7 @@ import { Box } from "@material-ui/core";
 import AddHotelForm from "./AddHotelForm";
 import BaseAlert from "./../shared/BaseAlert";
 import RoomTable from "./../Room/RoomTable";
-import ServiceTable from "./ServiceTable";
+import ServiceTable from "../Service/ServiceTable";
 import { useSelector } from "react-redux";
 import BaseImageDialog from "./../shared/BaseImageDialog";
 import Grid from "@material-ui/core/Grid";
@@ -139,7 +139,7 @@ export default function HotelEditor(props) {
                 toRoomSection={toRoomSection}
                 hotel={hotel}
                 callUpdateAlert={callUpdateAlert}
-                updateMainInfo={() => updateMainInfo()}
+                updateMainInfo={updateMainInfo}
               ></AddHotelForm>
             </Grid>
           ) : (

@@ -15,12 +15,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function BaseAlert({ open, handleClose, message }) {
-  const classes = useStyles();
-
+export default function BaseAlert({ open, handleClose, message, success }) {
   return (
     <Snackbar open={open} autoHideDuration={5000} onClose={() => handleClose()}>
-      <Alert onClose={() => handleClose()} severity="success">
+      <Alert
+        onClose={() => handleClose()}
+        severity={success ? "success" : "error"}
+      >
         {message}
       </Alert>
     </Snackbar>

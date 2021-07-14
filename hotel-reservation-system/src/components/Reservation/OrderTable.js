@@ -20,6 +20,9 @@ import ZoomInIcon from "@material-ui/icons/ZoomIn";
 import BaseDialog from "../shared/BaseDialog";
 import RoomDetails from "../Room/RoomDetails";
 import { useSelector } from "react-redux";
+import DeleteIcon from "@material-ui/icons/Delete";
+import BaseDeleteDialog from "../shared/BaseDeleteDialog";
+import BaseAlert from "../shared/BaseAlert";
 
 const useRowStyles = makeStyles({
   root: {
@@ -41,16 +44,60 @@ function Row(props) {
   const classes = useRowStyles();
   const [roomDetailsOpen, setRoomDetailsOpen] = useState(false);
   const [room, setRoom] = useState();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertSuccessStatus, setAlertSuccessStatus] = useState(true);
+  const [orderId, setOrderId] = useState("");
   let component = <RoomDetails room={room}></RoomDetails>;
   let role = useSelector((state) => state.role);
+  let token = localStorage.getItem("token");
 
   function openRoomDetails(room) {
-    console.log(room);
     setRoom(room);
     setRoomDetailsOpen(true);
   }
   function handleCloseRoomDetails() {
     setRoomDetailsOpen(false);
+  }
+
+  function handleCloseDeleteDialog() {
+    setDeleteDialogOpen(false);
+  }
+  const handleCloseAlert = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setAlertOpen(false);
+  };
+
+  function callAlert(message, successStatus) {
+    setAlertMessage(message);
+    setAlertSuccessStatus(successStatus);
+    setAlertOpen(true);
+  }
+
+  async function deleteOrder() {
+    const DeleteOrder = async () => {
+      await API.delete("/orders/" + orderId, {
+        headers: { Authorization: "Bearer " + token },
+      })
+        .then((response) => response.data)
+        .then((data) => {
+          callAlert("order deleted successfully", true);
+        })
+        .catch((error) =>
+          callAlert("something went wrong. Please, try again", false)
+        );
+    };
+
+    await DeleteOrder();
+    handleCloseDeleteDialog();
+  }
+  function handleClickDeleteIcon(orderId) {
+    setOrderId(orderId);
+    setDeleteDialogOpen(true);
   }
 
   return (
@@ -84,6 +131,13 @@ function Row(props) {
         </TableCell>
         <TableCell align="right">{order.numberOfDays}</TableCell>
         <TableCell align="right">{ccyFormat(order.fullPrice)}</TableCell>
+        <TableCell>
+          <IconButton color="inherit">
+            <DeleteIcon
+              onClick={() => handleClickDeleteIcon(order.id)}
+            ></DeleteIcon>
+          </IconButton>
+        </TableCell>
       </TableRow>
       {order.services.length === 0 ? (
         ""
@@ -239,6 +293,19 @@ function Row(props) {
         handleClose={handleCloseRoomDetails}
         form={component}
       ></BaseDialog>
+      <BaseDeleteDialog
+        open={deleteDialogOpen}
+        handleCloseDeleteDialog={handleCloseDeleteDialog}
+        title="cancel order"
+        message="order will be canceled."
+        deleteItem={deleteOrder}
+      ></BaseDeleteDialog>
+      <BaseAlert
+        open={alertOpen}
+        handleClose={handleCloseAlert}
+        message={alertMessage}
+        success={alertSuccessStatus}
+      ></BaseAlert>
     </>
   );
 }
@@ -273,7 +340,6 @@ export default function OrderTable() {
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
     SetPageForRequest(newPage + 1);
-    console.log(newPage);
   };
 
   const handleChangeRowsPerPage = (event) => {
@@ -310,6 +376,7 @@ export default function OrderTable() {
               <TableCell align="right" style={{ minWidth: 170 }}>
                 Full Price
               </TableCell>
+              <TableCell />
             </TableRow>
           </TableHead>
           <TableBody>

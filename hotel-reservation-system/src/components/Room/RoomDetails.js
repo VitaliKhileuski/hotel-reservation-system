@@ -1,17 +1,12 @@
 import { React, useEffect, useState } from "react";
 import {
-  Box,
-  Grid,
-  Button,
   GridList,
   GridListTile,
   makeStyles,
-  CardMedia,
   Typography,
 } from "@material-ui/core";
-import BaseCard from "./../shared/BaseCard";
+
 import BaseDialog from "../shared/BaseDialog";
-import DateFilter from "../Filters/DateFilter";
 
 const useStyles = makeStyles((theme) => ({
   root: {

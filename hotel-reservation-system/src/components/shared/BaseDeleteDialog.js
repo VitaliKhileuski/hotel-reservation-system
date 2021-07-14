@@ -30,7 +30,7 @@ export default function BaseDeleteDialog({
         <Button onClick={() => handleCloseDeleteDialog()} color="primary">
           Cancel
         </Button>
-        <Button onClick={() => deleteItem()} color="primary" autoFocus>
+        <Button onClick={deleteItem} color="primary" autoFocus>
           Delete
         </Button>
       </DialogActions>
