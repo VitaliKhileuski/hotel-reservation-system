@@ -38,7 +38,6 @@ export default function MainReservationDialog({
   checkInDate,
   checkOutDate,
 }) {
-
   const [flag, setFlag] = useState(true);
   const [selectedServices, setSelectedServices] = useState([]);
   const [checkIn, setCheckIn] = useState(checkInDate);

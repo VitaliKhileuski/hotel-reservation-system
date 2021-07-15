@@ -38,8 +38,8 @@ export default function Home() {
   const [cities, setCities] = useState([]);
   const [currentCountry, setCurrentCountry] = useState("");
   const [hotels, setHotels] = useState([]);
-  const [hotelNames,setHotelNames] = useState([])
-  const [hotelName,setHotelName] = useState("");
+  const [hotelNames, setHotelNames] = useState([]);
+  const [hotelName, setHotelName] = useState("");
   const [isValidDates, setIsValidDates] = useState(true);
   const [checkInDate, setCheckInDate] = useState(
     useSelector((state) => state.checkInDate)
@@ -166,7 +166,7 @@ export default function Home() {
         <Grid>
           <Typography variant="h6">What place do you want to visit?</Typography>
           <Autocomplete
-            id="combo-box-demo"
+            id="countries"
             options={countries}
             onChange={(event, value) => {
               console.log(value);
@@ -186,7 +186,7 @@ export default function Home() {
         <Grid>
           <Typography variant="h6">Choose your city</Typography>
           <Autocomplete
-            id="combo-box-demo2"
+            id="cities"
             options={cities}
             getOptionLabel={(option) => option}
             onChange={(event, value) => setCity(value)}
@@ -205,17 +205,13 @@ export default function Home() {
         <Grid>
           <Typography variant="h6">Find by name</Typography>
           <Autocomplete
-            id="combo-box-demo2"
+            id="hotelNames"
             options={hotelNames}
             getOptionLabel={(option) => option}
             onChange={(event, value) => setHotelName(value)}
             style={{ width: 300 }}
             renderInput={(params) => (
-              <TextField
-                {...params}
-                label="find by name"
-                variant="outlined"
-              />
+              <TextField {...params} label="find by name" variant="outlined" />
             )}
           />
         </Grid>

@@ -1,6 +1,6 @@
 import { React, useState } from "react";
 import DateFnsUtils from "@date-io/date-fns";
-import moment from 'moment'
+import moment from "moment";
 import { useDispatch } from "react-redux";
 import {
   MuiPickersUtilsProvider,
@@ -21,8 +21,7 @@ export default function DateFilter({
   checkOutDate,
   changeDates,
   isValidInfo,
-}){
-
+}) {
   const dispatch = useDispatch();
   const [checkIn, setCheckIn] = useState(checkInDate);
   const [checkOut, setCheckOut] = useState(checkOutDate);
@@ -101,7 +100,7 @@ export default function DateFilter({
         <Typography variant="h6">Check out date</Typography>
         <KeyboardDatePicker
           disableToolbar
-          minDate={new Date(moment(checkIn).add(2, 'days')._d)}
+          minDate={new Date(moment(checkIn).add(2, "days")._d)}
           variant="inline"
           format="MM/dd/yyyy"
           inputVariant="outlined"

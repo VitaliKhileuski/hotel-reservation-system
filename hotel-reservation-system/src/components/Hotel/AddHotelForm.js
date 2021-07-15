@@ -38,7 +38,6 @@ export default function AddHotelForm({
   callUpdateAlert,
   updateMainInfo,
 }) {
-
   const classes = useStyles();
   const token = localStorage.getItem("token");
   const [buildingNumberLabelError, setBuildingNumberLabelError] = useState("");

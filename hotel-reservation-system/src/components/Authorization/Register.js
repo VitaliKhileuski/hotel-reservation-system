@@ -64,7 +64,7 @@ export default function Register({ handleClose }) {
       .then((response) => {
         if (role !== "Admin") {
           if (!!response && !!response.data) {
-            FillStorage(response.data[0], response.data[1],dispatch);
+            FillStorage(response.data[0], response.data[1], dispatch);
           }
         } else {
           handleClose();
