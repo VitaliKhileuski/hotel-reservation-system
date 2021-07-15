@@ -1,14 +1,13 @@
 import { React, useState, useEffect } from "react";
-import { Button } from "@material-ui/core";
+import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import TextField from "@material-ui/core/TextField";
 import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
-
-import API from "./../../api/";
 import Autocomplete from "@material-ui/lab/Autocomplete";
+import API from "./../../api/";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -22,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.secondary.main,
   },
   form: {
-    width: 400, // Fix IE 11 issue.
+    width: 400,
     marginTop: theme.spacing(1),
   },
   submit: {
@@ -34,10 +33,10 @@ export default function HotelAdminDialog({
   hotelId,
   message,
   handleClose,
-  callAssignAdminAlert,
-  callDeleteAdminAlert,
+  callAlert,
   assingFlag,
 }) {
+
   const classes = useStyles();
   const [users, setUsers] = useState([]);
   const [admin, setAdmin] = useState();
@@ -50,7 +49,7 @@ export default function HotelAdminDialog({
       })
         .then((response) => response.data)
         .then((data) => {
-          if (data !== undefined) setUsers(data);
+          if (!!data) setUsers(data);
         })
         .catch((error) => console.log(error));
     };
@@ -61,8 +60,7 @@ export default function HotelAdminDialog({
       })
         .then((response) => response.data)
         .then((data) => {
-          console.log(data);
-          if (data !== undefined) setUsers(data);
+          if (!!data) setUsers(data);
         })
         .catch((error) => console.log(error));
     };
@@ -79,8 +77,12 @@ export default function HotelAdminDialog({
       headers: { Authorization: "Bearer " + token },
     })
       .then((response) => response.data)
-      .then((data) => {})
-      .catch((error) => console.log(error.response.data.message));
+      .then((data) => {
+        callAlert("hotel admin assigned successfully", true);
+      })
+      .catch((error) =>
+        callAlert(false)
+      );
   };
 
   const DeleteHotelAdmin = async () => {
@@ -88,20 +90,22 @@ export default function HotelAdminDialog({
       headers: { Authorization: "Bearer " + token },
     })
       .then((response) => response.data)
-      .then((data) => {})
-      .catch((error) => console.log(error.response.data.message));
+      .then((data) => {
+        callAlert("hotel admin deleted successfully", true);
+      })
+      .catch((error) =>
+        callAlert(false)
+      );
   };
 
   function updateHotelAdmin() {
     UpdateHotelAdmin();
     handleClose();
-    callAssignAdminAlert();
   }
 
   function deleteHotelAdmin() {
     DeleteHotelAdmin();
     handleClose();
-    callDeleteAdminAlert();
   }
   function actionWithAdmin() {
     if (assingFlag === true) {

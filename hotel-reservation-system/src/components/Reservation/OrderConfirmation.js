@@ -1,28 +1,14 @@
-import { React, useState, useEffect } from "react";
+import { React, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import {
-  Button,
-  Dialog,
-  AppBar,
-  Typography,
-  Paper,
-  TextField,
-  Checkbox,
-  FormControlLabel,
-  Grid,
-} from "@material-ui/core";
-import Toolbar from "@material-ui/core/Toolbar";
-import IconButton from "@material-ui/core/IconButton";
-import CloseIcon from "@material-ui/icons/Close";
-import Slide from "@material-ui/core/Slide";
-import BaseStepper from "./../shared/BaseStepper";
-import RoomDetails from "../Room/RoomDetails";
-import ServiceChoice from "../Service/ServiceChoise";
-import DateFilter from "../Filters/DateFilter";
-import ReservationPaymentTable from "./ReservationPaymentTable";
-import { useSelector } from "react-redux";
-import API from "./../../api";
-import { useDispatch } from "react-redux";
+import { useHistory } from "react-router";
+import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
+import Paper from '@material-ui/core/Paper';
+import TextField from '@material-ui/core/TextField';
+import Checkbox from '@material-ui/core/Checkbox';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Grid from '@material-ui/core/Grid';
+import { useSelector, useDispatch } from "react-redux";
 import {
   IS_LOGGED,
   NAME,
@@ -30,7 +16,11 @@ import {
   EMAIL,
   USER_ID,
 } from "./../../storage/actions/actionTypes";
-import { useHistory } from "react-router";
+import API from "./../../api";
+import BaseDialog from "../shared/BaseDialog";
+import { FillStorage,FillLocalStorage } from "../Authorization/TokenData";
+import { EMAIL_REGEX } from "../../constants/Regex";
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -56,20 +46,45 @@ export default function OrderConfirmation({
   checkInDate,
   checkOutDate,
 }) {
-  const [checked, setChecked] = useState(true);
+
+  const [checked, setChecked] = useState(false);
   const history = useHistory();
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState();
   const [emailErrorLabel, setEmailErrorLabel] = useState("");
   const classes = useStyles();
   const dispatch = useDispatch();
   const isLogged = useSelector((state) => state.isLogged);
-  let userEmail = useSelector((state) => state.email);
+  const userEmail = useSelector((state) => state.email);
 
+  const [messageDialogOpen, SetMessageDialogOpen] = useState(false);
+  const messageForGuest = (
+    <Typography style={{ margin: 50 }}>
+      Order successfully created.we have registered you so that you can track
+      your order. Your email and password will be send to your email. You can
+      change your profile details in the my profile tab
+    </Typography>
+  );
+  const messageForUser = (
+    <Typography style={{ margin: 50 }}>
+      Order successfully created.You can track it in my Orders tab.
+    </Typography>
+  );
+
+  function handleCloseMessageDialog() {
+    console.log("handle close");
+    console.log(email);
+    if (!!email) {
+      dispatch({ type: EMAIL, email: email });
+    }
+    SetMessageDialogOpen(false);
+    history.push({
+      pathname: "/home",
+    });
+  }
+  
   function validateEmail(email) {
     setEmailErrorLabel("");
-    const emailRegex =
-      /^[\w!#$%&'+-/=?^_`{|}~]+(.[\w!#$%&'+-/=?^_`{|}~]+)*@((([-\w]+.)+[a-zA-Z]{2,4})|(([0-9]{1,3}.){3}[0-9]{1,3}))$/;
-    const flag = emailRegex.test(email);
+    const flag = EMAIL_REGEX.test(email);
     if (!flag) {
       setEmailErrorLabel("invalid email");
     }
@@ -92,92 +107,103 @@ export default function OrderConfirmation({
     let request = {
       Email: email,
     };
-    await API.post("/users/", request)
-      .then((response) => response.data)
-      .then((data) => {})
+    await API.post("/account/register", request)
+      .then((response) => {
+        if (!!response && !!response.data) {
+          FillLocalStorage(response.data[0],response.data[1]);
+          FillStorage(response.data[0],dispatch);
+        }
+      })
       .catch((error) => {
-        console.log(error.response.data.Message);
-        setEmailErrorLabel(error.response.data.Message);
+        if (!!error.response) {
+          setEmailErrorLabel(error.response.data.Message);
+          console.log(error.response.data.Message);
+        }
       });
   };
 
   async function сreateOrder() {
     if (checked === true && emailErrorLabel === "") console.log("email");
-    console.log(userEmail);
     if (userEmail === "" || userEmail === undefined) {
       await createUser();
-      console.log("dispatches");
       userEmail = email;
-      dispatch({ type: NAME, name: "user" });
-      dispatch({ type: IS_LOGGED, isLogged: true });
-      dispatch({ type: ROLE, role: "User" });
     }
-    const request = {
+    let request = {
       StartDate: checkInDate,
       EndDate: checkOutDate,
       ServiceQuantities: selectedServices,
       UserEmail: userEmail,
     };
     createOrderRequest(request);
-    history.push({
-      pathname: "/home",
-    });
+    SetMessageDialogOpen(true);
   }
 
   return (
-    <Paper className={classes.paper}>
-      <Grid
-        className={classes.paperGrid}
-        spacing={5}
-        container
-        direction="column"
-        justify="space-around"
-        alignItems="center"
-      >
-        <Grid item xs={12}>
-          <Typography>
-            check in date: {checkInDate.toLocaleDateString("en-GB")}
-          </Typography>
-          <Typography>
-            check in date: {checkOutDate.toLocaleDateString("en-GB")}
-          </Typography>
-        </Grid>
-        {isLogged === false ? (
-          <Grid item xs={12}>
-            <TextField
-              label="write your email"
-              required
-              value={email}
-              onChange={(e) => validateEmail(e.target.value)}
-              error={emailErrorLabel !== ""}
-              helperText={emailErrorLabel}
-              autoComplete="email"
-            ></TextField>
-          </Grid>
-        ) : (
-          ""
-        )}
-        <Grid item xs={12}>
-          <FormControlLabel
-            control={
-              <Checkbox
-                onChange={(e) => setChecked(e.target.checked)}
-                checked={checked}
-                name="checkedB"
-                color="primary"
-              />
-            }
-            label="I agree with the information I entered"
-          />
-        </Grid>
-        <Button
-          variant="contained"
-          onClick={() => сreateOrder()}
-          color="primary"
+    <>
+      <Paper className={classes.paper}>
+        <Grid
+          className={classes.paperGrid}
+          spacing={5}
+          container
+          direction="column"
+          justify="space-around"
+          alignItems="center"
         >
-          Order
-        </Button>
-      </Grid>
-    </Paper>
+          <Grid item xs={12}>
+            <Typography>
+              check in date: {checkInDate.toLocaleDateString("en-GB")}
+            </Typography>
+            <Typography>
+              check in date: {checkOutDate.toLocaleDateString("en-GB")}
+            </Typography>
+          </Grid>
+          {isLogged === false ? (
+            <Grid item xs={12}>
+              <TextField
+                label="write your email"
+                required
+                value={email}
+                onChange={(e) => validateEmail(e.target.value)}
+                error={emailErrorLabel !== ""}
+                helperText={emailErrorLabel}
+                autoComplete="email"
+              ></TextField>
+            </Grid>
+          ) : (
+            ""
+          )}
+          <Grid item xs={12}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  onChange={(e) => setChecked(e.target.checked)}
+                  checked={checked}
+                  name="checkedB"
+                  color="primary"
+                />
+              }
+              label="I agree with the information I entered"
+            />
+          </Grid>
+          <Button
+            variant="contained"
+            onClick={сreateOrder}
+            color="primary"
+            disabled={!checked || emailErrorLabel !== "" || email === ""}
+          >
+            Order
+          </Button>
+        </Grid>
+      </Paper>
+      <BaseDialog
+        open={messageDialogOpen}
+        handleClose={handleCloseMessageDialog}
+        form={
+          !!useSelector((state) => state.email)
+            ? messageForUser
+            : messageForGuest
+        }
+      ></BaseDialog>
+    </>
   );
 }

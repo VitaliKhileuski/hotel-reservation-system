@@ -1,16 +1,19 @@
-import { React, useState, useEffect } from "react";
+import { React, useState } from "react";
 import DateFnsUtils from "@date-io/date-fns";
-import { makeStyles } from "@material-ui/core/styles";
+import moment from 'moment'
+import { useDispatch } from "react-redux";
 import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
 } from "@material-ui/pickers";
-import { Grid, Typography } from "@material-ui/core";
+import Grid from "@material-ui/core/Grid";
+import Typography from "@material-ui/core/Typography";
 import API from "../../api";
 import RoomIsOccupiedAlert from "../Reservation/RoomIsOccupiedAlert";
-const useStyles = makeStyles((theme) => ({
-  root: {},
-}));
+import {
+  CHECK_IN_DATE,
+  CHECK_OUT_DATE,
+} from "./../../storage/actions/actionTypes";
 
 export default function DateFilter({
   roomId,
@@ -18,16 +21,13 @@ export default function DateFilter({
   checkOutDate,
   changeDates,
   isValidInfo,
-}) {
-  const classes = useStyles();
-  console.log(checkOutDate);
+}){
+
+  const dispatch = useDispatch();
   const [checkIn, setCheckIn] = useState(checkInDate);
   const [checkOut, setCheckOut] = useState(checkOutDate);
   const [roomIsOccupiedAlertOpen, setRoomIsOccupiedAlertOpen] = useState(false);
-  useEffect(() => {
-    if (roomId !== undefined) {
-    }
-  }, [checkIn, checkOut]);
+
   const checkPlace = async (checkIn, checkOut) => {
     await API.get(
       "/rooms/" +
@@ -51,19 +51,27 @@ export default function DateFilter({
   };
 
   const handleDateCheckInChange = (date) => {
+    dispatch({ type: CHECK_IN_DATE, checkInDate: date });
     setCheckIn(date);
     changeDates(date, checkOut);
     if (date < checkOut) {
-      checkPlace(date, checkOut);
+      isValidInfo(true);
+      if (!!roomId) {
+        checkPlace(date, checkOut);
+      }
     } else {
       isValidInfo(false);
     }
   };
   const handleDateCheckOutChange = (date) => {
+    dispatch({ type: CHECK_OUT_DATE, checkOutDate: date });
     setCheckOut(date);
     changeDates(checkIn, date);
     if (date > checkIn) {
-      checkPlace(checkIn, date);
+      isValidInfo(true);
+      if (!!roomId) {
+        checkPlace(checkIn, date);
+      }
     } else {
       isValidInfo(false);
     }
@@ -93,13 +101,12 @@ export default function DateFilter({
         <Typography variant="h6">Check out date</Typography>
         <KeyboardDatePicker
           disableToolbar
-          minDate={new Date(checkIn.getTime() + 1000 * 60 * 60 * 24)}
+          minDate={new Date(moment(checkIn).add(2, 'days')._d)}
           variant="inline"
           format="MM/dd/yyyy"
           inputVariant="outlined"
           value={checkOut}
           onChange={handleDateCheckOutChange}
-          invalidLabel="adsfsdf"
           KeyboardButtonProps={{
             "aria-label": "change date",
           }}
@@ -107,7 +114,7 @@ export default function DateFilter({
       </Grid>
       <RoomIsOccupiedAlert
         open={roomIsOccupiedAlertOpen}
-        handleClose={() => handleCloseAlert()}
+        handleClose={handleCloseAlert}
       ></RoomIsOccupiedAlert>
     </MuiPickersUtilsProvider>
   );

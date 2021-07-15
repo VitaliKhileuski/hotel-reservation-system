@@ -1,18 +1,16 @@
 import { React, useEffect, useState } from "react";
-import {
-  MuiPickersUtilsProvider,
-  KeyboardDatePicker,
-} from "@material-ui/pickers";
 import Grid from "@material-ui/core/Grid";
-import DateFnsUtils from "@date-io/date-fns";
-import { Typography, Button } from "@material-ui/core";
+import Typography from "@material-ui/core/Typography";
+import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import { makeStyles } from "@material-ui/core/styles";
-import API from "../api";
-import HotelList from "./Hotel/HotelList";
 import Pagination from "@material-ui/lab/Pagination";
-import { Redirect, useHistory } from "react-router";
+import { useDispatch, useSelector } from "react-redux";
+import API from "../api";
+import { CHECK_IN_DATE, CHECK_OUT_DATE } from "../storage/actions/actionTypes";
+import HotelList from "./Hotel/HotelList";
+import DateFilter from "./Filters/DateFilter";
 
 const useStyles = makeStyles((theme) => ({
   option: {
@@ -40,33 +38,51 @@ export default function Home() {
   const [cities, setCities] = useState([]);
   const [currentCountry, setCurrentCountry] = useState("");
   const [hotels, setHotels] = useState([]);
-  const [checkInDate, setCheckInDate] = useState(new Date(Date.now()));
+  const [hotelNames,setHotelNames] = useState([])
+  const [hotelName,setHotelName] = useState("");
+  const [isValidDates, setIsValidDates] = useState(true);
+  const [checkInDate, setCheckInDate] = useState(
+    useSelector((state) => state.checkInDate)
+  );
   const [checkOutDate, setCheckOutDate] = useState(
-    new Date(Date.now() + 2 * 24 * 60 * 60 * 1000)
+    useSelector((state) => state.checkOutDate)
   );
   const [page, setPage] = useState(1);
   const [maxPage, setMaxPage] = useState(1);
   const pageSize = 8;
-  const history = useHistory();
+  const userId = useSelector((state) => state.userId);
+  const dispatch = useDispatch();
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
-    const loadCountries = async () => {
-      await API.get("/locations/countries")
-        .then((response) => response.data)
-        .then((data) => {
-          if (data !== undefined) setCountries(data);
-        })
-        .catch((error) => console.log(error));
-    };
     loadCountries();
+    loadHotelNames();
   }, []);
+
+  const loadCountries = async () => {
+    await API.get("/locations/countries")
+      .then((response) => response.data)
+      .then((data) => {
+        if (!!data) setCountries(data);
+      })
+      .catch((error) => console.log(error));
+  };
+
+  const loadHotelNames = async () => {
+    await API.get("/hotels/hotelNames")
+      .then((response) => response.data)
+      .then((data) => {
+        if (!!data) setHotelNames(data);
+      })
+      .catch((error) => console.log(error));
+  };
 
   useEffect(() => {
     const loadCities = async () => {
       await API.get("/locations/cities/" + currentCountry)
         .then((response) => response.data)
         .then((data) => {
-          if (data !== undefined) setCities(data);
+          if (!!data) setCities(data);
         })
         .catch((error) => console.log(error));
     };
@@ -77,41 +93,57 @@ export default function Home() {
     setCity("");
   }, [currentCountry]);
 
-  const getFilteredHotels = async () => {
-    await API.get(
-      "/hotels?checkInDate=" +
-        checkInDate.toJSON() +
-        "&checkOutDate=" +
-        checkOutDate.toJSON() +
-        "&country=" +
-        currentCountry +
-        "&city=" +
-        city +
-        "&PageNumber=" +
-        page +
-        "&PageSize=" +
-        pageSize
-    )
-      .then((response) => response.data)
-      .then((data) => {
-        setHotels(data.items);
-        setMaxPage(data.numberOfPages);
-      })
-      .catch((error) => console.log(error));
-  };
+  async function SearchFilteredHotels() {
+    dispatch({ type: CHECK_IN_DATE, checkInDate: checkInDate });
+    dispatch({ type: CHECK_OUT_DATE, checkOutDate: checkOutDate });
+
+    const getFilteredHotels = async () => {
+      await API.get(
+        "/hotels/page?" +
+          "userId=" +
+          userId +
+          "&checkInDate=" +
+          checkInDate.toJSON() +
+          "&checkOutDate=" +
+          checkOutDate.toJSON() +
+          "&country=" +
+          currentCountry +
+          "&city=" +
+          city +
+          "&hotelName=" +
+          hotelName +
+          "&PageNumber=" +
+          page +
+          "&PageSize=" +
+          pageSize
+      )
+        .then((response) => response.data)
+        .then((data) => {
+          setHotels(data.items);
+          setMaxPage(data.numberOfPages);
+        })
+        .catch((error) => console.log(error));
+    };
+    if (!!token && !!userId) {
+      getFilteredHotels();
+    }
+    if (!token && !userId) {
+      getFilteredHotels();
+    }
+  }
+  function changeDates(checkInDate, checkOutDate) {
+    setCheckInDate(checkInDate);
+    setCheckOutDate(checkOutDate);
+  }
+  function isValidInfo(isValid) {
+    setIsValidDates(isValid);
+  }
 
   useEffect(() => {
-    getFilteredHotels();
-  }, [page]);
+    SearchFilteredHotels();
+  }, [page, userId]);
 
   const classes = useStyles();
-  const tommorow = new Date(Date.now() + 24 * 60 * 60 * 1000);
-  const handleDateCheckInChange = (date) => {
-    setCheckInDate(date);
-  };
-  const handleDateCheckOutChange = (date) => {
-    setCheckOutDate(date);
-  };
   const changePage = (event, value) => {
     setPage(value);
   };
@@ -125,38 +157,12 @@ export default function Home() {
         justify="center"
         alignItems="flex-start"
       >
-        <MuiPickersUtilsProvider utils={DateFnsUtils}>
-          <Grid>
-            <Typography variant="h6">Check in Date</Typography>
-            <KeyboardDatePicker
-              disableToolbar
-              disablePast
-              variant="inline"
-              inputVariant="outlined"
-              format="MM/dd/yyyy"
-              value={checkInDate}
-              onChange={handleDateCheckInChange}
-              KeyboardButtonProps={{
-                "aria-label": "change date",
-              }}
-            />
-          </Grid>
-          <Grid>
-            <Typography variant="h6">Check out date</Typography>
-            <KeyboardDatePicker
-              disableToolbar
-              minDate={tommorow}
-              variant="inline"
-              format="MM/dd/yyyy"
-              inputVariant="outlined"
-              value={checkOutDate}
-              onChange={handleDateCheckOutChange}
-              KeyboardButtonProps={{
-                "aria-label": "change date",
-              }}
-            />
-          </Grid>
-        </MuiPickersUtilsProvider>
+        <DateFilter
+          checkInDate={checkInDate}
+          checkOutDate={checkOutDate}
+          changeDates={changeDates}
+          isValidInfo={isValidInfo}
+        ></DateFilter>
         <Grid>
           <Typography variant="h6">What place do you want to visit?</Typography>
           <Autocomplete
@@ -196,6 +202,23 @@ export default function Home() {
             )}
           />
         </Grid>
+        <Grid>
+          <Typography variant="h6">Find by name</Typography>
+          <Autocomplete
+            id="combo-box-demo2"
+            options={hotelNames}
+            getOptionLabel={(option) => option}
+            onChange={(event, value) => setHotelName(value)}
+            style={{ width: 300 }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="find by name"
+                variant="outlined"
+              />
+            )}
+          />
+        </Grid>
         <Grid
           container
           direction="row"
@@ -206,7 +229,8 @@ export default function Home() {
             variant="contained"
             color="primary"
             size="large"
-            onClick={getFilteredHotels}
+            disabled={!isValidDates}
+            onClick={SearchFilteredHotels}
           >
             Search
           </Button>

@@ -11,25 +11,27 @@ export default function BaseDeleteDialog({
   deleteItem,
   message,
   handleCloseDeleteDialog,
+  title,
 }) {
+
   return (
     <Dialog
       open={open}
-      onClose={() => handleCloseDeleteDialog()}
+      onClose={handleCloseDeleteDialog}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
     >
-      <DialogTitle id="alert-dialog-title">Reservation</DialogTitle>
+      <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
           {message}
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => handleCloseDeleteDialog()} color="primary">
+        <Button onClick={handleCloseDeleteDialog} color="primary">
           Cancel
         </Button>
-        <Button onClick={() => deleteItem()} color="primary" autoFocus>
+        <Button onClick={deleteItem} color="primary" autoFocus>
           Delete
         </Button>
       </DialogActions>

@@ -1,18 +1,18 @@
 import { React, useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { makeStyles } from "@material-ui/core/styles";
+import { useSelector } from "react-redux";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import Typography from "@material-ui/core/Typography";
-import { Box } from "@material-ui/core";
-import AddHotelForm from "./AddHotelForm";
-import BaseAlert from "./../shared/BaseAlert";
-import RoomTable from "./../Room/RoomTable";
-import ServiceTable from "./ServiceTable";
-import { useSelector } from "react-redux";
-import BaseImageDialog from "./../shared/BaseImageDialog";
+import { Box } from "@material-ui/core/";
 import Grid from "@material-ui/core/Grid";
 import API from "./../../api";
+import BaseAlert from "./../shared/BaseAlert";
+import RoomTable from "./../Room/RoomTable";
+import BaseImageDialog from "./../shared/BaseImageDialog";
+import ServiceTable from "../Service/ServiceTable";
+import AddHotelForm from "./AddHotelForm";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -39,6 +39,7 @@ TabPanel.propTypes = {
   index: PropTypes.any.isRequired,
   value: PropTypes.any.isRequired,
 };
+
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 3,
@@ -63,13 +64,6 @@ export default function HotelEditor(props) {
   const [hotel, setHotel] = useState(props.location.state.hotel);
   const [updateAlertOpen, setUpdateAlertOpen] = useState(false);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
-
-  let content = [
-    `${hotel.name}`,
-    `country: ${hotel.location.country}`,
-    `city: ${hotel.location.city}`,
-    `street: ${hotel.location.street} ${hotel.location.buildingNumber}`,
-  ];
   const role = useSelector((state) => state.role);
 
   const handleChange = (event, newValue) => {
@@ -79,9 +73,6 @@ export default function HotelEditor(props) {
   function callUpdateAlert() {
     setUpdateAlertOpen(true);
   }
-  function callImageDialog() {
-    setImageDialogOpen(true);
-  }
 
   const handleCloseUpdateAlert = (event, reason) => {
     if (reason === "clickaway") {
@@ -89,12 +80,15 @@ export default function HotelEditor(props) {
     }
     setUpdateAlertOpen(false);
   };
+
   function toRoomSection() {
     setValue(1);
   }
+
   function handleCloseImageDialog() {
     setImageDialogOpen(false);
   }
+
   async function updateMainInfo() {
     const GetHotel = async () => {
       await API.get("/hotels/" + hotel.id)
@@ -109,8 +103,6 @@ export default function HotelEditor(props) {
     await GetHotel();
     toRoomSection();
   }
-
-  useEffect(() => {}, [hotel]);
 
   return (
     <div className={classes.root}>
@@ -139,7 +131,7 @@ export default function HotelEditor(props) {
                 toRoomSection={toRoomSection}
                 hotel={hotel}
                 callUpdateAlert={callUpdateAlert}
-                updateMainInfo={() => updateMainInfo()}
+                updateMainInfo={updateMainInfo}
               ></AddHotelForm>
             </Grid>
           ) : (
@@ -157,8 +149,8 @@ export default function HotelEditor(props) {
       <BaseImageDialog
         hotelId={hotel.id}
         open={imageDialogOpen}
-        handleClose={() => handleCloseImageDialog()}
-        updateMainInfo={() => updateMainInfo()}
+        handleClose={handleCloseImageDialog}
+        updateMainInfo={updateMainInfo}
         imageUrls={hotel.imageUrls}
       ></BaseImageDialog>
       <BaseAlert

@@ -1,5 +1,5 @@
-import { React, useState, useEffect } from "react";
-import { Button } from "@material-ui/core";
+import { React, useState } from "react";
+import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import TextField from "@material-ui/core/TextField";
 import Grid from "@material-ui/core/Grid";
@@ -7,8 +7,8 @@ import Box from "@material-ui/core/Box";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { Formik, Form, ErrorMessage, Field } from "formik";
-import * as Yup from "yup";
 import API from "../../api";
+import { ROOM_VALIDATION_SCHEMA } from "../../constants/ValidationSchemas";
 
 const useStyles = makeStyles((theme) => ({
   root: {},
@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.secondary.main,
   },
   form: {
-    width: "100%", // Fix IE 11 issue.
+    width: "100%",
     marginTop: theme.spacing(1),
   },
   submit: {
@@ -31,58 +31,43 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function AddRoomForm({
-  hotelId,
-  room,
-  handleClose,
-  callAddAlert,
-  callUpdateAlert,
-}) {
+export default function AddRoomForm({ hotelId, room, handleClose, callAlert }) {
   const classes = useStyles();
-  const [showAlert, setShowAlert] = useState(false);
   const token = localStorage.getItem("token");
 
   const initialValues = {
-    roomNumber: room === undefined ? "" : room.roomNumber,
-    bedsNumber: room === undefined ? "" : room.bedsNumber,
-    paymentPerDay: room === undefined ? "" : room.paymentPerDay,
+    roomNumber: !!room ? room.roomNumber : "",
+    bedsNumber: !!room ? room.bedsNumber : "",
+    paymentPerDay: !!room ? room.paymentPerDay : "",
   };
-  const validationSchema = Yup.object().shape({
-    roomNumber: Yup.string().required("room Number is required").trim(),
-    bedsNumber: Yup.number("beds number must be a number").required(
-      "beds number is required"
-    ),
-    paymentPerDay: Yup.number("payment per day must be a number").required(
-      "payment per day is required"
-    ),
-  });
+
   const onSubmit = async (values) => {
     const request = {
       RoomNumber: values.roomNumber,
       BedsNumber: values.bedsNumber,
       PaymentPerDay: values.paymentPerDay,
     };
-    console.log(request.PaymentPerDay);
+
     const CreateRoom = async () => {
       await API.post("/rooms/" + hotelId, request, {
         headers: { Authorization: "Bearer " + token },
       })
         .then((response) => response.data)
-        .then((data) => {})
-        .catch((error) => console.log(error.response.data.message));
+        .then((data) => {
+          callAlert("room added successfully", true);
+        })
+        .catch((error) =>
+          callAlert(false)
+        );
     };
-    if (room === undefined) {
-      await CreateRoom();
-      handleClose();
-      callAddAlert();
-    } else {
+    if (!!room) {
       await UpdateRoom(request);
       handleClose();
-      callUpdateAlert();
-      console.log("update");
+    } else {
+      await CreateRoom();
+      handleClose();
     }
 
-    setShowAlert(true);
   };
 
   const UpdateRoom = async (request) => {
@@ -90,8 +75,12 @@ export default function AddRoomForm({
       headers: { Authorization: "Bearer " + token },
     })
       .then((response) => response.data)
-      .then((data) => {})
-      .catch((error) => console.log(error.response.data.message));
+      .then((data) => {
+        callAlert("room updated successfully", true);
+      })
+      .catch((error) =>
+        callAlert(false)
+      );
   };
 
   return (
@@ -102,7 +91,7 @@ export default function AddRoomForm({
           <Formik
             initialValues={initialValues}
             onSubmit={onSubmit}
-            validationSchema={validationSchema}
+            validationSchema={ROOM_VALIDATION_SCHEMA}
           >
             {(props) => (
               <Form className={classes.form}>

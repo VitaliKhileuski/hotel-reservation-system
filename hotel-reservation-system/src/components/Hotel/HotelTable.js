@@ -2,30 +2,28 @@ import { React, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Redirect, useHistory } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
-import {
-  Paper,
-  IconButton,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TablePagination,
-  TableRow,
-  Button,
-} from "@material-ui/core";
+import Paper from "@material-ui/core/Paper";
+import IconButton from "@material-ui/core/IconButton";
+import Table from "@material-ui/core/Table";
+import TableBody from "@material-ui/core/TableBody";
+import TableCell from "@material-ui/core/TableCell";
+import Button from "@material-ui/core/Button";
+import TableRow from "@material-ui/core/TableRow";
+import TableContainer from "@material-ui/core/TableContainer";
+import TablePagination from "@material-ui/core/TablePagination";
+import TableHead from "@material-ui/core/TableHead";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
+import PersonAddIcon from "@material-ui/icons/PersonAdd";
+import PersonAddDisabledIcon from "@material-ui/icons/PersonAddDisabled";
+import AddPhotoAlternateIcon from "@material-ui/icons/AddPhotoAlternate";
 import API from "./../../api";
 import BaseAlert from "./../shared/BaseAlert";
 import BaseDialog from "../shared/BaseDialog";
-import AddHotelForm from "./AddHotelForm";
 import BaseDeleteDialog from "./../shared/BaseDeleteDialog";
-import PersonAddIcon from "@material-ui/icons/PersonAdd";
-import PersonAddDisabledIcon from "@material-ui/icons/PersonAddDisabled";
-import HotelAdminDialog from "./HotelAdminDialog";
-import AddPhotoAlternateIcon from "@material-ui/icons/AddPhotoAlternate";
 import BaseImageDialog from "../shared/BaseImageDialog";
+import AddHotelForm from "./AddHotelForm";
+import HotelAdminDialog from "./HotelAdminDialog";
 
 const useStyles = makeStyles({
   root: {
@@ -56,29 +54,26 @@ export default function HotelTable() {
   const [flag, setFlag] = useState(false);
   const [message, setMessage] = useState("");
   const [assingFlag, setAssignFlag] = useState(false);
-
-  const [addAlertOpen, setAddAlertOpen] = useState(false);
-  const [deleteAlertOpen, setDeleteAlertOpen] = useState(false);
-  const [assignAdminAlertOpen, setAssignAdminAlertOpen] = useState(false);
-  const [deleteAdminAlertOpen, setDeleteAdminAlertOpen] = useState(false);
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertSuccessStatus, setAlertSuccessStatus] = useState(true);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
-
   const isLogged = useSelector((state) => state.isLogged);
   const adminId = useSelector((state) => state.userId);
-  let hotelAdminField = "";
-  let form = (
+
+  const form = (
     <AddHotelForm
-      handleClose={() => handleClose()}
-      callAlert={() => callAddAlert()}
+      handleClose={handleClose}
+      callAlert={callAlert}
     ></AddHotelForm>
   );
-  let component = (
+
+  const component = (
     <HotelAdminDialog
       hotelId={hotelId}
       message={message}
-      handleClose={() => handleClose()}
-      callAssignAdminAlert={() => callAssignAdminAlert()}
-      callDeleteAdminAlert={() => callDeleteAdminAlert()}
+      handleClose={handleClose}
+      callAlert={callAlert}
       assingFlag={assingFlag}
     ></HotelAdminDialog>
   );
@@ -101,11 +96,13 @@ export default function HotelTable() {
         })
         .catch((error) => console.log(error.response.data.Message));
     };
-    if (role === "Admin") {
-      loadHotels();
-    }
-    if (role === "HotelAdmin") {
-      loadHotelAdminHotels();
+    if (openDeleteDialog === false) {
+      if (role === "Admin") {
+        loadHotels();
+      }
+      if (role === "HotelAdmin") {
+        loadHotelAdminHotels();
+      }
     }
   }, [rowsPerPage, page, open, openDeleteDialog]);
 
@@ -130,7 +127,6 @@ export default function HotelTable() {
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
     SetPageForRequest(newPage + 1);
-    console.log(newPage);
   };
 
   const handleChangeRowsPerPage = (event) => {
@@ -154,23 +150,29 @@ export default function HotelTable() {
   }
 
   async function deleteHotel() {
-    console.log(hotelId);
     const DeleteHotel = async () => {
       await API.delete("/hotels/" + hotelId, {
         headers: { Authorization: "Bearer " + token },
-      }).catch((error) => console.log(error.response.data.message));
+      })
+        .then((response) => response.data)
+        .then((data) => {
+          handleClose();
+          setAlertMessage("hotel deleted successfully", true);
+          setAlertOpen(true);
+        })
+        .catch((error) => {
+          callAlert(false);
+        });
     };
-
     await DeleteHotel();
     handleCloseDeleteDialog();
-    callDeleteAlert();
   }
 
   function callAlertDialog(hotelId) {
     setHotelId(hotelId);
-    console.log(hotelId);
     setOpenDeleteDialog(true);
   }
+
   function toHotelEditor(hotel) {
     history.push({
       pathname: "/hotelEditor",
@@ -179,23 +181,18 @@ export default function HotelTable() {
       },
     });
   }
-  function callAddAlert() {
-    setAddAlertOpen(true);
+
+  function callAlert(message, successStatus) {
+    setAlertMessage(message);
+    setAlertSuccessStatus(successStatus);
+    setAlertOpen(true);
   }
 
-  function callDeleteAlert() {
-    setDeleteAlertOpen(true);
-  }
-  function callAssignAdminAlert() {
-    setAssignAdminAlertOpen(true);
-  }
-  function callDeleteAdminAlert() {
-    setDeleteAdminAlertOpen(true);
-  }
   function callImageDialog(hotel) {
     setHotel(hotel);
     setImageDialogOpen(true);
   }
+
   function handleCloseImageDialog() {
     setImageDialogOpen(false);
   }
@@ -204,11 +201,7 @@ export default function HotelTable() {
     if (reason === "clickaway") {
       return;
     }
-
-    setAddAlertOpen(false);
-    setDeleteAlertOpen(false);
-    setAssignAdminAlertOpen(false);
-    setDeleteAdminAlertOpen(false);
+    setAlertOpen(false);
   };
   function SetAdmin(hotelId) {
     setMessage("add admin");
@@ -225,154 +218,136 @@ export default function HotelTable() {
 
   if (!isLogged || role === "User") {
     return <Redirect to="/home"></Redirect>;
-  } else {
-    return (
-      <>
-        <Paper className={classes.root}>
-          <TableContainer className={classes.container}>
-            <Table stickyHeader aria-label="sticky table">
-              <TableHead>
-                <TableRow>
-                  <TableCell align="right" style={{ minWidth: 170 }}>
-                    Name
-                  </TableCell>
-                  <TableCell align="right" style={{ minWidth: 170 }}>
-                    Country
-                  </TableCell>
-                  <TableCell align="right" style={{ minWidth: 170 }}>
-                    City
-                  </TableCell>
-                  <TableCell align="right" style={{ minWidth: 170 }}>
-                    Street
-                  </TableCell>
-                  <TableCell align="right" style={{ minWidth: 170 }}>
-                    Building Number
-                  </TableCell>
-                  <TableCell style={{ minWidth: 30 }} />
-                  <TableCell style={{ minWidth: 30 }} />
-                  <TableCell style={{ minWidth: 30 }} />
-                  <TableCell style={{ minWidth: 30 }} />
-                  <TableCell style={{ minWidth: 30 }} />
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {hotels.map((hotel) => (
-                  <TableRow key={hotel.id}>
-                    <TableCell align="right">{hotel.name}</TableCell>
-                    <TableCell align="right">
-                      {hotel.location.country}
-                    </TableCell>
-                    <TableCell align="right">{hotel.location.city}</TableCell>
-                    <TableCell align="right">{hotel.location.street}</TableCell>
-                    <TableCell align="right">
-                      {hotel.location.buildingNumber}
-                    </TableCell>
-                    <TableCell>
-                      <IconButton
-                        color="inherit"
-                        onClick={() => toHotelEditor(hotel)}
-                      >
-                        <EditIcon></EditIcon>
-                      </IconButton>
-                      <IconButton
-                        color="inherit"
-                        onClick={() => callAlertDialog(hotel.id)}
-                      >
-                        <DeleteIcon></DeleteIcon>
-                      </IconButton>
-                      <IconButton
-                        color="inherit"
-                        onClick={() => SetAdmin(hotel.id)}
-                      >
-                        <PersonAddIcon></PersonAddIcon>
-                      </IconButton>
-                      <IconButton
-                        color="inherit"
-                        onClick={() => DeleteAdmin(hotel.id)}
-                      >
-                        <PersonAddDisabledIcon></PersonAddDisabledIcon>
-                      </IconButton>
-                      <IconButton
-                        color="inherit"
-                        onClick={() => callImageDialog(hotel)}
-                      >
-                        <AddPhotoAlternateIcon></AddPhotoAlternateIcon>
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          <TablePagination
-            rowsPerPageOptions={[5, 10, 50]}
-            component="div"
-            count={maxNumberOfHotels}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onChangePage={handleChangePage}
-            onChangeRowsPerPage={handleChangeRowsPerPage}
-          />
-        </Paper>
-        {role === "Admin" ? (
-          <Button
-            variant="contained"
-            color="primary"
-            size="large"
-            margin="normal"
-            className={classes.addHotelButton}
-            onClick={OpenAddHotelDialog}
-          >
-            Add hotel
-          </Button>
-        ) : (
-          ""
-        )}
-        <BaseDialog
-          title="create/update"
-          open={open}
-          handleClose={handleClose}
-          form={flag === true ? component : form}
-        ></BaseDialog>
-        {hotel === undefined ? (
-          ""
-        ) : (
-          <BaseImageDialog
-            hotelId={hotel.id}
-            open={imageDialogOpen}
-            handleClose={() => handleCloseImageDialog()}
-            imageUrls={hotel.imageUrls}
-          ></BaseImageDialog>
-        )}
-        <BaseDeleteDialog
-          open={openDeleteDialog}
-          handleCloseDeleteDialog={handleCloseDeleteDialog}
-          deleteItem={deleteHotel}
-          title={"Are you sure to delete this hotel?"}
-          message={"the hotel will be permanently deleted"}
-        ></BaseDeleteDialog>
-
-        <BaseAlert
-          open={addAlertOpen}
-          handleClose={handleCloseAlert}
-          message={"hotel added successfully"}
-        ></BaseAlert>
-        <BaseAlert
-          open={deleteAlertOpen}
-          handleClose={handleCloseAlert}
-          message={"hotel deleted succesfully"}
-        ></BaseAlert>
-        <BaseAlert
-          open={assignAdminAlertOpen}
-          handleClose={handleCloseAlert}
-          message={" hotel admin assigned successfully"}
-        ></BaseAlert>
-        <BaseAlert
-          open={deleteAdminAlertOpen}
-          handleClose={handleCloseAlert}
-          message={"hotel admin deleted successfully"}
-        ></BaseAlert>
-      </>
-    );
   }
+  return (
+    <>
+      <Paper className={classes.root}>
+        <TableContainer className={classes.container}>
+          <Table stickyHeader aria-label="sticky table">
+            <TableHead>
+              <TableRow>
+                <TableCell align="right" style={{ minWidth: 170 }}>
+                  Name
+                </TableCell>
+                <TableCell align="right" style={{ minWidth: 170 }}>
+                  Country
+                </TableCell>
+                <TableCell align="right" style={{ minWidth: 170 }}>
+                  City
+                </TableCell>
+                <TableCell align="right" style={{ minWidth: 170 }}>
+                  Street
+                </TableCell>
+                <TableCell align="right" style={{ minWidth: 170 }}>
+                  Building Number
+                </TableCell>
+                <TableCell style={{ minWidth: 30 }} />
+                <TableCell style={{ minWidth: 30 }} />
+                <TableCell style={{ minWidth: 30 }} />
+                <TableCell style={{ minWidth: 30 }} />
+                <TableCell style={{ minWidth: 30 }} />
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {hotels.map((hotel) => (
+                <TableRow key={hotel.id}>
+                  <TableCell align="right">{hotel.name}</TableCell>
+                  <TableCell align="right">{hotel.location.country}</TableCell>
+                  <TableCell align="right">{hotel.location.city}</TableCell>
+                  <TableCell align="right">{hotel.location.street}</TableCell>
+                  <TableCell align="right">
+                    {hotel.location.buildingNumber}
+                  </TableCell>
+                  <TableCell>
+                    <IconButton
+                      color="inherit"
+                      onClick={() => toHotelEditor(hotel)}
+                    >
+                      <EditIcon></EditIcon>
+                    </IconButton>
+                    <IconButton
+                      color="inherit"
+                      onClick={() => callAlertDialog(hotel.id)}
+                    >
+                      <DeleteIcon></DeleteIcon>
+                    </IconButton>
+                    <IconButton
+                      color="inherit"
+                      onClick={() => SetAdmin(hotel.id)}
+                    >
+                      <PersonAddIcon></PersonAddIcon>
+                    </IconButton>
+                    <IconButton
+                      color="inherit"
+                      onClick={() => DeleteAdmin(hotel.id)}
+                    >
+                      <PersonAddDisabledIcon></PersonAddDisabledIcon>
+                    </IconButton>
+                    <IconButton
+                      color="inherit"
+                      onClick={() => callImageDialog(hotel)}
+                    >
+                      <AddPhotoAlternateIcon></AddPhotoAlternateIcon>
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 50]}
+          component="div"
+          count={maxNumberOfHotels}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onChangePage={handleChangePage}
+          onChangeRowsPerPage={handleChangeRowsPerPage}
+        />
+      </Paper>
+      {role === "Admin" ? (
+        <Button
+          variant="contained"
+          color="primary"
+          size="large"
+          margin="normal"
+          className={classes.addHotelButton}
+          onClick={OpenAddHotelDialog}
+        >
+          Add hotel
+        </Button>
+      ) : (
+        ""
+      )}
+      <BaseDialog
+        title="create/update"
+        open={open}
+        handleClose={handleClose}
+        form={flag === true ? component : form}
+      ></BaseDialog>
+      {!!hotel ? (
+        <BaseImageDialog
+          hotelId={hotel.id}
+          open={imageDialogOpen}
+          handleClose={handleCloseImageDialog}
+          imageUrls={hotel.imageUrls}
+        ></BaseImageDialog>
+      ) : (
+        ""
+      )}
+      <BaseDeleteDialog
+        open={openDeleteDialog}
+        handleCloseDeleteDialog={handleCloseDeleteDialog}
+        deleteItem={deleteHotel}
+        title={"Are you sure to delete this hotel?"}
+        message={"the hotel will be permanently deleted"}
+      ></BaseDeleteDialog>
+      <BaseAlert
+        open={alertOpen}
+        handleClose={handleCloseAlert}
+        message={alertMessage}
+        success={alertSuccessStatus}
+      ></BaseAlert>
+    </>
+  );
 }

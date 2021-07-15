@@ -3,11 +3,11 @@ import Checkbox from "@material-ui/core/Checkbox";
 import TextField from "@material-ui/core/TextField";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
+import { makeStyles } from "@material-ui/core/styles";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import Chip from "@material-ui/core/chip";
 import API from "./../../api/";
-import ServiceTable from "./../Hotel/ServiceTable";
-import { makeStyles } from "@material-ui/core/styles";
+import ServiceTable from "./ServiceTable";
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
@@ -22,6 +22,7 @@ export default function ServiceChoice({
   oldSelectedServices,
   getSelectedServices,
 }) {
+
   const classes = useStyles();
   const [services, setServices] = useState([]);
   const [selectedServices, setSelectedServices] = useState(oldSelectedServices);
@@ -30,9 +31,9 @@ export default function ServiceChoice({
       await API.get("/services")
         .then((response) => response.data)
         .then((data) => {
-          if (data !== undefined) {
+          if (!!data) {
             data.map((item) => {
-              var itemWithQuantity = {
+              let itemWithQuantity = {
                 Serviceid: item.id,
                 name: item.name,
                 payment: item.payment,
@@ -40,7 +41,6 @@ export default function ServiceChoice({
               };
               services.push(itemWithQuantity);
             });
-            console.log(services);
           }
         })
         .catch((error) => console.log(error));

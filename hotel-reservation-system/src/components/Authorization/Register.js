@@ -9,16 +9,11 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { Formik, Form, ErrorMessage, Field } from "formik";
-import * as Yup from "yup";
-import api from "./../../api/";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  IS_LOGGED,
-  NAME,
-  ROLE,
-  USER_ID,
-  EMAIL,
-} from "../../storage/actions/actionTypes.js";
+import api from "./../../api/";
+import { REGISTER_VALIDATION_SCHEMA } from "../../constants/ValidationSchemas";
+import { EMAIL_REGEX } from "../../constants/Regex";
+import { FillStorage } from "./TokenData";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -32,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.secondary.main,
   },
   form: {
-    width: "100%", // Fix IE 11 issue.
+    width: "100%",
     marginTop: theme.spacing(3),
   },
   submit: {
@@ -40,14 +35,14 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Register() {
-  const dispatch = useDispatch();
+export default function Register({ handleClose }) {
   const isLogged = useSelector((state) => state.isLogged);
   const classes = useStyles();
+  const dispatch = useDispatch();
   const [emailErrorLabel, setEmailErrorLabel] = useState("");
   const [email, setEmail] = useState("");
-  const phoneRegExp =
-    /^\+((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
+  const role = useSelector((state) => state.role);
+
   const initialValues = {
     lastName: "",
     firstName: "",
@@ -56,49 +51,27 @@ export default function Register() {
     phone: "",
     passwordConfirm: "",
   };
-  const validationSchema = Yup.object().shape({
-    firstName: Yup.string().required("first name is required"),
-    lastName: Yup.string().required("last name is required"),
-    phone: Yup.string()
-      .required("phone number is required")
-      .matches(phoneRegExp, "enter valid phone"),
-    password: Yup.string()
-      .min(8, "Minimum characters should be 8")
-      .required("password is required")
-      .matches(
-        /^(?=.*[0-9])(?=.*[a-z])/,
-        "password should contains numbers and latin letters"
-      ),
-    passwordConfirm: Yup.string()
-      .oneOf([Yup.ref("password"), null], "Passwords must match")
-      .required("Required"),
-  });
   const onSubmit = (values) => {
     const request = {
       Email: email,
       Name: values.firstName,
       SurName: values.lastName,
-      UserName: values.userName,
       PhoneNumber: values.phone,
       Password: values.password,
     };
     api
       .post("/account/register", request)
       .then((response) => {
-        if (response !== undefined && response.data !== undefined) {
-          localStorage.setItem("token", response.data[0]);
-          localStorage.setItem("refreshToken", response.data[1]);
-          const jwt = JSON.parse(atob(response.data[0].split(".")[1]));
-          dispatch({ type: IS_LOGGED, isLogged: true });
-          dispatch({ type: NAME, name: jwt.firstname });
-          dispatch({ type: ROLE, role: jwt.role });
-          dispatch({ type: USER_ID, userId: jwt.id });
-          dispatch({ type: EMAIL, userId: jwt.email });
-          console.log(response);
+        if (role !== "Admin") {
+          if (!!response && !!response.data) {
+            FillStorage(response.data[0], response.data[1],dispatch);
+          }
+        } else {
+          handleClose();
         }
       })
       .catch((error) => {
-        if (error.response !== undefined) {
+        if (!!error.response) {
           setEmailErrorLabel(error.response.data.Message);
           console.log(error.response.data.Message);
           console.log(error.response.data);
@@ -107,9 +80,7 @@ export default function Register() {
   };
   function ValidateEmail(email) {
     setEmailErrorLabel("");
-    const emailRegex =
-      /^[\w!#$%&'+-/=?^_`{|}~]+(.[\w!#$%&'+-/=?^_`{|}~]+)*@((([-\w]+.)+[a-zA-Z]{2,4})|(([0-9]{1,3}.){3}[0-9]{1,3}))$/;
-    const flag = emailRegex.test(email);
+    const flag = EMAIL_REGEX.test(email);
     if (!flag) {
       setEmailErrorLabel("invalid email");
     }
@@ -118,20 +89,24 @@ export default function Register() {
     }
     setEmail(email);
   }
-  if (isLogged) {
+  if (isLogged && role !== "Admin") {
     return <Redirect to="/home"></Redirect>;
   } else
     return (
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <div className={classes.paper}>
-          <Typography component="h1" variant="h5">
-            Sign up
-          </Typography>
+          {role !== "Admin" ? (
+            <Typography component="h1" variant="h5">
+              Sign up
+            </Typography>
+          ) : (
+            ""
+          )}
           <Formik
             initialValues={initialValues}
             onSubmit={onSubmit}
-            validationSchema={validationSchema}
+            validationSchema={REGISTER_VALIDATION_SCHEMA}
           >
             {(props) => (
               <Form className={classes.form}>
@@ -237,13 +212,17 @@ export default function Register() {
                   color="primary"
                   className={classes.submit}
                 >
-                  Sign Up
+                  {role !== "Admin" ? "Sign up" : "Add user"}
                 </Button>
                 <Grid container justify="flex-end">
                   <Grid item>
-                    <Link to="/login" variant="body2">
-                      Already have an account? Sign in
-                    </Link>
+                    {role !== "Admin" ? (
+                      <Link to="/login" variant="body2">
+                        Already have an account? Sign in
+                      </Link>
+                    ) : (
+                      ""
+                    )}
                   </Grid>
                 </Grid>
               </Form>

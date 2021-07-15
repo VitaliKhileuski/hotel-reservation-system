@@ -4,7 +4,6 @@ import Stepper from "@material-ui/core/Stepper";
 import Step from "@material-ui/core/Step";
 import StepLabel from "@material-ui/core/StepLabel";
 import Button from "@material-ui/core/Button";
-import Typography from "@material-ui/core/Typography";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -36,16 +35,15 @@ export default function BaseStepper({ changeStep, isValidInfo }) {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
   const steps = getSteps();
-  console.log(activeStep);
 
   const handleNext = () => {
-    let step = activeStep + 1;
+    const step = activeStep + 1;
     setActiveStep(activeStep + 1);
     changeStep(step);
   };
 
   const handleBack = () => {
-    let step = activeStep - 1;
+    const step = activeStep - 1;
     setActiveStep(activeStep - 1);
     changeStep(step);
   };

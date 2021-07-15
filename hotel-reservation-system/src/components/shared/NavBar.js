@@ -1,28 +1,22 @@
-import { React, useState, useRef, useEffect } from "react";
-import "./../../css/App.css";
-import { Link, Redirect } from "react-router-dom";
-import {
-  AppBar,
-  Button,
-  Toolbar,
-  Typography,
-  MenuItem,
-  MenuList,
-  Popper,
-  ClickAwayListener,
-  Paper,
-  Grow,
-} from "@material-ui/core";
+import { React, useState, useRef } from "react";
+import { Link, useHistory } from "react-router-dom";
+import { ClickAwayListener } from "@material-ui/core";
+import AppBar from "@material-ui/core/AppBar";
+import Button from "@material-ui/core/Button";
+import Toolbar from "@material-ui/core/Toolbar";
+import Typography from "@material-ui/core/Typography";
+import MenuItem from "@material-ui/core/MenuItem";
+import MenuList from "@material-ui/core/MenuList";
+import Popper from "@material-ui/core/Popper";
+import Grow from "@material-ui/core/Grow";
+import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
 import { useSelector } from "react-redux";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import { useDispatch } from "react-redux";
-import {
-  IS_LOGGED,
-  NAME,
-  EMAIL,
-  ROLE,
-} from "./../../storage/actions/actionTypes";
+import { Logout } from "../Authorization/TokenData";
+import "./../../css/App.css";
+
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
@@ -37,8 +31,9 @@ const useStyles = makeStyles((theme) => ({
     textDecoration: "none",
   },
 }));
-function NavBar() {
+export default function NavBar() {
   const dispatch = useDispatch();
+  const history = useHistory();
   const [open, setOpen] = useState(false);
   const anchorRef = useRef(null);
   const classes = useStyles();
@@ -46,6 +41,7 @@ function NavBar() {
   const role = useSelector((state) => state.role);
 
   const name = useSelector((state) => state.name);
+  useSelector((state) => console.log(state));
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen);
     console.log(role);
@@ -64,20 +60,22 @@ function NavBar() {
       setOpen(false);
     }
   }
+  function toHomePage() {
+    history.push({
+      pathname: "/home",
+    });
+  }
 
-  const Logout = () => {
-    localStorage.removeItem("refreshToken");
-    localStorage.removeItem("token");
-    dispatch({ type: IS_LOGGED, isLogged: false });
-    dispatch({ type: NAME, name: "" });
-    dispatch({ type: ROLE, role: "" });
-    dispatch({ type: EMAIL, email: "" });
-  };
   return (
     <div className={classes.root}>
       <AppBar position="static">
         <Toolbar>
-          <Typography align="left" variant="h6" className={classes.title}>
+          <Typography
+            onClick={toHomePage}
+            align="left"
+            variant="h6"
+            className={classes.title}
+          >
             Hotels
           </Typography>
           {isLogged ? (
@@ -115,6 +113,21 @@ function NavBar() {
                           id="menu-list-grow"
                           onKeyDown={handleListKeyDown}
                         >
+                          <Link to="/userProfile" className={classes.link}>
+                            <MenuItem onClick={handleClose}>
+                              User profile
+                            </MenuItem>
+                          </Link>
+                          {role === "Admin" ? (
+                            <Link to="/users" className={classes.link}>
+                              <MenuItem onClick={handleClose}>Users</MenuItem>
+                            </Link>
+                          ) : (
+                            ""
+                          )}
+                          <Link to="/orders" className={classes.link}>
+                            <MenuItem onClick={handleClose}>Orders</MenuItem>
+                          </Link>
                           {role !== "User" ? (
                             <Link to="/ownedHotels" className={classes.link}>
                               <MenuItem onClick={handleClose}>
@@ -127,7 +140,7 @@ function NavBar() {
                           <MenuItem
                             onClick={(e) => {
                               handleClose(e);
-                              Logout();
+                              Logout(dispatch, history);
                             }}
                           >
                             Logout
@@ -158,4 +171,3 @@ function NavBar() {
     </div>
   );
 }
-export default NavBar;

@@ -1,17 +1,9 @@
-import { React, useEffect, useState } from "react";
-import {
-  Box,
-  Grid,
-  Button,
-  GridList,
-  GridListTile,
-  makeStyles,
-  CardMedia,
-  Typography,
-} from "@material-ui/core";
-import BaseCard from "./../shared/BaseCard";
+import { React, useState } from "react";
+import { makeStyles } from "@material-ui/core";
+import GridListTile from "@material-ui/core/GridListTile";
+import GridList from "@material-ui/core/GridList";
+import Typography from "@material-ui/core/Typography";
 import BaseDialog from "../shared/BaseDialog";
-import DateFilter from "../Filters/DateFilter";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -22,10 +14,8 @@ const useStyles = makeStyles((theme) => ({
   },
   gridList: {
     width: "60%",
-    height: "85%",
+    height: "100%",
   },
-  text: {},
-  dateFilter: {},
 }));
 
 export default function RoomDetails({ room }) {
@@ -36,23 +26,28 @@ export default function RoomDetails({ room }) {
   function closeImageDialog() {
     setImageDialogOpen(false);
   }
+
   function zoomImage(url) {
-    let img = <img src={url}></img>;
+    const img = <img src={url}></img>;
     setElement(img);
     setImageDialogOpen(true);
   }
 
   return (
     <div className={classes.root}>
-      <GridList cellHeight="200" className={classes.gridList} cols={3}>
-        {room.imageUrls.map((image) => (
-          <GridListTile key={image} cols={1}>
-            <img onClick={() => zoomImage(image)} src={image} />
-          </GridListTile>
-        ))}
-      </GridList>
+      {room.imageUrls !== null && room.imageUrls.length !== 0 ? (
+        <GridList cellHeight="200" className={classes.gridList} cols={3}>
+          {room.imageUrls.map((image) => (
+            <GridListTile key={image} cols={1}>
+              <img onClick={() => zoomImage(image)} src={image} />
+            </GridListTile>
+          ))}
+        </GridList>
+      ) : (
+        <Typography>No images</Typography>
+      )}
 
-      <div className={classes.text}>
+      <div>
         <Typography variant="h4">room number: {room.roomNumber}</Typography>
         <Typography variant="h4">number of beds: {room.bedsNumber}</Typography>
         <Typography variant="h4">
@@ -62,7 +57,7 @@ export default function RoomDetails({ room }) {
       <BaseDialog
         title="Image"
         open={imageDialogOpen}
-        handleClose={() => closeImageDialog()}
+        handleClose={closeImageDialog}
         form={element}
       ></BaseDialog>
     </div>

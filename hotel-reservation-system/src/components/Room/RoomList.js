@@ -1,5 +1,6 @@
-import { React, useEffect, useState } from "react";
-import { Box, Grid, Button } from "@material-ui/core";
+import { React } from "react";
+import { Box } from "@material-ui/core";
+import Grid from "@material-ui/core/Grid";
 import BaseCard from "./../shared/BaseCard";
 
 export default function RoomList({ rooms, checkInDate, checkOutDate }) {
@@ -7,7 +8,7 @@ export default function RoomList({ rooms, checkInDate, checkOutDate }) {
     <Box p={4}>
       <Grid justify="center" alignItems="center" container spacing={0}>
         {rooms.map((roomListItem, i) => {
-          let content = [
+          const content = [
             `room number: ${roomListItem.roomNumber}`,
             `beds number: ${roomListItem.bedsNumber}`,
             `payment per day: ${roomListItem.paymentPerDay}`,

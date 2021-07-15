@@ -1,28 +1,24 @@
 import { React, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { Redirect, useHistory } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
-import {
-  Paper,
-  IconButton,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TablePagination,
-  TableRow,
-  Button,
-} from "@material-ui/core";
+import Paper from "@material-ui/core/Paper"
+import IconButton from "@material-ui/core/IconButton"
+import Table from "@material-ui/core/Table"
+import TableBody from "@material-ui/core/TableBody"
+import TableCell from "@material-ui/core/TableCell"
+import TableContainer from "@material-ui/core/TableContainer"
+import TableHead from "@material-ui/core/TableHead"
+import TablePagination from "@material-ui/core/TablePagination"
+import TableRow from "@material-ui/core/TableRow"
+import Button from "@material-ui/core/Button"
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
-import API from "./../../api";
-import AddServiceForm from "./AddServiceForm";
-import BaseAlert from "./../shared/BaseAlert";
-import BaseDialog from "../shared/BaseDialog";
-import BaseDeleteDialog from "./../shared/BaseDeleteDialog";
 import AddIcon from "@material-ui/icons/Add";
 import RemoveIcon from "@material-ui/icons/Remove";
+import API from "../../api";
+import BaseAlert from "../shared/BaseAlert";
+import BaseDialog from "../shared/BaseDialog";
+import BaseDeleteDialog from "../shared/BaseDeleteDialog";
+import AddServiceForm from "./AddServiceForm";
 
 const useStyles = makeStyles({
   root: {
@@ -49,20 +45,19 @@ export default function ServiceTable({ hotelId, serviceList }) {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [serviceId, setServiceId] = useState(0);
   const [service, setService] = useState();
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertSuccessStatus, setAlertSuccessStatus] = useState(true);
 
-  const [addAlertOpen, setAddAlertOpen] = useState(false);
-  const [deleteAlertOpen, setDeleteAlertOpen] = useState(false);
-  const [updateAlertOpen, setUpdateAlertOpen] = useState(false);
-
-  let form = (
+  const form = (
     <AddServiceForm
-      handleClose={() => handleClose()}
+      handleClose={handleClose}
       hotelId={hotelId}
       service={service}
-      callAddAlert={callAddAlert}
-      callUpdateAlert={callUpdateAlert}
+      callAlert={callAlert}
     ></AddServiceForm>
   );
+
   useEffect(() => {
     if (hotelId === undefined) {
       setServices(serviceList);
@@ -70,7 +65,7 @@ export default function ServiceTable({ hotelId, serviceList }) {
   }, [serviceList, service]);
 
   useEffect(() => {
-    if (hotelId !== undefined) {
+    if (!!hotelId) {
       const loadServices = async () => {
         await API.get(
           "/services/" +
@@ -82,8 +77,6 @@ export default function ServiceTable({ hotelId, serviceList }) {
         )
           .then((response) => response.data)
           .then((data) => {
-            console.log(data);
-            console.log(data);
             setServices(data.item1);
             setMaxNumberOfServices(data.item2);
           })
@@ -104,22 +97,27 @@ export default function ServiceTable({ hotelId, serviceList }) {
     setPage(0);
     SetPageForRequest(1);
   };
+
   function OpenAddServiceDialog(service) {
     setService(service);
     setOpenDialog(true);
   }
+
   function handleClose() {
     setOpenDialog(false);
   }
+
   function callDeleteDialog(serviceId) {
     setServiceId(serviceId);
     setOpenDeleteDialog(true);
   }
+
   function handleCloseDeleteDialog() {
     setOpenDeleteDialog(false);
   }
+
   function increaseQuantity(service) {
-    var newService = {
+   const newService = {
       id: service.id,
       name: service.name,
       payment: service.payment,
@@ -127,9 +125,10 @@ export default function ServiceTable({ hotelId, serviceList }) {
     };
     setService(newService);
   }
+
   function reduceQuantity(service) {
     if (service.quantity !== 1) {
-      var newService = {
+      const newService = {
         id: service.id,
         name: service.name,
         payment: service.payment,
@@ -138,32 +137,27 @@ export default function ServiceTable({ hotelId, serviceList }) {
       setService(newService);
     }
   }
+  function callAlert(message, successStatus) {
+    setAlertMessage(message);
+    setAlertSuccessStatus(successStatus);
+    setAlertOpen(true);
+  }
+
   const handleCloseAlert = (event, reason) => {
     if (reason === "clickaway") {
       return;
     }
-
-    setAddAlertOpen(false);
-    setDeleteAlertOpen(false);
-    setUpdateAlertOpen(false);
+    setAlertOpen(false);
   };
-  function callAddAlert() {
-    setAddAlertOpen(true);
-  }
-  function callUpdateAlert() {
-    setUpdateAlertOpen(true);
-  }
-  function callDeleteAlert() {
-    setDeleteAlertOpen(true);
-  }
+
   function slice(services) {
-    if (hotelId === undefined) {
+    if (!!hotelId) {
+      return services;
+    } else {
       return services.slice(
         page * rowsPerPage,
         page * rowsPerPage + rowsPerPage
       );
-    } else {
-      return services;
     }
   }
 
@@ -171,12 +165,18 @@ export default function ServiceTable({ hotelId, serviceList }) {
     const DeleteService = async () => {
       await API.delete("/services/" + serviceId, {
         headers: { Authorization: "Bearer " + token },
-      }).catch((error) => console.log(error.response.data.message));
+      })
+        .then((response) => response.data)
+        .then((data) => {
+          callAlert("service deleted successfully", true);
+        })
+        .catch((error) =>
+          callAlert(false)
+        );
     };
 
     await DeleteService();
     handleCloseDeleteDialog();
-    callDeleteAlert();
   }
 
   return (
@@ -192,12 +192,12 @@ export default function ServiceTable({ hotelId, serviceList }) {
                 <TableCell align="right" style={{ minWidth: 100 }}>
                   Payment
                 </TableCell>
-                {hotelId === undefined ? (
+                {!!hotelId ? (
+                  ""
+                ) : (
                   <TableCell align="right" style={{ minWidth: 50 }}>
                     Quantity
                   </TableCell>
-                ) : (
-                  ""
                 )}
                 <TableCell />
                 <TableCell />
@@ -208,7 +208,22 @@ export default function ServiceTable({ hotelId, serviceList }) {
                 <TableRow key={service.id}>
                   <TableCell align="right">{service.name}</TableCell>
                   <TableCell align="right">{service.payment}</TableCell>
-                  {hotelId === undefined ? (
+                  {!!hotelId ? (
+                    <TableCell>
+                      <IconButton
+                        color="inherit"
+                        onClick={() => OpenAddServiceDialog(service)}
+                      >
+                        <EditIcon></EditIcon>
+                      </IconButton>
+                      <IconButton
+                        color="inherit"
+                        onClick={() => callDeleteDialog(service.id)}
+                      >
+                        <DeleteIcon></DeleteIcon>
+                      </IconButton>
+                    </TableCell>
+                  ) : (
                     <>
                       <TableCell align="right">{service.quantity}</TableCell>
                       <TableCell>
@@ -226,21 +241,6 @@ export default function ServiceTable({ hotelId, serviceList }) {
                         </IconButton>
                       </TableCell>
                     </>
-                  ) : (
-                    <TableCell>
-                      <IconButton
-                        color="inherit"
-                        onClick={() => OpenAddServiceDialog(service)}
-                      >
-                        <EditIcon></EditIcon>
-                      </IconButton>
-                      <IconButton
-                        color="inherit"
-                        onClick={() => callDeleteDialog(service.id)}
-                      >
-                        <DeleteIcon></DeleteIcon>
-                      </IconButton>
-                    </TableCell>
                   )}
                 </TableRow>
               ))}
@@ -250,16 +250,14 @@ export default function ServiceTable({ hotelId, serviceList }) {
         <TablePagination
           rowsPerPageOptions={[5, 10, 50]}
           component="div"
-          count={hotelId === undefined ? services.length : maxNumberOfServices}
+          count={!!hotelId ? maxNumberOfServices : services.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onChangePage={handleChangePage}
           onChangeRowsPerPage={handleChangeRowsPerPage}
         />
       </Paper>
-      {hotelId === undefined ? (
-        ""
-      ) : (
+      {!!hotelId ? (
         <>
           <Button
             variant="contained"
@@ -267,7 +265,7 @@ export default function ServiceTable({ hotelId, serviceList }) {
             size="large"
             margin="normal"
             className={classes.createRoomButton}
-            onClick={() => OpenAddServiceDialog()}
+            onClick={OpenAddServiceDialog}
           >
             Create Service
           </Button>
@@ -284,21 +282,14 @@ export default function ServiceTable({ hotelId, serviceList }) {
             message={"service will be permanently deleted"}
           ></BaseDeleteDialog>
           <BaseAlert
-            open={addAlertOpen}
+            open={alertOpen}
             handleClose={handleCloseAlert}
-            message={"service added successfully"}
-          ></BaseAlert>
-          <BaseAlert
-            open={deleteAlertOpen}
-            handleClose={handleCloseAlert}
-            message={"service deleted succesfully"}
-          ></BaseAlert>
-          <BaseAlert
-            open={updateAlertOpen}
-            handleClose={handleCloseAlert}
-            message={"service updated succesfully"}
+            message={alertMessage}
+            success={alertSuccessStatus}
           ></BaseAlert>
         </>
+      ) : (
+        ""
       )}
     </>
   );

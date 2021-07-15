@@ -6,7 +6,6 @@ import TableCell from "@material-ui/core/TableCell";
 import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
-import Paper from "@material-ui/core/Paper";
 
 const useStyles = makeStyles({
   table: {
@@ -23,7 +22,7 @@ export default function ReservationPaymentTable({
   checkOutDate,
 }) {
   const classes = useStyles();
-  let numberOfDays = Math.round(
+  const numberOfDays = Math.round(
     Math.abs(checkInDate - checkOutDate) / (1000 * 3600 * 24)
   );
   function ccyFormat(num) {
@@ -31,7 +30,6 @@ export default function ReservationPaymentTable({
   }
   function calculateTotalSum() {
     let sum = 0;
-    console.log("re");
     selectedServices.map((item) => {
       sum += item.payment * item.quantity;
     });

@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import { Button, Dialog, AppBar, Typography } from "@material-ui/core";
+import Dialog from "@material-ui/core/Dialog";
+import AppBar from "@material-ui/core/AppBar";
+import Typography from "@material-ui/core/Typography";
 import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
@@ -21,12 +23,13 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 export default function BaseDialog({ title, open, handleClose, form }) {
+  
   const classes = useStyles();
 
   return (
     <Dialog
       open={open}
-      onClose={() => handleClose()}
+      onClose={handleClose}
       TransitionComponent={Transition}
     >
       <AppBar className={classes.appBar}>
@@ -37,7 +40,7 @@ export default function BaseDialog({ title, open, handleClose, form }) {
           <IconButton
             edge="end"
             color="inherit"
-            onClick={() => handleClose()}
+            onClick={handleClose}
             aria-label="close"
           >
             <CloseIcon />

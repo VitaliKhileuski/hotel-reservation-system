@@ -1,10 +1,7 @@
 import { React, useState, useEffect } from "react";
-import { DropzoneDialogBase } from "material-ui-dropzone";
-import { USER_ID } from "./../../storage/actions/actionTypes";
-import { useSelector } from "react-redux";
-import API from "./../../api";
 import axios from "axios";
-import { set } from "date-fns";
+import { DropzoneDialogBase } from "material-ui-dropzone";
+import API from "./../../api";
 
 export default function BaseImageDialog({
   open,
@@ -13,26 +10,18 @@ export default function BaseImageDialog({
   handleClose,
   roomId,
 }) {
+
   const [fileObjects, setFileObjects] = useState([]);
   const token = localStorage.getItem("token");
   const [requestFiles, setRequestFiles] = useState([]);
   const [flag, setFlag] = useState(false);
-  const [currentImages, setCurrentImages] = useState([]);
   const [tempImages, setTempImages] = useState([]);
 
   useEffect(async () => {
-    if (open === true) {
-      setFileObjects([]);
-      if (currentImages.length !== 0) {
-        setFileObjects(currentImages);
-      } else {
-        if (open === false) {
-          setFileObjects([]);
-        }
-        if (imageUrls !== undefined) {
-          await loadImages();
-        }
-      }
+    setTempImages([]);
+    setFileObjects([]);
+    if (!!imageUrls) {
+      await loadImages();
     }
   }, [open]);
 
@@ -45,7 +34,7 @@ export default function BaseImageDialog({
 
   async function saveImages() {
     mapImagesForRequest();
-    if (roomId !== undefined) {
+    if (!!roomId) {
       await saveImagesForRoom();
     } else {
       await saveImagesForHotel();
@@ -57,12 +46,12 @@ export default function BaseImageDialog({
   const loadImages = async () => {
     await imageUrls.forEach(async (item) => {
       await GetImage(item);
-      if (fileObjects.length !== 0) {
-        if (flag === true) {
-          setFlag(false);
-        } else {
-          setFlag(true);
-        }
+
+      if (flag === true) {
+        setFlag(false);
+      } else {
+        setFlag(true);
+
         console.log(fileObjects);
         console.log(`flag ${flag}`);
       }
@@ -85,9 +74,11 @@ export default function BaseImageDialog({
           };
 
           tempImages.push(file);
-          if (tempImages.length === imageUrls.length) {
-            setCurrentImages(tempImages);
-            setFileObjects(tempImages);
+          setFileObjects(tempImages);
+          if (flag === true) {
+            setFlag(false);
+          } else {
+            setFlag(true);
           }
         }
       })
@@ -116,13 +107,12 @@ export default function BaseImageDialog({
     };
     setImagesToRoom();
     setRequestFiles([]);
-    setCurrentImages(fileObjects);
     setFileObjects([]);
     handleClose();
   }
 
   async function saveImagesForHotel() {
-    if (hotelId !== undefined) {
+    if (!!hotelId) {
       const setImagesToHotel = async () => {
         await API.post("/images/" + hotelId + "/setHotelImages", requestFiles, {
           headers: { Authorization: "Bearer " + token },
@@ -131,17 +121,14 @@ export default function BaseImageDialog({
       setImagesToHotel();
       console.log("file objects save");
       console.log(fileObjects);
-      setCurrentImages(fileObjects);
-      console.log("current images save");
       setFileObjects([]);
       setRequestFiles([]);
-      console.log(currentImages);
       handleClose();
     }
   }
 
   function deleteFile(file) {
-    var index = fileObjects.indexOf(file);
+    const index = fileObjects.indexOf(file);
     if (index > -1) {
       fileObjects.splice(index, 1);
     }
@@ -158,8 +145,8 @@ export default function BaseImageDialog({
       fileObjects={fileObjects}
       maxFileSize={5000000}
       open={open}
-      onClose={() => handleClose()}
-      onSave={() => saveImages()}
+      onClose={handleClose()}
+      onSave={saveImages}
       onAdd={(newFileObjs) => {
         console.log(...newFileObjs);
         setFileObjects([].concat(fileObjects, newFileObjs));

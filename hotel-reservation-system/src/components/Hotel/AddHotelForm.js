@@ -1,17 +1,14 @@
 import { React, useState, useEffect } from "react";
-import { Button } from "@material-ui/core";
+import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import TextField from "@material-ui/core/TextField";
-import { Link, Redirect } from "react-router-dom";
 import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
-import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { Formik, Form, ErrorMessage, Field } from "formik";
-import * as Yup from "yup";
 import API from "./../../api/";
-import Autocomplete from "@material-ui/lab/Autocomplete";
+import { HOTEL_VALIDATION_SCHEMA } from "../../constants/ValidationSchemas";
 
 const useStyles = makeStyles((theme) => ({
   root: {},
@@ -26,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.secondary.main,
   },
   form: {
-    width: "100%", // Fix IE 11 issue.
+    width: "100%",
     marginTop: theme.spacing(1),
   },
   submit: {
@@ -41,28 +38,22 @@ export default function AddHotelForm({
   callUpdateAlert,
   updateMainInfo,
 }) {
+
   const classes = useStyles();
-  const [users, setUsers] = useState([]);
-  const [showAlert, setShowAlert] = useState(false);
   const token = localStorage.getItem("token");
   const [buildingNumberLabelError, setBuildingNumberLabelError] = useState("");
   const [buildingNumber, setBuildingNumber] = useState(
-    hotel === undefined ? "" : hotel.location.buildingNumber
+    !!hotel ? hotel.location.buildingNumber : ""
   );
 
   const initialValues = {
-    name: hotel === undefined ? "" : hotel.name,
-    country: hotel === undefined ? "" : hotel.location.country,
-    city: hotel === undefined ? "" : hotel.location.city,
-    street: hotel === undefined ? "" : hotel.location.street,
-    buildingNumber: hotel === undefined ? "" : hotel.location.buildingNumber,
+    name: !!hotel ? hotel.name : "",
+    country: !!hotel ? hotel.location.country : "",
+    city: !!hotel ? hotel.location.city : "",
+    street: !!hotel ? hotel.location.street : "",
+    buildingNumber: !!hotel ? hotel.location.buildingNumber : "",
   };
-  const validationSchema = Yup.object().shape({
-    name: Yup.string().required("name is required").trim(),
-    country: Yup.string().required("country is required").trim(),
-    city: Yup.string().required("city is required").trim(),
-    street: Yup.string().required("street is required").trim(),
-  });
+
   const onSubmit = async (values) => {
     const request = {
       Name: values.name.trim(),
@@ -80,18 +71,17 @@ export default function AddHotelForm({
         .then((response) => response.data)
         .then((data) => {
           handleClose();
-          callAlert();
-          setShowAlert(true);
+          callAlert("hotel added succesfully", true);
         })
         .catch((error) => {
           console.log(error.response.data.Message);
           setBuildingNumberLabelError(error.response.data.Message);
         });
     };
-    if (hotel === undefined) {
-      await CreateHotel();
-    } else {
+    if (!!hotel) {
       await UpdateHotel(request);
+    } else {
+      await CreateHotel();
     }
   };
 
@@ -109,6 +99,7 @@ export default function AddHotelForm({
         setBuildingNumberLabelError(error.response.data.Message);
       });
   };
+
   function ValidateLocation(buildingNumber) {
     buildingNumber = buildingNumber.trim();
     setBuildingNumberLabelError("");
@@ -127,7 +118,7 @@ export default function AddHotelForm({
           <Formik
             initialValues={initialValues}
             onSubmit={onSubmit}
-            validationSchema={validationSchema}
+            validationSchema={HOTEL_VALIDATION_SCHEMA}
           >
             {(props) => (
               <Form className={classes.form}>

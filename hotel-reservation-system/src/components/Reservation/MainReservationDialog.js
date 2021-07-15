@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import { Button, Dialog, AppBar, Typography } from "@material-ui/core";
+import Dialog from "@material-ui/core/Dialog";
+import AppBar from "@material-ui/core/AppBar";
+import Typography from "@material-ui/core/Typography";
 import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
@@ -10,7 +12,6 @@ import RoomDetails from "../Room/RoomDetails";
 import ServiceChoice from "../Service/ServiceChoise";
 import DateFilter from "../Filters/DateFilter";
 import Payment from "./Payment";
-import { checkUtils } from "@material-ui/pickers/_shared/hooks/useUtils";
 
 const useStyles = makeStyles((theme) => ({
   appBar: {
@@ -29,6 +30,7 @@ const useStyles = makeStyles((theme) => ({
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="down" ref={ref} {...props} />;
 });
+
 export default function MainReservationDialog({
   open,
   handleClose,
@@ -36,20 +38,21 @@ export default function MainReservationDialog({
   checkInDate,
   checkOutDate,
 }) {
+
   const [flag, setFlag] = useState(true);
   const [selectedServices, setSelectedServices] = useState([]);
   const [checkIn, setCheckIn] = useState(checkInDate);
   const [checkOut, setCheckOut] = useState(checkOutDate);
   const [isValidInfo, setIsValidInfo] = useState(true);
-  let roomDetailsСomponent = <RoomDetails room={room}></RoomDetails>;
-  let choiseOfServicesComponent = (
+  const roomDetailsСomponent = <RoomDetails room={room}></RoomDetails>;
+  const choiseOfServicesComponent = (
     <ServiceChoice
       oldSelectedServices={selectedServices}
       getSelectedServices={getSelectedServices}
     ></ServiceChoice>
   );
 
-  let paymentComponent = (
+  const paymentComponent = (
     <Payment
       selectedServices={selectedServices}
       room={room}
@@ -60,8 +63,6 @@ export default function MainReservationDialog({
   const classes = useStyles();
   const [currentComponent, setCurrentComponent] =
     useState(roomDetailsСomponent);
-
-  useEffect(() => {}, [currentComponent, isValidInfo]);
 
   function getSelectedServices(selectedServices) {
     setSelectedServices(selectedServices);
@@ -82,6 +83,7 @@ export default function MainReservationDialog({
         return "Unknown step";
     }
   }
+
   function changeStep(step) {
     console.log(step);
     if (step === 0) {
@@ -91,14 +93,17 @@ export default function MainReservationDialog({
     }
     getStepComponent(step);
   }
+
   function close() {
     setCurrentComponent(roomDetailsСomponent);
     handleClose();
   }
+
   function changeDates(checkIn, checkOut) {
     setCheckIn(checkIn);
     setCheckOut(checkOut);
   }
+
   function checkValidInfo(isValid) {
     setIsValidInfo(isValid);
     console.log(isValid);
@@ -108,7 +113,7 @@ export default function MainReservationDialog({
     <Dialog
       open={open}
       fullScreen
-      onClose={() => close()}
+      onClose={close}
       TransitionComponent={Transition}
     >
       <AppBar className={classes.appBar}>
@@ -119,7 +124,7 @@ export default function MainReservationDialog({
           <IconButton
             edge="end"
             color="inherit"
-            onClick={() => close()}
+            onClick={close}
             aria-label="close"
           >
             <CloseIcon />
@@ -128,7 +133,7 @@ export default function MainReservationDialog({
       </AppBar>
       {currentComponent}
       <div className={classes.dateFilter}>
-        {flag === true && room !== undefined ? (
+        {flag === true && !!room ? (
           <DateFilter
             roomId={room.id}
             checkInDate={checkIn}

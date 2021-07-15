@@ -1,17 +1,14 @@
-import { React, useState, useEffect } from "react";
-import API from "./../../api";
+import { React, useState } from "react";
 import { useSelector } from "react-redux";
-import { useHistory } from "react-router";
 import Carousel from "react-material-ui-carousel";
+import { makeStyles } from "@material-ui/core";
+import Card from "@material-ui/core/Card";
+import CardActionArea from "@material-ui/core/CardActionArea";
+import CardContent from "@material-ui/core/CardContent";
+import CardMedia from "@material-ui/core/CardMedia";
+import Typography from "@material-ui/core/Typography";
 import defaultImage from "./../../img/room.jpg";
-import {
-  Card,
-  makeStyles,
-  CardActionArea,
-  CardContent,
-  CardMedia,
-  Typography,
-} from "@material-ui/core";
+import API from "./../../api";
 import MainReservationDialog from "../Reservation/MainReservationDialog";
 
 const useStyles = makeStyles({
@@ -34,23 +31,34 @@ export default function BaseCard({
 }) {
   const classes = useStyles();
   const [reservationDialogOpen, setReservationDialogOpen] = useState(false);
-  const history = useHistory();
+  const islogged = useSelector((state) => state.isLogged);
   const token = localStorage.getItem("token");
-  console.log(room);
-  console.log(checkOutDate);
 
   function callReservationDialog() {
-    console.log("click");
+    console.log(islogged);
+    if (islogged) {
+      blockRoom();
+    }
     setReservationDialogOpen(true);
   }
+  const blockRoom = async () => {
+    await API.put("/rooms/" + room.id + "/block", {
+      headers: { Authorization: "Bearer " + token },
+    })
+      .then((response) => response.data)
+      .then((data) => {})
+      .catch((error) => console.log(error.response.data.message));
+  };
+
   function handleCloseReservationDialog() {
     setReservationDialogOpen(false);
   }
+
   return (
     <>
       <Card
         className={classes.root}
-        onClick={room !== undefined ? callReservationDialog : clickAction}
+        onClick={!!room ? callReservationDialog : clickAction}
       >
         <CardActionArea>
           {imageUrls === undefined || imageUrls.length === 0 ? (
@@ -81,7 +89,7 @@ export default function BaseCard({
         </CardActionArea>
       </Card>
       <MainReservationDialog
-        handleClose={() => handleCloseReservationDialog()}
+        handleClose={handleCloseReservationDialog}
         open={reservationDialogOpen}
         room={room}
         checkInDate={checkInDate}
