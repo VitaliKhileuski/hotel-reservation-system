@@ -142,7 +142,7 @@ export default function RoomTable({ hotelId }) {
           callAlert("room deleted successfully", true);
         })
         .catch((error) =>
-          callAlert("something went wrong. Please, try again", false)
+          callAlert(false)
         );
     };
 

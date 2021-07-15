@@ -99,11 +99,13 @@ export default function HotelTable() {
         })
         .catch((error) => console.log(error.response.data.Message));
     };
-    if (role === "Admin") {
-      loadHotels();
-    }
-    if (role === "HotelAdmin") {
-      loadHotelAdminHotels();
+    if (openDeleteDialog === false) {
+      if (role === "Admin") {
+        loadHotels();
+      }
+      if (role === "HotelAdmin") {
+        loadHotelAdminHotels();
+      }
     }
   }, [rowsPerPage, page, open, openDeleteDialog]);
 
@@ -162,7 +164,7 @@ export default function HotelTable() {
           setAlertOpen(true);
         })
         .catch((error) => {
-          callAlert("something went wrong. Please try again", false);
+          callAlert(false);
         });
     };
 

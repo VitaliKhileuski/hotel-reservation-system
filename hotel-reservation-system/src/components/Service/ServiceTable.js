@@ -172,7 +172,7 @@ export default function ServiceTable({ hotelId, serviceList }) {
           callAlert("service deleted successfully", true);
         })
         .catch((error) =>
-          callAlert("something went wrong. Please try again.", false)
+          callAlert(false)
         );
     };
 

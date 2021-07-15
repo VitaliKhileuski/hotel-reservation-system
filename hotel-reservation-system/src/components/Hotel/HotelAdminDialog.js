@@ -81,7 +81,7 @@ export default function HotelAdminDialog({
         callAlert("hotel admin assigned successfully", true);
       })
       .catch((error) =>
-        callAlert("something went wrong. Please try again", false)
+        callAlert(false)
       );
   };
 
@@ -94,7 +94,7 @@ export default function HotelAdminDialog({
         callAlert("hotel admin deleted successfully", true);
       })
       .catch((error) =>
-        callAlert("something went wrong. Please try again", false)
+        callAlert(false)
       );
   };
 

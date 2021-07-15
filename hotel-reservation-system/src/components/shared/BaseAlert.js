@@ -22,7 +22,7 @@ export default function BaseAlert({ open, handleClose, message, success }) {
         onClose={() => handleClose()}
         severity={success ? "success" : "error"}
       >
-        {message}
+        {success ? message : "Something went wrong. Please, try again"}
       </Alert>
     </Snackbar>
   );

@@ -1,3 +1,4 @@
+import moment from 'moment'
 const initialState = {
   isLogged: false,
   role: "",
@@ -5,7 +6,7 @@ const initialState = {
   email: "",
   userId: "",
   checkInDate: new Date(Date.now()),
-  checkOutDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
+  checkOutDate: moment().add(2, 'days')._d,
 };
 
 export default initialState;

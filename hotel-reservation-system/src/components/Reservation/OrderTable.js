@@ -38,17 +38,11 @@ function ccyFormat(num) {
   return `${num.toFixed(2)}`;
 }
 
-function Row(props) {
-  const { order } = props;
+function Row({ order, handleClickDeleteIcon }) {
   const [open, setOpen] = useState(false);
   const classes = useRowStyles();
   const [roomDetailsOpen, setRoomDetailsOpen] = useState(false);
   const [room, setRoom] = useState();
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [alertOpen, setAlertOpen] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
-  const [alertSuccessStatus, setAlertSuccessStatus] = useState(true);
-  const [orderId, setOrderId] = useState("");
   let component = <RoomDetails room={room}></RoomDetails>;
   let role = useSelector((state) => state.role);
   let token = localStorage.getItem("token");
@@ -59,45 +53,6 @@ function Row(props) {
   }
   function handleCloseRoomDetails() {
     setRoomDetailsOpen(false);
-  }
-
-  function handleCloseDeleteDialog() {
-    setDeleteDialogOpen(false);
-  }
-  const handleCloseAlert = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    setAlertOpen(false);
-  };
-
-  function callAlert(message, successStatus) {
-    setAlertMessage(message);
-    setAlertSuccessStatus(successStatus);
-    setAlertOpen(true);
-  }
-
-  async function deleteOrder() {
-    const DeleteOrder = async () => {
-      await API.delete("/orders/" + orderId, {
-        headers: { Authorization: "Bearer " + token },
-      })
-        .then((response) => response.data)
-        .then((data) => {
-          callAlert("order deleted successfully", true);
-        })
-        .catch((error) =>
-          callAlert("something went wrong. Please, try again", false)
-        );
-    };
-
-    await DeleteOrder();
-    handleCloseDeleteDialog();
-  }
-  function handleClickDeleteIcon(orderId) {
-    setOrderId(orderId);
-    setDeleteDialogOpen(true);
   }
 
   return (
@@ -293,19 +248,6 @@ function Row(props) {
         handleClose={handleCloseRoomDetails}
         form={component}
       ></BaseDialog>
-      <BaseDeleteDialog
-        open={deleteDialogOpen}
-        handleCloseDeleteDialog={handleCloseDeleteDialog}
-        title="cancel order"
-        message="order will be canceled."
-        deleteItem={deleteOrder}
-      ></BaseDeleteDialog>
-      <BaseAlert
-        open={alertOpen}
-        handleClose={handleCloseAlert}
-        message={alertMessage}
-        success={alertSuccessStatus}
-      ></BaseAlert>
     </>
   );
 }
@@ -316,6 +258,11 @@ export default function OrderTable() {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [pageForRequest, SetPageForRequest] = useState(0);
   const [maxNumberOfOrders, setMaxNumberOfOrders] = useState(0);
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertSuccessStatus, setAlertSuccessStatus] = useState(true);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [orderId, setOrderId] = useState("");
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -334,8 +281,49 @@ export default function OrderTable() {
         })
         .catch((error) => console.log(error.response.data.Message));
     };
-    loadOrders();
-  }, [rowsPerPage, page]);
+    if (deleteDialogOpen === false) {
+      loadOrders();
+    }
+  }, [rowsPerPage, page, deleteDialogOpen]);
+
+  async function deleteOrder() {
+    const DeleteOrder = async () => {
+      await API.delete("/orders/" + orderId + "/deleteOrder", {
+        headers: { Authorization: "Bearer " + token },
+      })
+        .then((response) => response.data)
+        .then((data) => {
+          callAlert("order deleted successfully", true);
+        })
+        .catch((error) =>
+          callAlert(false)
+        ); 
+    };
+    DeleteOrder();
+    handleCloseDeleteDialog();
+  }
+
+  function callAlert(message, successStatus) {
+    setAlertMessage(message);
+    setAlertSuccessStatus(successStatus);
+    setAlertOpen(true);
+  }
+
+  function handleCloseDeleteDialog() {
+    setDeleteDialogOpen(false);
+  }
+  function handleClickDeleteIcon(orderId) {
+    setOrderId(orderId);
+    setDeleteDialogOpen(true);
+  }
+
+  const handleCloseAlert = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setAlertOpen(false);
+  };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -381,7 +369,11 @@ export default function OrderTable() {
           </TableHead>
           <TableBody>
             {orders.map((order) => (
-              <Row key={order.id} order={order} />
+              <Row
+                key={order.id}
+                order={order}
+                handleClickDeleteIcon={handleClickDeleteIcon}
+              />
             ))}
           </TableBody>
         </Table>
@@ -395,6 +387,19 @@ export default function OrderTable() {
         onChangePage={handleChangePage}
         onChangeRowsPerPage={handleChangeRowsPerPage}
       />
+      <BaseDeleteDialog
+        open={deleteDialogOpen}
+        handleCloseDeleteDialog={handleCloseDeleteDialog}
+        title="cancel order"
+        message="order will be canceled."
+        deleteItem={deleteOrder}
+      ></BaseDeleteDialog>
+      <BaseAlert
+        open={alertOpen}
+        handleClose={handleCloseAlert}
+        message={alertMessage}
+        success={alertSuccessStatus}
+      ></BaseAlert>
     </>
   );
 }

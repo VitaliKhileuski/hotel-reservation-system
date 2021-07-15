@@ -1,5 +1,6 @@
 import { React, useState, useEffect } from "react";
 import DateFnsUtils from "@date-io/date-fns";
+import moment from 'moment'
 import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
@@ -25,6 +26,9 @@ export default function DateFilter({
   const [checkOut, setCheckOut] = useState(checkOutDate);
   const [roomIsOccupiedAlertOpen, setRoomIsOccupiedAlertOpen] = useState(false);
 
+
+  console.log(checkIn);
+  console.log(checkOut);
   const checkPlace = async (checkIn, checkOut) => {
     await API.get(
       "/rooms/" +
@@ -98,13 +102,12 @@ export default function DateFilter({
         <Typography variant="h6">Check out date</Typography>
         <KeyboardDatePicker
           disableToolbar
-          minDate={new Date(checkIn.getTime() + 1000 * 60 * 60 * 24)}
+          minDate={new Date(moment(checkIn).add(2, 'days')._d)}
           variant="inline"
           format="MM/dd/yyyy"
           inputVariant="outlined"
           value={checkOut}
           onChange={handleDateCheckOutChange}
-          invalidLabel="adsfsdf"
           KeyboardButtonProps={{
             "aria-label": "change date",
           }}

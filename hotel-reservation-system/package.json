@@ -21,6 +21,7 @@
     "material-ui-phone-number": "^2.2.6",
     "materialui-daterange-picker": "^1.1.92",
     "materialui-pagination": "0.0.6",
+    "moment": "^2.29.1",
     "prettier": "^2.3.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",

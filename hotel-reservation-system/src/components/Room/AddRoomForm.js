@@ -58,7 +58,7 @@ export default function AddRoomForm({ hotelId, room, handleClose, callAlert }) {
           callAlert("room added successfully", true);
         })
         .catch((error) =>
-          callAlert("something went wrong. Please, try again.", false)
+          callAlert(false)
         );
     };
     if (!!room) {
@@ -81,7 +81,7 @@ export default function AddRoomForm({ hotelId, room, handleClose, callAlert }) {
         callAlert("room updated successfully", true);
       })
       .catch((error) =>
-        callAlert("something went wrong. Please, try again.", false)
+        callAlert(false)
       );
   };
 

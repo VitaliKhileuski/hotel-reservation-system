@@ -9,16 +9,8 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { Formik, Form, ErrorMessage, Field } from "formik";
-import * as Yup from "yup";
 import api from "./../../api/";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  IS_LOGGED,
-  NAME,
-  ROLE,
-  USER_ID,
-  EMAIL,
-} from "../../storage/actions/actionTypes.js";
 import { REGISTER_VALIDATION_SCHEMA } from "../../constants/ValidationSchemas";
 import { EMAIL_REGEX } from "../../constants/Regex";
 import { FillStorage } from "./TokenData";
@@ -72,7 +64,7 @@ export default function Register({ handleClose }) {
       .then((response) => {
         if (role !== "Admin") {
           if (!!response && !!response.data) {
-            FillStorage(response.data[0], response.data[1], dispatch);
+            FillStorage(response.data[0], response.data[1],dispatch);
           }
         } else {
           handleClose();
