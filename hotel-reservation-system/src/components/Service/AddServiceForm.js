@@ -1,5 +1,5 @@
-import { React, useState, useEffect } from "react";
-import { Button } from "@material-ui/core";
+import { React, useState } from "react";
+import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import TextField from "@material-ui/core/TextField";
 import Grid from "@material-ui/core/Grid";
@@ -7,7 +7,7 @@ import Box from "@material-ui/core/Box";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { Formik, Form, ErrorMessage, Field } from "formik";
-import API from "./../../api/";
+import API from "../../api";
 import { SERVICE_VALIDATION_SCHEMA } from "../../constants/ValidationSchemas";
 
 const useStyles = makeStyles((theme) => ({
@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.secondary.main,
   },
   form: {
-    width: "100%", // Fix IE 11 issue.
+    width: "100%",
     marginTop: theme.spacing(1),
   },
   submit: {
@@ -35,7 +35,7 @@ export default function AddServiceForm({
   hotelId,
   service,
   handleClose,
-  callAlert,
+  callAlert
 }) {
   const classes = useStyles();
   const [serviceName, setServiceName] = useState(!!service ? service.name : "");
@@ -60,7 +60,7 @@ export default function AddServiceForm({
         .then((response) => response.data)
         .then((data) => {
           handleClose();
-          callAlert("service added successfully", true);
+          callAlert("service added successfully",true);
         })
         .catch((error) => {
           setServiceNameErrorLabel(error.response.data.Message);
@@ -80,7 +80,7 @@ export default function AddServiceForm({
       .then((response) => response.data)
       .then((data) => {
         handleClose();
-        callAlert("service updated successfully", true);
+        callAlert("service updated successfully",true);
       })
       .catch((error) => {
         console.log(error.response.data.Message);

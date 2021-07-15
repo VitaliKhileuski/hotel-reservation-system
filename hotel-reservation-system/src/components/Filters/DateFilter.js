@@ -1,18 +1,19 @@
-import { React, useState, useEffect } from "react";
+import { React, useState } from "react";
 import DateFnsUtils from "@date-io/date-fns";
 import moment from 'moment'
+import { useDispatch } from "react-redux";
 import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
 } from "@material-ui/pickers";
-import { Grid, Typography } from "@material-ui/core";
+import Grid from "@material-ui/core/Grid";
+import Typography from "@material-ui/core/Typography";
 import API from "../../api";
 import RoomIsOccupiedAlert from "../Reservation/RoomIsOccupiedAlert";
 import {
   CHECK_IN_DATE,
   CHECK_OUT_DATE,
 } from "./../../storage/actions/actionTypes";
-import { useDispatch } from "react-redux";
 
 export default function DateFilter({
   roomId,
@@ -20,15 +21,13 @@ export default function DateFilter({
   checkOutDate,
   changeDates,
   isValidInfo,
-}) {
+}){
+
   const dispatch = useDispatch();
   const [checkIn, setCheckIn] = useState(checkInDate);
   const [checkOut, setCheckOut] = useState(checkOutDate);
   const [roomIsOccupiedAlertOpen, setRoomIsOccupiedAlertOpen] = useState(false);
 
-
-  console.log(checkIn);
-  console.log(checkOut);
   const checkPlace = async (checkIn, checkOut) => {
     await API.get(
       "/rooms/" +

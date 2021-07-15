@@ -2,23 +2,14 @@ import { React, useState } from "react";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import TextField from "@material-ui/core/TextField";
-import { Link, Redirect } from "react-router-dom";
 import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
-import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { Formik, Form, ErrorMessage, Field } from "formik";
 import * as Yup from "yup";
 import API from "./../../api/";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  IS_LOGGED,
-  NAME,
-  ROLE,
-  USER_ID,
-  EMAIL,
-} from "../../storage/actions/actionTypes.js";
+import { PASSWORD_REGEX } from "../../constants/Regex";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -32,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.secondary.main,
   },
   form: {
-    width: "100%", // Fix IE 11 issue.
+    width: "100%",
     marginTop: theme.spacing(3),
   },
   submit: {
@@ -41,21 +32,18 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function ChangePasswordForm({ user, handleClose }) {
-  const dispatch = useDispatch();
   const classes = useStyles();
   const [currentPassword, setCurrentPassword] = useState("");
   const [passwordErrorLabel, setPasswordErrorLabel] = useState("");
-  const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
   const initialValues = {
     newPassword: "",
     passwordConfirm: "",
   };
-  let token = localStorage.getItem("token");
+  const token = localStorage.getItem("token");
 
   function ValidatePassword(password) {
     setPasswordErrorLabel("");
-    const passwordRegex = /^(?=.*[0-9])(?=.*[a-zA-Z])/;
-    const flag = passwordRegex.test(password);
+    const flag = PASSWORD_REGEX.test(password);
     if (!flag) {
       setPasswordErrorLabel(
         "password should contains numbers and latin letters"
@@ -70,7 +58,7 @@ export default function ChangePasswordForm({ user, handleClose }) {
     setCurrentPassword(password);
   }
 
-  const validationSchema = Yup.object().shape({
+  const CHANGE_PASSWORD_VALIDATION_SCHEMA = Yup.object().shape({
     newPassword: Yup.string()
       .min(8, "Minimum characters should be 8")
       .notOneOf(
@@ -79,13 +67,14 @@ export default function ChangePasswordForm({ user, handleClose }) {
       )
       .required("password is required")
       .matches(
-        /^(?=.*[0-9])(?=.*[a-zA-Z])/,
+        PASSWORD_REGEX,
         "password should contains numbers and latin letters"
       ),
     passwordConfirm: Yup.string()
       .oneOf([Yup.ref("newPassword"), null], "Passwords must match")
       .required("password is required"),
   });
+
   const onSubmit = async (values) => {
     const password = {
       Password: currentPassword,
@@ -139,7 +128,7 @@ export default function ChangePasswordForm({ user, handleClose }) {
         <Formik
           initialValues={initialValues}
           onSubmit={onSubmit}
-          validationSchema={validationSchema}
+          validationSchema={CHANGE_PASSWORD_VALIDATION_SCHEMA}
         >
           {(props) => (
             <Form className={classes.form}>

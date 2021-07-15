@@ -1,7 +1,7 @@
 import { React, useState, useEffect } from "react";
+import axios from "axios";
 import { DropzoneDialogBase } from "material-ui-dropzone";
 import API from "./../../api";
-import axios from "axios";
 
 export default function BaseImageDialog({
   open,
@@ -10,6 +10,7 @@ export default function BaseImageDialog({
   handleClose,
   roomId,
 }) {
+
   const [fileObjects, setFileObjects] = useState([]);
   const token = localStorage.getItem("token");
   const [requestFiles, setRequestFiles] = useState([]);
@@ -127,7 +128,7 @@ export default function BaseImageDialog({
   }
 
   function deleteFile(file) {
-    let index = fileObjects.indexOf(file);
+    const index = fileObjects.indexOf(file);
     if (index > -1) {
       fileObjects.splice(index, 1);
     }
@@ -144,10 +145,8 @@ export default function BaseImageDialog({
       fileObjects={fileObjects}
       maxFileSize={5000000}
       open={open}
-      onClose={() => {
-        handleClose();
-      }}
-      onSave={() => saveImages()}
+      onClose={handleClose()}
+      onSave={saveImages}
       onAdd={(newFileObjs) => {
         console.log(...newFileObjs);
         setFileObjects([].concat(fileObjects, newFileObjs));

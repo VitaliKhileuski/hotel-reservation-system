@@ -1,23 +1,22 @@
-import { React, useState, useRef, useEffect } from "react";
-import "./../../css/App.css";
-import { Link, Redirect, useHistory } from "react-router-dom";
-import {
-  AppBar,
-  Button,
-  Toolbar,
-  Typography,
-  MenuItem,
-  MenuList,
-  Popper,
-  ClickAwayListener,
-  Paper,
-  Grow,
-} from "@material-ui/core";
+import { React, useState, useRef } from "react";
+import { Link, useHistory } from "react-router-dom";
+import { ClickAwayListener } from "@material-ui/core";
+import AppBar from "@material-ui/core/AppBar";
+import Button from "@material-ui/core/Button";
+import Toolbar from "@material-ui/core/Toolbar";
+import Typography from "@material-ui/core/Typography";
+import MenuItem from "@material-ui/core/MenuItem";
+import MenuList from "@material-ui/core/MenuList";
+import Popper from "@material-ui/core/Popper";
+import Grow from "@material-ui/core/Grow";
+import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
 import { useSelector } from "react-redux";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import { useDispatch } from "react-redux";
 import { Logout } from "../Authorization/TokenData";
+import "./../../css/App.css";
+
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,

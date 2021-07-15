@@ -1,16 +1,14 @@
-import { React, useState, useEffect } from "react";
-import API from "./../../api";
+import { React, useState } from "react";
 import { useSelector } from "react-redux";
 import Carousel from "react-material-ui-carousel";
+import { makeStyles } from "@material-ui/core";
+import Card from "@material-ui/core/Card";
+import CardActionArea from "@material-ui/core/CardActionArea";
+import CardContent from "@material-ui/core/CardContent";
+import CardMedia from "@material-ui/core/CardMedia";
+import Typography from "@material-ui/core/Typography";
 import defaultImage from "./../../img/room.jpg";
-import {
-  Card,
-  makeStyles,
-  CardActionArea,
-  CardContent,
-  CardMedia,
-  Typography,
-} from "@material-ui/core";
+import API from "./../../api";
 import MainReservationDialog from "../Reservation/MainReservationDialog";
 
 const useStyles = makeStyles({
@@ -33,10 +31,8 @@ export default function BaseCard({
 }) {
   const classes = useStyles();
   const [reservationDialogOpen, setReservationDialogOpen] = useState(false);
-  let islogged = useSelector((state) => state.isLogged);
+  const islogged = useSelector((state) => state.isLogged);
   const token = localStorage.getItem("token");
-  console.log(room);
-  console.log(checkOutDate);
 
   function callReservationDialog() {
     console.log(islogged);
@@ -57,6 +53,7 @@ export default function BaseCard({
   function handleCloseReservationDialog() {
     setReservationDialogOpen(false);
   }
+
   return (
     <>
       <Card

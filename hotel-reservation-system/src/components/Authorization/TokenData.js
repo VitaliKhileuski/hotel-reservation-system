@@ -14,10 +14,12 @@ export function FillStorage(token, dispatch) {
   dispatch({ type: NAME, name: jwt.firstname });
   dispatch({ type: ROLE, role: jwt.role });
 }
+
 export function FillLocalStorage(token, refreshToken) {
   localStorage.setItem("token", token);
   localStorage.setItem("refreshToken", refreshToken);
 }
+
 export function Logout(dispatch, history) {
   localStorage.removeItem("refreshToken");
   localStorage.removeItem("token");

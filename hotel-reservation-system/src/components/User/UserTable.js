@@ -1,26 +1,20 @@
 import { React, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { Redirect, useHistory } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
+import Paper from "@material-ui/core/Paper"
+import IconButton from "@material-ui/core/IconButton"
+import Table from "@material-ui/core/Table"
+import TableBody from "@material-ui/core/TableBody"
+import TableCell from "@material-ui/core/TableCell"
+import TableContainer from "@material-ui/core/TableContainer"
+import TableHead from "@material-ui/core/TableHead"
+import TablePagination from "@material-ui/core/TablePagination"
+import TableRow from "@material-ui/core/TableRow"
+import Button from "@material-ui/core/Button"
+import DeleteIcon from "@material-ui/icons/Delete";
+import API from "../../api";
 import BaseDialog from "../shared/BaseDialog";
 import BaseDeleteDialog from "../shared/BaseDeleteDialog";
 import Register from "./../Authorization/Register";
-
-import {
-  Paper,
-  IconButton,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TablePagination,
-  TableRow,
-  Button,
-  Tab,
-} from "@material-ui/core";
-import DeleteIcon from "@material-ui/icons/Delete";
-import API from "../../api";
 
 const useStyles = makeStyles({
   root: {
@@ -43,9 +37,7 @@ export default function UserTable({ hotelId }) {
   const [page, setPage] = useState(0);
   const [pageForRequest, SetPageForRequest] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [openDialog, setOpenDialog] = useState(false);
   const [userId, setUserId] = useState();
-  const [user, setUser] = useState();
   const [addUserDialogOpen, setAddUserDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const form = <Register handleClose={handleCloseAddUserDialog}></Register>;
@@ -104,9 +96,11 @@ export default function UserTable({ hotelId }) {
     setUserId(userId);
     setDeleteDialogOpen(true);
   }
+
   function handleCloseDeleteDialog() {
     setDeleteDialogOpen(false);
   }
+
   function openAddUserDialog() {
     setAddUserDialogOpen(true);
   }

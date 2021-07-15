@@ -2,30 +2,28 @@ import { React, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Redirect, useHistory } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
-import {
-  Paper,
-  IconButton,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TablePagination,
-  TableRow,
-  Button,
-} from "@material-ui/core";
+import Paper from "@material-ui/core/Paper";
+import IconButton from "@material-ui/core/IconButton";
+import Table from "@material-ui/core/Table";
+import TableBody from "@material-ui/core/TableBody";
+import TableCell from "@material-ui/core/TableCell";
+import Button from "@material-ui/core/Button";
+import TableRow from "@material-ui/core/TableRow";
+import TableContainer from "@material-ui/core/TableContainer";
+import TablePagination from "@material-ui/core/TablePagination";
+import TableHead from "@material-ui/core/TableHead";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
+import PersonAddIcon from "@material-ui/icons/PersonAdd";
+import PersonAddDisabledIcon from "@material-ui/icons/PersonAddDisabled";
+import AddPhotoAlternateIcon from "@material-ui/icons/AddPhotoAlternate";
 import API from "./../../api";
 import BaseAlert from "./../shared/BaseAlert";
 import BaseDialog from "../shared/BaseDialog";
-import AddHotelForm from "./AddHotelForm";
 import BaseDeleteDialog from "./../shared/BaseDeleteDialog";
-import PersonAddIcon from "@material-ui/icons/PersonAdd";
-import PersonAddDisabledIcon from "@material-ui/icons/PersonAddDisabled";
-import HotelAdminDialog from "./HotelAdminDialog";
-import AddPhotoAlternateIcon from "@material-ui/icons/AddPhotoAlternate";
 import BaseImageDialog from "../shared/BaseImageDialog";
+import AddHotelForm from "./AddHotelForm";
+import HotelAdminDialog from "./HotelAdminDialog";
 
 const useStyles = makeStyles({
   root: {
@@ -56,7 +54,6 @@ export default function HotelTable() {
   const [flag, setFlag] = useState(false);
   const [message, setMessage] = useState("");
   const [assingFlag, setAssignFlag] = useState(false);
-
   const [alertOpen, setAlertOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertSuccessStatus, setAlertSuccessStatus] = useState(true);
@@ -64,14 +61,14 @@ export default function HotelTable() {
   const isLogged = useSelector((state) => state.isLogged);
   const adminId = useSelector((state) => state.userId);
 
-  let form = (
+  const form = (
     <AddHotelForm
       handleClose={handleClose}
       callAlert={callAlert}
     ></AddHotelForm>
   );
 
-  let component = (
+  const component = (
     <HotelAdminDialog
       hotelId={hotelId}
       message={message}
@@ -167,7 +164,6 @@ export default function HotelTable() {
           callAlert(false);
         });
     };
-
     await DeleteHotel();
     handleCloseDeleteDialog();
   }
@@ -176,6 +172,7 @@ export default function HotelTable() {
     setHotelId(hotelId);
     setOpenDeleteDialog(true);
   }
+
   function toHotelEditor(hotel) {
     history.push({
       pathname: "/hotelEditor",
@@ -184,6 +181,7 @@ export default function HotelTable() {
       },
     });
   }
+
   function callAlert(message, successStatus) {
     setAlertMessage(message);
     setAlertSuccessStatus(successStatus);
@@ -194,6 +192,7 @@ export default function HotelTable() {
     setHotel(hotel);
     setImageDialogOpen(true);
   }
+
   function handleCloseImageDialog() {
     setImageDialogOpen(false);
   }
@@ -330,7 +329,7 @@ export default function HotelTable() {
         <BaseImageDialog
           hotelId={hotel.id}
           open={imageDialogOpen}
-          handleClose={() => handleCloseImageDialog()}
+          handleClose={handleCloseImageDialog}
           imageUrls={hotel.imageUrls}
         ></BaseImageDialog>
       ) : (

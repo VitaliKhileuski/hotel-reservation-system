@@ -1,17 +1,14 @@
-import { React, useState, useEffect } from "react";
+import { React, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import {
-  Button,
-  Typography,
-  Paper,
-  TextField,
-  Checkbox,
-  FormControlLabel,
-  Grid,
-} from "@material-ui/core";
-import { useSelector } from "react-redux";
-import API from "./../../api";
-import { useDispatch } from "react-redux";
+import { useHistory } from "react-router";
+import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
+import Paper from '@material-ui/core/Paper';
+import TextField from '@material-ui/core/TextField';
+import Checkbox from '@material-ui/core/Checkbox';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Grid from '@material-ui/core/Grid';
+import { useSelector, useDispatch } from "react-redux";
 import {
   IS_LOGGED,
   NAME,
@@ -19,8 +16,11 @@ import {
   EMAIL,
   USER_ID,
 } from "./../../storage/actions/actionTypes";
-import { useHistory } from "react-router";
+import API from "./../../api";
 import BaseDialog from "../shared/BaseDialog";
+import { FillStorage,FillLocalStorage } from "../Authorization/TokenData";
+import { EMAIL_REGEX } from "../../constants/Regex";
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -46,6 +46,7 @@ export default function OrderConfirmation({
   checkInDate,
   checkOutDate,
 }) {
+
   const [checked, setChecked] = useState(false);
   const history = useHistory();
   const [email, setEmail] = useState();
@@ -53,7 +54,7 @@ export default function OrderConfirmation({
   const classes = useStyles();
   const dispatch = useDispatch();
   const isLogged = useSelector((state) => state.isLogged);
-  let userEmail = useSelector((state) => state.email);
+  const userEmail = useSelector((state) => state.email);
 
   const [messageDialogOpen, SetMessageDialogOpen] = useState(false);
   const messageForGuest = (
@@ -80,11 +81,10 @@ export default function OrderConfirmation({
       pathname: "/home",
     });
   }
+  
   function validateEmail(email) {
     setEmailErrorLabel("");
-    const emailRegex =
-      /^[\w!#$%&'+-/=?^_`{|}~]+(.[\w!#$%&'+-/=?^_`{|}~]+)*@((([-\w]+.)+[a-zA-Z]{2,4})|(([0-9]{1,3}.){3}[0-9]{1,3}))$/;
-    const flag = emailRegex.test(email);
+    const flag = EMAIL_REGEX.test(email);
     if (!flag) {
       setEmailErrorLabel("invalid email");
     }
@@ -110,15 +110,8 @@ export default function OrderConfirmation({
     await API.post("/account/register", request)
       .then((response) => {
         if (!!response && !!response.data) {
-          localStorage.setItem("token", response.data[0]);
-          localStorage.setItem("refreshToken", response.data[1]);
-          const jwt = JSON.parse(atob(response.data[0].split(".")[1]));
-          dispatch({ type: IS_LOGGED, isLogged: true });
-          dispatch({ type: NAME, name: jwt.firstname });
-          dispatch({ type: ROLE, role: jwt.role });
-          dispatch({ type: USER_ID, userId: jwt.id });
-          dispatch({ type: EMAIL, userId: jwt.email });
-          console.log(response);
+          FillLocalStorage(response.data[0],response.data[1]);
+          FillStorage(response.data[0],dispatch);
         }
       })
       .catch((error) => {
@@ -135,7 +128,7 @@ export default function OrderConfirmation({
       await createUser();
       userEmail = email;
     }
-    const request = {
+    let request = {
       StartDate: checkInDate,
       EndDate: checkOutDate,
       ServiceQuantities: selectedServices,

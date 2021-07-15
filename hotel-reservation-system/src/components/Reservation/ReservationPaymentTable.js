@@ -22,7 +22,7 @@ export default function ReservationPaymentTable({
   checkOutDate,
 }) {
   const classes = useStyles();
-  let numberOfDays = Math.round(
+  const numberOfDays = Math.round(
     Math.abs(checkInDate - checkOutDate) / (1000 * 3600 * 24)
   );
   function ccyFormat(num) {

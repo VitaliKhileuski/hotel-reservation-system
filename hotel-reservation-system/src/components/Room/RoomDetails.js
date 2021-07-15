@@ -1,11 +1,8 @@
-import { React, useEffect, useState } from "react";
-import {
-  GridList,
-  GridListTile,
-  makeStyles,
-  Typography,
-} from "@material-ui/core";
-
+import { React, useState } from "react";
+import { makeStyles } from "@material-ui/core";
+import GridListTile from "@material-ui/core/GridListTile";
+import GridList from "@material-ui/core/GridList";
+import Typography from "@material-ui/core/Typography";
 import BaseDialog from "../shared/BaseDialog";
 
 const useStyles = makeStyles((theme) => ({
@@ -19,8 +16,6 @@ const useStyles = makeStyles((theme) => ({
     width: "60%",
     height: "100%",
   },
-  text: {},
-  dateFilter: {},
 }));
 
 export default function RoomDetails({ room }) {
@@ -31,8 +26,9 @@ export default function RoomDetails({ room }) {
   function closeImageDialog() {
     setImageDialogOpen(false);
   }
+
   function zoomImage(url) {
-    let img = <img src={url}></img>;
+    const img = <img src={url}></img>;
     setElement(img);
     setImageDialogOpen(true);
   }
@@ -51,7 +47,7 @@ export default function RoomDetails({ room }) {
         <Typography>No images</Typography>
       )}
 
-      <div className={classes.text}>
+      <div>
         <Typography variant="h4">room number: {room.roomNumber}</Typography>
         <Typography variant="h4">number of beds: {room.bedsNumber}</Typography>
         <Typography variant="h4">

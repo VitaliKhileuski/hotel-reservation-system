@@ -1,5 +1,5 @@
-import { React, useState, useEffect } from "react";
-import { Button } from "@material-ui/core";
+import { React, useState } from "react";
+import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import TextField from "@material-ui/core/TextField";
 import Grid from "@material-ui/core/Grid";
@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.secondary.main,
   },
   form: {
-    width: "100%", // Fix IE 11 issue.
+    width: "100%",
     marginTop: theme.spacing(1),
   },
   submit: {
@@ -33,7 +33,6 @@ const useStyles = makeStyles((theme) => ({
 
 export default function AddRoomForm({ hotelId, room, handleClose, callAlert }) {
   const classes = useStyles();
-  const [showAlert, setShowAlert] = useState(false);
   const token = localStorage.getItem("token");
 
   const initialValues = {
@@ -48,7 +47,7 @@ export default function AddRoomForm({ hotelId, room, handleClose, callAlert }) {
       BedsNumber: values.bedsNumber,
       PaymentPerDay: values.paymentPerDay,
     };
-    console.log(request.PaymentPerDay);
+
     const CreateRoom = async () => {
       await API.post("/rooms/" + hotelId, request, {
         headers: { Authorization: "Bearer " + token },
@@ -69,7 +68,6 @@ export default function AddRoomForm({ hotelId, room, handleClose, callAlert }) {
       handleClose();
     }
 
-    setShowAlert(true);
   };
 
   const UpdateRoom = async (request) => {

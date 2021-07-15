@@ -1,15 +1,15 @@
 import { React, useEffect, useState } from "react";
 import Grid from "@material-ui/core/Grid";
-import { Typography, Button } from "@material-ui/core";
+import Typography from "@material-ui/core/Typography";
+import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import { makeStyles } from "@material-ui/core/styles";
-import API from "../api";
-import HotelList from "./Hotel/HotelList";
 import Pagination from "@material-ui/lab/Pagination";
-import { Redirect, useHistory } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
+import API from "../api";
 import { CHECK_IN_DATE, CHECK_OUT_DATE } from "../storage/actions/actionTypes";
+import HotelList from "./Hotel/HotelList";
 import DateFilter from "./Filters/DateFilter";
 
 const useStyles = makeStyles((theme) => ({
@@ -38,6 +38,8 @@ export default function Home() {
   const [cities, setCities] = useState([]);
   const [currentCountry, setCurrentCountry] = useState("");
   const [hotels, setHotels] = useState([]);
+  const [hotelNames,setHotelNames] = useState([])
+  const [hotelName,setHotelName] = useState("");
   const [isValidDates, setIsValidDates] = useState(true);
   const [checkInDate, setCheckInDate] = useState(
     useSelector((state) => state.checkInDate)
@@ -48,21 +50,32 @@ export default function Home() {
   const [page, setPage] = useState(1);
   const [maxPage, setMaxPage] = useState(1);
   const pageSize = 8;
-  let userId = useSelector((state) => state.userId);
+  const userId = useSelector((state) => state.userId);
   const dispatch = useDispatch();
-  let token = localStorage.getItem("token");
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
-    const loadCountries = async () => {
-      await API.get("/locations/countries")
-        .then((response) => response.data)
-        .then((data) => {
-          if (!!data) setCountries(data);
-        })
-        .catch((error) => console.log(error));
-    };
     loadCountries();
+    loadHotelNames();
   }, []);
+
+  const loadCountries = async () => {
+    await API.get("/locations/countries")
+      .then((response) => response.data)
+      .then((data) => {
+        if (!!data) setCountries(data);
+      })
+      .catch((error) => console.log(error));
+  };
+
+  const loadHotelNames = async () => {
+    await API.get("/hotels/hotelNames")
+      .then((response) => response.data)
+      .then((data) => {
+        if (!!data) setHotelNames(data);
+      })
+      .catch((error) => console.log(error));
+  };
 
   useEffect(() => {
     const loadCities = async () => {
@@ -97,6 +110,8 @@ export default function Home() {
           currentCountry +
           "&city=" +
           city +
+          "&hotelName=" +
+          hotelName +
           "&PageNumber=" +
           page +
           "&PageSize=" +
@@ -182,6 +197,23 @@ export default function Home() {
               <TextField
                 {...params}
                 label="choose your city"
+                variant="outlined"
+              />
+            )}
+          />
+        </Grid>
+        <Grid>
+          <Typography variant="h6">Find by name</Typography>
+          <Autocomplete
+            id="combo-box-demo2"
+            options={hotelNames}
+            getOptionLabel={(option) => option}
+            onChange={(event, value) => setHotelName(value)}
+            style={{ width: 300 }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="find by name"
                 variant="outlined"
               />
             )}

@@ -1,5 +1,5 @@
 import { React, useState, useEffect } from "react";
-import { Button } from "@material-ui/core";
+import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import TextField from "@material-ui/core/TextField";
 import Grid from "@material-ui/core/Grid";
@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.secondary.main,
   },
   form: {
-    width: "100%", // Fix IE 11 issue.
+    width: "100%",
     marginTop: theme.spacing(1),
   },
   submit: {
@@ -38,6 +38,7 @@ export default function AddHotelForm({
   callUpdateAlert,
   updateMainInfo,
 }) {
+
   const classes = useStyles();
   const token = localStorage.getItem("token");
   const [buildingNumberLabelError, setBuildingNumberLabelError] = useState("");
@@ -98,6 +99,7 @@ export default function AddHotelForm({
         setBuildingNumberLabelError(error.response.data.Message);
       });
   };
+
   function ValidateLocation(buildingNumber) {
     buildingNumber = buildingNumber.trim();
     setBuildingNumberLabelError("");

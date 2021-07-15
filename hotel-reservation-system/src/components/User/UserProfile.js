@@ -1,27 +1,24 @@
 import { React, useState, useEffect } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import profileImage from "./../../img/userProfile.png";
-import { Grid, Typography, Paper, Button } from "@material-ui/core";
-import { display } from "@material-ui/system";
+import Grid from "@material-ui/core/Grid"
+import Typography from "@material-ui/core/Typography"
+import Paper from "@material-ui/core/Paper"
+import Button from "@material-ui/core/Button"
 import { useSelector } from "react-redux";
 import API from "../../api";
+import profileImage from "./../../img/userProfile.png";
 import UpdateUserForm from "./../User/UpdateUserForm";
 import ChangePasswordForm from "./../User/ChangePasswordForm";
 import BaseDialog from "../shared/BaseDialog";
 
-const useStyles = makeStyles({
-  root: {
-    width: "100%",
-  },
-});
+export default function UserProfile() {
 
-export default function UserProfile({}) {
-  const classes = useStyles();
   const userId = useSelector((state) => state.userId);
   const [user, setUser] = useState();
   const token = localStorage.getItem("token");
   const [updateUserDialogOpen, setUpdateUserDialogOpen] = useState(false);
   const [changePasswordDialogOpen, setChangePasswordOpen] = useState(false);
+  const [flagForRerender, setFlagForRerender] = useState(false);
+
   const updateUserForm = (
     <UpdateUserForm
       changeFlag={changeflagForRerender}
@@ -29,13 +26,14 @@ export default function UserProfile({}) {
       user={user}
     ></UpdateUserForm>
   );
+
   const changePasswordForm = (
     <ChangePasswordForm
       user={user}
       handleClose={handlecloseChangePassword}
     ></ChangePasswordForm>
   );
-  const [flagForRerender, setFlagForRerender] = useState(false);
+
   useEffect(async () => {
     const loadUser = async () => {
       await API.get("/users/" + userId, {
@@ -57,6 +55,7 @@ export default function UserProfile({}) {
   function handlecloseUpdateUserDialog() {
     setUpdateUserDialogOpen(false);
   }
+
   function handlecloseChangePassword() {
     setChangePasswordOpen(false);
   }
@@ -68,6 +67,7 @@ export default function UserProfile({}) {
   function editProfile() {
     setUpdateUserDialogOpen(true);
   }
+
   function changePassword() {
     setChangePasswordOpen(true);
   }

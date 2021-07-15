@@ -1,6 +1,6 @@
 import { React } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import { Grid } from "@material-ui/core";
+import Grid from "@material-ui/core/Grid";
 import ReservationPaymentTable from "./ReservationPaymentTable";
 import OrderConfirmation from "./OrderConfirmation";
 
@@ -28,6 +28,7 @@ export default function Payment({
   checkInDate,
   checkOutDate,
 }) {
+
   const classes = useStyles();
 
   return (

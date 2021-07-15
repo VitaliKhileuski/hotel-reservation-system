@@ -35,16 +35,15 @@ export default function BaseStepper({ changeStep, isValidInfo }) {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
   const steps = getSteps();
-  console.log(activeStep);
 
   const handleNext = () => {
-    let step = activeStep + 1;
+    const step = activeStep + 1;
     setActiveStep(activeStep + 1);
     changeStep(step);
   };
 
   const handleBack = () => {
-    let step = activeStep - 1;
+    const step = activeStep - 1;
     setActiveStep(activeStep - 1);
     changeStep(step);
   };

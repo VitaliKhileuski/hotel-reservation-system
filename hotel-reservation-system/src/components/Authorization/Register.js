@@ -9,8 +9,8 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { Formik, Form, ErrorMessage, Field } from "formik";
-import api from "./../../api/";
 import { useDispatch, useSelector } from "react-redux";
+import api from "./../../api/";
 import { REGISTER_VALIDATION_SCHEMA } from "../../constants/ValidationSchemas";
 import { EMAIL_REGEX } from "../../constants/Regex";
 import { FillStorage } from "./TokenData";
@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.secondary.main,
   },
   form: {
-    width: "100%", // Fix IE 11 issue.
+    width: "100%",
     marginTop: theme.spacing(3),
   },
   submit: {
@@ -41,7 +41,7 @@ export default function Register({ handleClose }) {
   const dispatch = useDispatch();
   const [emailErrorLabel, setEmailErrorLabel] = useState("");
   const [email, setEmail] = useState("");
-  let role = useSelector((state) => state.role);
+  const role = useSelector((state) => state.role);
 
   const initialValues = {
     lastName: "",

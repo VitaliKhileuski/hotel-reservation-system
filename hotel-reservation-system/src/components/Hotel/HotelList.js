@@ -1,7 +1,8 @@
-import { React, useEffect, useState } from "react";
-import { Box, Grid, Button } from "@material-ui/core";
-import BaseCard from "./../shared/BaseCard";
+import { React} from "react";
 import { useHistory } from "react-router";
+import Grid from "@material-ui/core/Grid";
+import { Box } from "@material-ui/core";
+import BaseCard from "./../shared/BaseCard";
 
 export default function HotelList({
   toRoomsPage,

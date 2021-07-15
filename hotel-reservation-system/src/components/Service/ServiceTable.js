@@ -1,26 +1,24 @@
 import { React, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import {
-  Paper,
-  IconButton,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TablePagination,
-  TableRow,
-  Button,
-} from "@material-ui/core";
+import Paper from "@material-ui/core/Paper"
+import IconButton from "@material-ui/core/IconButton"
+import Table from "@material-ui/core/Table"
+import TableBody from "@material-ui/core/TableBody"
+import TableCell from "@material-ui/core/TableCell"
+import TableContainer from "@material-ui/core/TableContainer"
+import TableHead from "@material-ui/core/TableHead"
+import TablePagination from "@material-ui/core/TablePagination"
+import TableRow from "@material-ui/core/TableRow"
+import Button from "@material-ui/core/Button"
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
+import AddIcon from "@material-ui/icons/Add";
+import RemoveIcon from "@material-ui/icons/Remove";
 import API from "../../api";
-import AddServiceForm from "./AddServiceForm";
 import BaseAlert from "../shared/BaseAlert";
 import BaseDialog from "../shared/BaseDialog";
 import BaseDeleteDialog from "../shared/BaseDeleteDialog";
-import AddIcon from "@material-ui/icons/Add";
-import RemoveIcon from "@material-ui/icons/Remove";
+import AddServiceForm from "./AddServiceForm";
 
 const useStyles = makeStyles({
   root: {
@@ -47,19 +45,19 @@ export default function ServiceTable({ hotelId, serviceList }) {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [serviceId, setServiceId] = useState(0);
   const [service, setService] = useState();
-
   const [alertOpen, setAlertOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertSuccessStatus, setAlertSuccessStatus] = useState(true);
 
-  let form = (
+  const form = (
     <AddServiceForm
-      handleClose={() => handleClose()}
+      handleClose={handleClose}
       hotelId={hotelId}
       service={service}
       callAlert={callAlert}
     ></AddServiceForm>
   );
+
   useEffect(() => {
     if (hotelId === undefined) {
       setServices(serviceList);
@@ -104,6 +102,7 @@ export default function ServiceTable({ hotelId, serviceList }) {
     setService(service);
     setOpenDialog(true);
   }
+
   function handleClose() {
     setOpenDialog(false);
   }
@@ -118,7 +117,7 @@ export default function ServiceTable({ hotelId, serviceList }) {
   }
 
   function increaseQuantity(service) {
-    let newService = {
+   const newService = {
       id: service.id,
       name: service.name,
       payment: service.payment,
@@ -129,7 +128,7 @@ export default function ServiceTable({ hotelId, serviceList }) {
 
   function reduceQuantity(service) {
     if (service.quantity !== 1) {
-      let newService = {
+      const newService = {
         id: service.id,
         name: service.name,
         payment: service.payment,
@@ -266,7 +265,7 @@ export default function ServiceTable({ hotelId, serviceList }) {
             size="large"
             margin="normal"
             className={classes.createRoomButton}
-            onClick={() => OpenAddServiceDialog()}
+            onClick={OpenAddServiceDialog}
           >
             Create Service
           </Button>
