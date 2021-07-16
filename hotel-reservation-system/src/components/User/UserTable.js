@@ -16,6 +16,7 @@ import BaseDialog from "../shared/BaseDialog";
 import BaseDeleteDialog from "../shared/BaseDeleteDialog";
 import Register from "./../Authorization/Register";
 import UsersFilter from "../Filters/UserFilter";
+import BaseAlert from "../shared/BaseAlert";
 
 const useStyles = makeStyles({
   root: {
@@ -41,6 +42,9 @@ export default function UserTable() {
   const [userId, setUserId] = useState();
   const [addUserDialogOpen, setAddUserDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertSuccessStatus, setAlertSuccessStatus] = useState(true);
   const form = <Register handleClose={handleCloseAddUserDialog}></Register>;
 
   useEffect(() => {
@@ -81,12 +85,31 @@ export default function UserTable() {
     setPage(0);
     SetPageForRequest(1);
   };
+  const handleCloseAlert = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setAlertOpen(false);
+  };
+
+  function callAlert(message, successStatus) {
+    setAlertMessage(message);
+    setAlertSuccessStatus(successStatus);
+    setAlertOpen(true);
+  }
+
 
   async function deleteUser() {
     const DeleteUser = async () => {
       await API.delete("/users/" + userId, {
         headers: { Authorization: "Bearer " + token },
-      }).catch((error) => console.log(error.response.data.message));
+      }).
+      then((response) => response.data)
+      .then((data) => {
+        callAlert("user deleted successfully",true);
+      })
+      .catch((error) => callAlert(false));
     };
     DeleteUser();
     handleCloseDeleteDialog();
@@ -194,6 +217,8 @@ export default function UserTable() {
         form={form}
         handleClose={handleCloseAddUserDialog}
       ></BaseDialog>
+      <BaseAlert message={alertMessage} open={alertOpen} success={alertSuccessStatus} handleClose={handleCloseAlert}>
+      </BaseAlert>
     </>
   );
 }
