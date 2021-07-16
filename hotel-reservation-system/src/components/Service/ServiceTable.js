@@ -1,15 +1,15 @@
 import { React, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import Paper from "@material-ui/core/Paper"
-import IconButton from "@material-ui/core/IconButton"
-import Table from "@material-ui/core/Table"
-import TableBody from "@material-ui/core/TableBody"
-import TableCell from "@material-ui/core/TableCell"
-import TableContainer from "@material-ui/core/TableContainer"
-import TableHead from "@material-ui/core/TableHead"
-import TablePagination from "@material-ui/core/TablePagination"
-import TableRow from "@material-ui/core/TableRow"
-import Button from "@material-ui/core/Button"
+import Paper from "@material-ui/core/Paper";
+import IconButton from "@material-ui/core/IconButton";
+import Table from "@material-ui/core/Table";
+import TableBody from "@material-ui/core/TableBody";
+import TableCell from "@material-ui/core/TableCell";
+import TableContainer from "@material-ui/core/TableContainer";
+import TableHead from "@material-ui/core/TableHead";
+import TablePagination from "@material-ui/core/TablePagination";
+import TableRow from "@material-ui/core/TableRow";
+import Button from "@material-ui/core/Button";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
 import AddIcon from "@material-ui/icons/Add";
@@ -117,7 +117,7 @@ export default function ServiceTable({ hotelId, serviceList }) {
   }
 
   function increaseQuantity(service) {
-   const newService = {
+    const newService = {
       id: service.id,
       name: service.name,
       payment: service.payment,
@@ -170,9 +170,7 @@ export default function ServiceTable({ hotelId, serviceList }) {
         .then((data) => {
           callAlert("service deleted successfully", true);
         })
-        .catch((error) =>
-          callAlert(false)
-        );
+        .catch((error) => callAlert(false));
     };
 
     await DeleteService();

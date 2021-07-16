@@ -56,9 +56,7 @@ export default function AddRoomForm({ hotelId, room, handleClose, callAlert }) {
         .then((data) => {
           callAlert("room added successfully", true);
         })
-        .catch((error) =>
-          callAlert(false)
-        );
+        .catch((error) => callAlert(false));
     };
     if (!!room) {
       await UpdateRoom(request);
@@ -67,7 +65,6 @@ export default function AddRoomForm({ hotelId, room, handleClose, callAlert }) {
       await CreateRoom();
       handleClose();
     }
-
   };
 
   const UpdateRoom = async (request) => {
@@ -78,9 +75,7 @@ export default function AddRoomForm({ hotelId, room, handleClose, callAlert }) {
       .then((data) => {
         callAlert("room updated successfully", true);
       })
-      .catch((error) =>
-        callAlert(false)
-      );
+      .catch((error) => callAlert(false));
   };
 
   return (

@@ -23,15 +23,10 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 export default function BaseDialog({ title, open, handleClose, form }) {
-  
   const classes = useStyles();
 
   return (
-    <Dialog
-      open={open}
-      onClose={handleClose}
-      TransitionComponent={Transition}
-    >
+    <Dialog open={open} onClose={handleClose} TransitionComponent={Transition}>
       <AppBar className={classes.appBar}>
         <Toolbar>
           <Typography variant="h6" className={classes.title}>

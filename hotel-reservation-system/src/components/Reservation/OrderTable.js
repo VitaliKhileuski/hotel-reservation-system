@@ -294,9 +294,7 @@ export default function OrderTable() {
         .then((data) => {
           callAlert("order deleted successfully", true);
         })
-        .catch((error) =>
-          callAlert(false)
-        ); 
+        .catch((error) => callAlert(false));
     };
     DeleteOrder();
     handleCloseDeleteDialog();

@@ -10,7 +10,6 @@ export default function BaseImageDialog({
   handleClose,
   roomId,
 }) {
-
   const [fileObjects, setFileObjects] = useState([]);
   const token = localStorage.getItem("token");
   const [requestFiles, setRequestFiles] = useState([]);

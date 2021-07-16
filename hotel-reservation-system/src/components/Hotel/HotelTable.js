@@ -10,6 +10,7 @@ import TableCell from "@material-ui/core/TableCell";
 import Button from "@material-ui/core/Button";
 import TableRow from "@material-ui/core/TableRow";
 import TableContainer from "@material-ui/core/TableContainer";
+import Grid from "@material-ui/core/Grid";
 import TablePagination from "@material-ui/core/TablePagination";
 import TableHead from "@material-ui/core/TableHead";
 import EditIcon from "@material-ui/icons/Edit";
@@ -24,6 +25,10 @@ import BaseDeleteDialog from "./../shared/BaseDeleteDialog";
 import BaseImageDialog from "../shared/BaseImageDialog";
 import AddHotelForm from "./AddHotelForm";
 import HotelAdminDialog from "./HotelAdminDialog";
+import UserProfile from "../User/UserProfile";
+import UsersFilter from "../Filters/UserFilter";
+import TableSortLabel from "@material-ui/core/TableSortLabel";
+import HotelFilter from "../Filters/HotelFilter";
 
 const useStyles = makeStyles({
   root: {
@@ -34,6 +39,12 @@ const useStyles = makeStyles({
   },
   addHotelButton: {
     marginTop: 30,
+  },
+  grid: {
+    margin: 15,
+    alignSelf: "center",
+    alignContent: "center",
+    justifyContent: "center",
   },
 });
 
@@ -58,6 +69,7 @@ export default function HotelTable() {
   const [alertMessage, setAlertMessage] = useState("");
   const [alertSuccessStatus, setAlertSuccessStatus] = useState(true);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
+  const [hotelName, setHotelName] = useState("");
   const isLogged = useSelector((state) => state.isLogged);
   const adminId = useSelector((state) => state.userId);
 
@@ -79,23 +91,6 @@ export default function HotelTable() {
   );
 
   useEffect(() => {
-    const loadHotels = async () => {
-      await API.get(
-        "/hotels/pages?PageNumber=" +
-          pageForRequest +
-          "&PageSize=" +
-          rowsPerPage,
-        {
-          headers: { Authorization: "Bearer " + token },
-        }
-      )
-        .then((response) => response.data)
-        .then((data) => {
-          setHotels(data.item1);
-          setMaxNumberOfHotels(data.item2);
-        })
-        .catch((error) => console.log(error.response.data.Message));
-    };
     if (openDeleteDialog === false) {
       if (role === "Admin") {
         loadHotels();
@@ -105,6 +100,43 @@ export default function HotelTable() {
       }
     }
   }, [rowsPerPage, page, open, openDeleteDialog]);
+
+  const loadHotels = async (email, surname) => {
+    if (email === null || email === undefined) {
+      email = "";
+    }
+    if (surname === null || surname === undefined) {
+      surname = "";
+    }
+    await API.get(
+      "/hotels/page?" +
+        "userId=" +
+        adminId +
+        "&checkInDate=" +
+        "&checkOutDate=" +
+        "&country=" +
+        "&city=" +
+        "&hotelName=" +
+        hotelName +
+        "&email=" +
+        email +
+        "&surname=" +
+        surname +
+        "&PageNumber=" +
+        page +
+        "&PageSize=" +
+        rowsPerPage,
+      {
+        headers: { Authorization: "Bearer " + token },
+      }
+    )
+      .then((response) => response.data)
+      .then((data) => {
+        setHotels(data.items);
+        setMaxNumberOfHotels(data.numberOfItems);
+      })
+      .catch((error) => {});
+  };
 
   const loadHotelAdminHotels = async () => {
     await API.get(
@@ -215,12 +247,33 @@ export default function HotelTable() {
     setAssignFlag(false);
     setMessage("delete admin");
   }
+  function getValuesFromFilter(email, surname) {
+    loadHotels(email, surname);
+  }
+  function getValueFromHotelFilter(hotelName) {
+    setHotelName(hotelName);
+  }
 
   if (!isLogged || role === "User") {
     return <Redirect to="/home"></Redirect>;
   }
   return (
     <>
+      <Grid
+        className={classes.grid}
+        container
+        direction="row"
+        justifyContent="center"
+        alignItems="center"
+      >
+        <HotelFilter
+          getValuesFromFilter={getValueFromHotelFilter}
+        ></HotelFilter>
+        <UsersFilter
+          getValuesFromFilter={getValuesFromFilter}
+          isHotelAdmins={true}
+        ></UsersFilter>
+      </Grid>
       <Paper className={classes.root}>
         <TableContainer className={classes.container}>
           <Table stickyHeader aria-label="sticky table">
@@ -230,7 +283,7 @@ export default function HotelTable() {
                   Name
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 170 }}>
-                  Country
+                  <TableSortLabel>Country</TableSortLabel>
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 170 }}>
                   City

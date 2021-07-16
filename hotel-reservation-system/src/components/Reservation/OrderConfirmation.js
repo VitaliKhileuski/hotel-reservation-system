@@ -1,13 +1,13 @@
 import { React, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { useHistory } from "react-router";
-import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
-import Paper from '@material-ui/core/Paper';
-import TextField from '@material-ui/core/TextField';
-import Checkbox from '@material-ui/core/Checkbox';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Grid from '@material-ui/core/Grid';
+import Button from "@material-ui/core/Button";
+import Typography from "@material-ui/core/Typography";
+import Paper from "@material-ui/core/Paper";
+import TextField from "@material-ui/core/TextField";
+import Checkbox from "@material-ui/core/Checkbox";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Grid from "@material-ui/core/Grid";
 import { useSelector, useDispatch } from "react-redux";
 import {
   IS_LOGGED,
@@ -18,9 +18,8 @@ import {
 } from "./../../storage/actions/actionTypes";
 import API from "./../../api";
 import BaseDialog from "../shared/BaseDialog";
-import { FillStorage,FillLocalStorage } from "../Authorization/TokenData";
+import { FillStorage, FillLocalStorage } from "../Authorization/TokenData";
 import { EMAIL_REGEX } from "../../constants/Regex";
-
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -46,7 +45,6 @@ export default function OrderConfirmation({
   checkInDate,
   checkOutDate,
 }) {
-
   const [checked, setChecked] = useState(false);
   const history = useHistory();
   const [email, setEmail] = useState();
@@ -81,7 +79,7 @@ export default function OrderConfirmation({
       pathname: "/home",
     });
   }
-  
+
   function validateEmail(email) {
     setEmailErrorLabel("");
     const flag = EMAIL_REGEX.test(email);
@@ -110,8 +108,8 @@ export default function OrderConfirmation({
     await API.post("/account/register", request)
       .then((response) => {
         if (!!response && !!response.data) {
-          FillLocalStorage(response.data[0],response.data[1]);
-          FillStorage(response.data[0],dispatch);
+          FillLocalStorage(response.data[0], response.data[1]);
+          FillStorage(response.data[0], dispatch);
         }
       })
       .catch((error) => {

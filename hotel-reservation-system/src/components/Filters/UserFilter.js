@@ -8,12 +8,17 @@ import API from "./../../api";
 
 const useStyles = makeStyles((theme) => ({
   grid: {
-    margin : 15,
-    alignSelf: "center"
-  }
+    margin: 15,
+    alignSelf: "center",
+    alignContent: "center",
+    justifyContent: "center",
+  },
+  button: {
+    margin: 10,
+  },
 }));
 
-export default function UsersFilter() {
+export default function UsersFilter({ getValuesFromFilter, isHotelAdmins }) {
   const classes = useStyles();
   const [emails, setEmails] = useState([]);
   const [surnames, setSurnames] = useState([]);
@@ -22,8 +27,13 @@ export default function UsersFilter() {
   const token = localStorage.getItem("token");
 
   useEffect(() => {
-   loadEmails();
-   loadSurnames();
+    if (isHotelAdmins) {
+      loadHotelAdminsEmails();
+      loadHotelAdminsSurnames();
+    } else {
+      loadEmails();
+      loadSurnames();
+    }
   }, []);
 
   const loadEmails = async () => {
@@ -46,13 +56,29 @@ export default function UsersFilter() {
       })
       .catch((error) => {});
   };
+  const loadHotelAdminsSurnames = async () => {
+    await API.get("/users/hotelAdminsSurnames", {
+      headers: { Authorization: "Bearer " + token },
+    })
+      .then((response) => response.data)
+      .then((data) => {
+        setSurnames(data);
+      })
+      .catch((error) => {});
+  };
+  const loadHotelAdminsEmails = async () => {
+    await API.get("/users/hotelAdminsEmails", {
+      headers: { Authorization: "Bearer " + token },
+    })
+      .then((response) => response.data)
+      .then((data) => {
+        setEmails(data);
+      })
+      .catch((error) => {});
+  };
 
   return (
-    <Grid container
-    className={classes.grid}
-    direction="row"
-  justifyContent="center"
-  alignItems="center">
+    <>
       <Grid item>
         <Autocomplete
           id="emails"
@@ -60,10 +86,17 @@ export default function UsersFilter() {
           onChange={(event, value) => {
             setEmail(value);
           }}
+          disabled={!!surname ? true : false}
           getOptionLabel={(option) => option}
           style={{ width: 300 }}
           renderInput={(params) => (
-            <TextField {...params} label="find by email" variant="outlined" />
+            <TextField
+              {...params}
+              label={
+                isHotelAdmins ? "find by hotel admin's email" : "find by email"
+              }
+              variant="outlined"
+            />
           )}
         ></Autocomplete>
       </Grid>
@@ -74,19 +107,34 @@ export default function UsersFilter() {
           onChange={(event, value) => {
             setSurname(value);
           }}
+          disabled={!!email ? true : false}
           getOptionLabel={(option) => option}
           style={{ width: 300 }}
           renderInput={(params) => (
-            <TextField {...params} label="find by surname" variant="outlined" />
+            <TextField
+              {...params}
+              label={
+                isHotelAdmins
+                  ? "find by hotel admin's surname"
+                  : "find by surname"
+              }
+              variant="outlined"
+            />
           )}
         ></Autocomplete>
       </Grid>
       <Grid item>
-        <Button variant="contained"
-        color="primary"
-        size="large"
-        margin="normal">Search</Button>
+        <Button
+          variant="contained"
+          onClick={() => getValuesFromFilter(email, surname)}
+          className={classes.button}
+          color="primary"
+          size="large"
+          margin="normal"
+        >
+          Search
+        </Button>
       </Grid>
-    </Grid>
+    </>
   );
 }

@@ -1,8 +1,8 @@
 import { React, useState, useEffect } from "react";
-import Grid from "@material-ui/core/Grid"
-import Typography from "@material-ui/core/Typography"
-import Paper from "@material-ui/core/Paper"
-import Button from "@material-ui/core/Button"
+import Grid from "@material-ui/core/Grid";
+import Typography from "@material-ui/core/Typography";
+import Paper from "@material-ui/core/Paper";
+import Button from "@material-ui/core/Button";
 import { useSelector } from "react-redux";
 import API from "../../api";
 import profileImage from "./../../img/userProfile.png";
@@ -11,7 +11,6 @@ import ChangePasswordForm from "./../User/ChangePasswordForm";
 import BaseDialog from "../shared/BaseDialog";
 
 export default function UserProfile() {
-
   const userId = useSelector((state) => state.userId);
   const [user, setUser] = useState();
   const token = localStorage.getItem("token");

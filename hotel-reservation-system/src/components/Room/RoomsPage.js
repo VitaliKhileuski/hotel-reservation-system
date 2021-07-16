@@ -5,7 +5,6 @@ import { useSelector } from "react-redux";
 import API from "./../../api";
 import RoomList from "./RoomList";
 
-
 const useStyles = makeStyles((theme) => ({
   pagination: {
     "& > * + *": {
@@ -15,7 +14,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function RoomsPage(props) {
-
   const [rooms, setRooms] = useState([]);
   const [hotelId, setHotelId] = useState(props.location.state.hotelId);
   const [checkInDate, setCheckInDate] = useState(

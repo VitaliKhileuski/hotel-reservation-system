@@ -35,7 +35,7 @@ export default function AddServiceForm({
   hotelId,
   service,
   handleClose,
-  callAlert
+  callAlert,
 }) {
   const classes = useStyles();
   const [serviceName, setServiceName] = useState(!!service ? service.name : "");
@@ -60,7 +60,7 @@ export default function AddServiceForm({
         .then((response) => response.data)
         .then((data) => {
           handleClose();
-          callAlert("service added successfully",true);
+          callAlert("service added successfully", true);
         })
         .catch((error) => {
           setServiceNameErrorLabel(error.response.data.Message);
@@ -80,7 +80,7 @@ export default function AddServiceForm({
       .then((response) => response.data)
       .then((data) => {
         handleClose();
-        callAlert("service updated successfully",true);
+        callAlert("service updated successfully", true);
       })
       .catch((error) => {
         console.log(error.response.data.Message);
