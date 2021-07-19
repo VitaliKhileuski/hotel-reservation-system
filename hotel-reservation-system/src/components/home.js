@@ -36,7 +36,7 @@ export default function Home() {
   const [city, setCity] = useState("");
   const [countries, setCountries] = useState([]);
   const [cities, setCities] = useState([]);
-  const [currentCountry, setCurrentCountry] = useState("");
+  const [currentCountry, setCurrentCountry] = useState(null);
   const [hotels, setHotels] = useState([]);
   const [hotelNames, setHotelNames] = useState([]);
   const [hotelName, setHotelName] = useState("");

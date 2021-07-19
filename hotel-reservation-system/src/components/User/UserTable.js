@@ -51,20 +51,22 @@ export default function UserTable() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
+  const [userEmail, setUserEmail] = useState("");
+  const [userSurname, setUserSurname] = useState("");
   const [alertSuccessStatus, setAlertSuccessStatus] = useState(true);
   const form = <Register handleClose={handleCloseAddUserDialog}></Register>;
 
   useEffect(() => {
-    if (
-      deleteDialogOpen === false &&
-      addUserDialogOpen === false &&
-      userId === undefined
-    ) {
+    if (deleteDialogOpen === false && addUserDialogOpen === false) {
       loadUsers();
     }
   }, [rowsPerPage, page, deleteDialogOpen, addUserDialogOpen]);
 
-  const loadUsers = async (email, surname) => {
+  const loadUsers = async (email, surname, flag) => {
+    if (flag === undefined) {
+      email = userEmail;
+      surname = userSurname;
+    }
     if (email === undefined) {
       email = "";
     }
@@ -130,7 +132,7 @@ export default function UserTable() {
         })
         .catch((error) => callAlert(false));
     };
-    DeleteUser();
+    await DeleteUser();
     handleCloseDeleteDialog();
     setUserId(undefined);
   }
@@ -152,9 +154,9 @@ export default function UserTable() {
     setAddUserDialogOpen(false);
   }
   function getValuesFromFilter(email, surname) {
-    console.log(email);
-    console.log(surname);
-    loadUsers(email, surname);
+    setUserEmail(email);
+    setUserSurname(surname);
+    loadUsers(email, surname, true);
   }
 
   return (

@@ -70,6 +70,8 @@ export default function HotelTable() {
   const [alertSuccessStatus, setAlertSuccessStatus] = useState(true);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [hotelName, setHotelName] = useState("");
+  const [hotelAdminEmail, setHotelAdminEmail] = useState("");
+  const [hotelAdminSurname, setHotelAdminSurname] = useState("");
   const isLogged = useSelector((state) => state.isLogged);
   const adminId = useSelector((state) => state.userId);
 
@@ -91,7 +93,7 @@ export default function HotelTable() {
   );
 
   useEffect(() => {
-    if (openDeleteDialog === false) {
+    if (openDeleteDialog === false && open === false) {
       if (role === "Admin") {
         loadHotels();
       }
@@ -101,7 +103,12 @@ export default function HotelTable() {
     }
   }, [rowsPerPage, page, open, openDeleteDialog]);
 
-  const loadHotels = async (email, surname) => {
+  const loadHotels = async (email, surname, flag) => {
+    console.log(flag);
+    if (flag === undefined) {
+      email = hotelAdminEmail;
+      surname = hotelAdminSurname;
+    }
     if (email === null || email === undefined) {
       email = "";
     }
@@ -248,7 +255,9 @@ export default function HotelTable() {
     setMessage("delete admin");
   }
   function getValuesFromFilter(email, surname) {
-    loadHotels(email, surname);
+    setHotelAdminEmail(email);
+    setHotelAdminSurname(surname);
+    loadHotels(email, surname, true);
   }
   function getValueFromHotelFilter(hotelName) {
     setHotelName(hotelName);

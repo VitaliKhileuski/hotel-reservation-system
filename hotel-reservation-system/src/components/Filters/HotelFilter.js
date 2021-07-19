@@ -38,23 +38,23 @@ export default function HotelFilter({ getValuesFromFilter }) {
   };
 
   return (
-      <Grid item>
-        <Autocomplete
-          id="hotelNames"
-          options={hotelNames}
-          onChange={(event, value) => {
-            setHotelName(value);
-          }}
-          getOptionLabel={(option) => option}
-          style={{ width: 300 }}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="find by hotel name"
-              variant="outlined"
-            />
-          )}
-        ></Autocomplete>
-      </Grid>
+    <Grid item>
+      <Autocomplete
+        id="hotelNames"
+        options={hotelNames}
+        onChange={(event, value) => {
+          setHotelName(value);
+        }}
+        getOptionLabel={(option) => option}
+        style={{ width: 300 }}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            label="find by hotel name"
+            variant="outlined"
+          />
+        )}
+      ></Autocomplete>
+    </Grid>
   );
 }

@@ -8,17 +8,21 @@ import API from "./../../api";
 
 const useStyles = makeStyles((theme) => ({
   grid: {
-    margin : 15,
+    margin: 15,
     alignSelf: "center",
     alignContent: "center",
-    justifyContent : "center"
+    justifyContent: "center",
   },
-  button : {
-    margin : 10
-  }
+  button: {
+    margin: 10,
+  },
 }));
 
-  export default function UsersFilter({getValuesFromFilter, getValueFromHotelFilter, isHotelAdmins}) {
+export default function UsersFilter({
+  getValuesFromFilter,
+  getValueFromHotelFilter,
+  isHotelAdmins,
+}) {
   const classes = useStyles();
   const [emails, setEmails] = useState([]);
   const [surnames, setSurnames] = useState([]);
@@ -27,11 +31,10 @@ const useStyles = makeStyles((theme) => ({
   const token = localStorage.getItem("token");
 
   useEffect(() => {
-    if(isHotelAdmins){
+    if (isHotelAdmins) {
       loadHotelAdminsEmails();
       loadHotelAdminsSurnames();
-    }
-    else{
+    } else {
       loadEmails();
       loadSurnames();
     }
@@ -87,11 +90,17 @@ const useStyles = makeStyles((theme) => ({
           onChange={(event, value) => {
             setEmail(value);
           }}
-          disabled ={!!surname ? true : false}
+          disabled={!!surname ? true : false}
           getOptionLabel={(option) => option}
           style={{ width: 300 }}
           renderInput={(params) => (
-            <TextField {...params} label={isHotelAdmins ? "find by hotel admin's email" : "find by email"} variant="outlined" />
+            <TextField
+              {...params}
+              label={
+                isHotelAdmins ? "find by hotel admin's email" : "find by email"
+              }
+              variant="outlined"
+            />
           )}
         ></Autocomplete>
       </Grid>
@@ -102,22 +111,34 @@ const useStyles = makeStyles((theme) => ({
           onChange={(event, value) => {
             setSurname(value);
           }}
-          disabled ={!!email ? true : false}
+          disabled={!!email ? true : false}
           getOptionLabel={(option) => option}
           style={{ width: 300 }}
           renderInput={(params) => (
-            <TextField {...params} label={isHotelAdmins ? "find by hotel admin's surname" : "find by surname"} variant="outlined" />
+            <TextField
+              {...params}
+              label={
+                isHotelAdmins
+                  ? "find by hotel admin's surname"
+                  : "find by surname"
+              }
+              variant="outlined"
+            />
           )}
         ></Autocomplete>
       </Grid>
       <Grid item>
-        <Button variant="contained"
-        onClick={() => getValuesFromFilter(email,surname)}
-        className={classes.button}
-        color="primary"
-        size="large"
-        margin="normal">Search</Button>
+        <Button
+          variant="contained"
+          onClick={() => getValuesFromFilter(email, surname)}
+          className={classes.button}
+          color="primary"
+          size="large"
+          margin="normal"
+        >
+          Search
+        </Button>
       </Grid>
-      </>
+    </>
   );
 }

@@ -20,6 +20,7 @@ import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
 import { useStyles } from "@material-ui/pickers/views/Calendar/SlideTransition";
 import API from "./../../api";
 import BaseDialog from "../shared/BaseDialog";
+import OrderFilter from "../Filters/OrderFilter";
 import RoomDetails from "../Room/RoomDetails";
 import BaseDeleteDialog from "../shared/BaseDeleteDialog";
 import BaseAlert from "../shared/BaseAlert";
@@ -336,6 +337,7 @@ export default function OrderTable() {
   const classes = useStyles();
   return (
     <>
+      <OrderFilter></OrderFilter>
       <TableContainer component={Paper} className={classes.table}>
         <Table aria-label="collapsible table">
           <TableHead>

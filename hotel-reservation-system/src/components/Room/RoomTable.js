@@ -1,6 +1,5 @@
 import { React, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import BaseImageDialog from "../shared/BaseImageDialog";
 import Paper from "@material-ui/core/Paper";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
@@ -13,12 +12,14 @@ import TableHead from "@material-ui/core/TableHead";
 import IconButton from "@material-ui/core/IconButton";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
+import AddPhotoAlternateIcon from "@material-ui/icons/AddPhotoAlternate";
 import API from "../../api";
 import BaseDialog from "../shared/BaseDialog";
-import AddRoomForm from "./AddRoomForm";
 import BaseDeleteDialog from "../shared/BaseDeleteDialog";
+import BaseImageDialog from "../shared/BaseImageDialog";
+import RoomFilter from "../Filters/RoomFilter";
 import BaseAlert from "../shared/BaseAlert";
-import AddPhotoAlternateIcon from "@material-ui/icons/AddPhotoAlternate";
+import AddRoomForm from "./AddRoomForm";
 
 const useStyles = makeStyles({
   root: {
@@ -48,6 +49,7 @@ export default function RoomTable({ hotelId }) {
   const [alertMessage, setAlertMessage] = useState("");
   const [alertSuccessStatus, setAlertSuccessStatus] = useState(true);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
+  const [currentRoomNumber, setCurrentRoomNumber] = useState("");
 
   function callImageDialog(room) {
     setRoomId(room.id);
@@ -71,24 +73,31 @@ export default function RoomTable({ hotelId }) {
   );
 
   useEffect(() => {
-    const loadRooms = async () => {
-      await API.get(
-        "/rooms/" +
-          hotelId +
-          "/?PageNumber=" +
-          pageForRequest +
-          "&PageSize=" +
-          rowsPerPage
-      )
-        .then((response) => response.data)
-        .then((data) => {
-          setRooms(data.items);
-          setMaxNumberOfRooms(data.numberOfItems);
-        })
-        .catch((error) => console.log(error.response.data.message));
-    };
     loadRooms();
   }, [rowsPerPage, page, openDialog, openDeleteDialog]);
+
+  const loadRooms = async (roomNumber, flag) => {
+    if (flag === undefined) {
+      roomNumber = currentRoomNumber;
+    }
+    console.log(roomNumber);
+    await API.get(
+      "/rooms/" +
+        hotelId +
+        "?roomNumber=" +
+        roomNumber +
+        "&PageNumber=" +
+        pageForRequest +
+        "&PageSize=" +
+        rowsPerPage
+    )
+      .then((response) => response.data)
+      .then((data) => {
+        setRooms(data.items);
+        setMaxNumberOfRooms(data.numberOfItems);
+      })
+      .catch((error) => console.log(error.response.data.message));
+  };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -148,8 +157,17 @@ export default function RoomTable({ hotelId }) {
     handleCloseDeleteDialog();
   }
 
+  function getValuesFromFilter(roomNumber) {
+    setCurrentRoomNumber(roomNumber);
+    loadRooms(roomNumber, true);
+  }
+
   return (
     <>
+      <RoomFilter
+        hotelId={hotelId}
+        getValuesFromFilter={getValuesFromFilter}
+      ></RoomFilter>
       <Paper className={classes.root}>
         <TableContainer className={classes.container}>
           <Table stickyHeader aria-label="sticky table">
