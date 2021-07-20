@@ -15,6 +15,7 @@ import TablePagination from "@material-ui/core/TablePagination";
 import TableHead from "@material-ui/core/TableHead";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
+import TableSortLabel from '@material-ui/core/TableSortLabel';
 import PersonAddIcon from "@material-ui/icons/PersonAdd";
 import PersonAddDisabledIcon from "@material-ui/icons/PersonAddDisabled";
 import AddPhotoAlternateIcon from "@material-ui/icons/AddPhotoAlternate";
@@ -25,9 +26,7 @@ import BaseDeleteDialog from "./../shared/BaseDeleteDialog";
 import BaseImageDialog from "../shared/BaseImageDialog";
 import AddHotelForm from "./AddHotelForm";
 import HotelAdminDialog from "./HotelAdminDialog";
-import UserProfile from "../User/UserProfile";
 import UsersFilter from "../Filters/UserFilter";
-import TableSortLabel from "@material-ui/core/TableSortLabel";
 import HotelFilter from "../Filters/HotelFilter";
 
 const useStyles = makeStyles({
@@ -289,19 +288,19 @@ export default function HotelTable() {
             <TableHead>
               <TableRow>
                 <TableCell align="right" style={{ minWidth: 170 }}>
-                  Name
+                <TableSortLabel active={true}>Name</TableSortLabel>
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 170 }}>
                   <TableSortLabel>Country</TableSortLabel>
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 170 }}>
-                  City
+                <TableSortLabel>City</TableSortLabel>
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 170 }}>
-                  Street
+                <TableSortLabel>Street</TableSortLabel>
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 170 }}>
-                  Building Number
+                <TableSortLabel>Building number</TableSortLabel>
                 </TableCell>
                 <TableCell style={{ minWidth: 30 }} />
                 <TableCell style={{ minWidth: 30 }} />

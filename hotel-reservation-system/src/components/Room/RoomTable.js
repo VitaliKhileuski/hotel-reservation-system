@@ -50,12 +50,10 @@ export default function RoomTable({ hotelId }) {
   const [alertSuccessStatus, setAlertSuccessStatus] = useState(true);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [currentRoomNumber, setCurrentRoomNumber] = useState("");
-
+  console.log(hotelId);
   function callImageDialog(room) {
     setRoomId(room.id);
     setRoom(room);
-    console.log(room);
-    console.log(room.imageUrls);
     setImageDialogOpen(true);
   }
 
@@ -111,6 +109,7 @@ export default function RoomTable({ hotelId }) {
   };
 
   function OpenAddRoomDialog(room) {
+    console.log(room);
     setRoom(room);
     setOpenDialog(true);
   }
@@ -234,7 +233,7 @@ export default function RoomTable({ hotelId }) {
         size="large"
         margin="normal"
         className={classes.createRoomButton}
-        onClick={OpenAddRoomDialog}
+        onClick={() => OpenAddRoomDialog()}
       >
         Create room
       </Button>

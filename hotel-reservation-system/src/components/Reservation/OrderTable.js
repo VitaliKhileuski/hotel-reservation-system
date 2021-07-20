@@ -260,31 +260,51 @@ export default function OrderTable() {
   const [maxNumberOfOrders, setMaxNumberOfOrders] = useState(0);
   const [alertOpen, setAlertOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
+  const [hotelCountry, setHotelCountry] = useState("");
+  const [hotelCity, setHotelCity] = useState("");
+  const [currentSurname, setCurrentSurname] = useState("");
   const [alertSuccessStatus, setAlertSuccessStatus] = useState(true);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [orderId, setOrderId] = useState("");
   const token = localStorage.getItem("token");
 
   useEffect(() => {
-    const loadOrders = async () => {
-      await API.get(
-        "/orders?PageNumber=" + pageForRequest + "&PageSize=" + rowsPerPage,
-        {
-          headers: { Authorization: "Bearer " + token },
-        }
-      )
-        .then((response) => response.data)
-        .then((data) => {
-          console.log(data);
-          setOrders(data.items);
-          setMaxNumberOfOrders(data.numberOfItems);
-        })
-        .catch((error) => console.log(error.response.data.Message));
-    };
     if (deleteDialogOpen === false) {
       loadOrders();
     }
   }, [rowsPerPage, page, deleteDialogOpen]);
+
+  const loadOrders = async (country, city, surname, flag) => {
+    if (flag === undefined) {
+      country = hotelCountry;
+      city = hotelCity;
+      surname = currentSurname;
+    }
+
+    await API.get(
+      "/orders?" +
+        "country=" +
+        country +
+        "&city=" +
+        city +
+        "&surname=" +
+        surname +
+        "&PageNumber=" +
+        pageForRequest +
+        "&PageSize=" +
+        rowsPerPage,
+      {
+        headers: { Authorization: "Bearer " + token },
+      }
+    )
+      .then((response) => response.data)
+      .then((data) => {
+        console.log(data);
+        setOrders(data.items);
+        setMaxNumberOfOrders(data.numberOfItems);
+      })
+      .catch((error) => console.log(error.response.data.Message));
+  };
 
   async function deleteOrder() {
     const DeleteOrder = async () => {
@@ -310,9 +330,16 @@ export default function OrderTable() {
   function handleCloseDeleteDialog() {
     setDeleteDialogOpen(false);
   }
+
   function handleClickDeleteIcon(orderId) {
     setOrderId(orderId);
     setDeleteDialogOpen(true);
+  }
+  function getValuesFromFilter(country, city, surname) {
+    setHotelCountry(country);
+    setHotelCity(city);
+    setCurrentSurname(surname);
+    loadOrders(country, city, surname, true);
   }
 
   const handleCloseAlert = (event, reason) => {
@@ -337,7 +364,7 @@ export default function OrderTable() {
   const classes = useStyles();
   return (
     <>
-      <OrderFilter></OrderFilter>
+      <OrderFilter getValuesFromFilter={getValuesFromFilter}></OrderFilter>
       <TableContainer component={Paper} className={classes.table}>
         <Table aria-label="collapsible table">
           <TableHead>

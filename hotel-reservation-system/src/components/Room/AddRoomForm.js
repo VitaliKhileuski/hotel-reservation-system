@@ -34,7 +34,8 @@ const useStyles = makeStyles((theme) => ({
 export default function AddRoomForm({ hotelId, room, handleClose, callAlert }) {
   const classes = useStyles();
   const token = localStorage.getItem("token");
-
+  console.log(hotelId);
+  console.log(room);
   const initialValues = {
     roomNumber: !!room ? room.roomNumber : "",
     bedsNumber: !!room ? room.bedsNumber : "",
@@ -47,7 +48,6 @@ export default function AddRoomForm({ hotelId, room, handleClose, callAlert }) {
       BedsNumber: values.bedsNumber,
       PaymentPerDay: values.paymentPerDay,
     };
-
     const CreateRoom = async () => {
       await API.post("/rooms/" + hotelId, request, {
         headers: { Authorization: "Bearer " + token },
@@ -59,6 +59,7 @@ export default function AddRoomForm({ hotelId, room, handleClose, callAlert }) {
         .catch((error) => callAlert(false));
     };
     if (!!room) {
+      console.log(room);
       await UpdateRoom(request);
       handleClose();
     } else {

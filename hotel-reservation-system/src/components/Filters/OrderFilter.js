@@ -30,6 +30,7 @@ export default function OrderFilter({ getValuesFromFilter }) {
 
   useEffect(() => {
     loadCountries();
+    loadCustomersSurnames();
   }, []);
 
   const loadCountries = async () => {
@@ -37,6 +38,17 @@ export default function OrderFilter({ getValuesFromFilter }) {
       .then((response) => response.data)
       .then((data) => {
         if (!!data) setCountries(data);
+      })
+      .catch((error) => console.log(error));
+  };
+
+  const loadCustomersSurnames = async () => {
+    await API.get("/users/customersSurnames", {
+      headers: { Authorization: "Bearer " + token },
+    })
+      .then((response) => response.data)
+      .then((data) => {
+        if (!!data) setSurnames(data);
       })
       .catch((error) => console.log(error));
   };
@@ -72,7 +84,7 @@ export default function OrderFilter({ getValuesFromFilter }) {
           renderInput={(params) => (
             <TextField
               {...params}
-              label="choose your counrty"
+              label="choose your country"
               variant="outlined"
             />
           )}
@@ -117,6 +129,7 @@ export default function OrderFilter({ getValuesFromFilter }) {
           color="primary"
           size="large"
           margin="normal"
+          onClick={() => getValuesFromFilter(currentCountry, city, surname)}
         >
           Search
         </Button>
