@@ -9,6 +9,7 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import Grid from "@material-ui/core/Grid";
 import TablePagination from "@material-ui/core/TablePagination";
+import TableSortLabel from "@material-ui/core/TableSortLabel";
 import TableRow from "@material-ui/core/TableRow";
 import Button from "@material-ui/core/Button";
 import DeleteIcon from "@material-ui/icons/Delete";
@@ -53,6 +54,8 @@ export default function UserTable() {
   const [alertMessage, setAlertMessage] = useState("");
   const [userEmail, setUserEmail] = useState("");
   const [userSurname, setUserSurname] = useState("");
+  const [currentSortField, setCurrentSortField] = useState("");
+  const [currentAscending, setCurrentAscending] = useState("");
   const [alertSuccessStatus, setAlertSuccessStatus] = useState(true);
   const form = <Register handleClose={handleCloseAddUserDialog}></Register>;
 
@@ -62,7 +65,7 @@ export default function UserTable() {
     }
   }, [rowsPerPage, page, deleteDialogOpen, addUserDialogOpen]);
 
-  const loadUsers = async (email, surname, flag) => {
+  const loadUsers = async (email, surname, flag, sortField, ascending) => {
     if (flag === undefined) {
       email = userEmail;
       surname = userSurname;
@@ -72,6 +75,17 @@ export default function UserTable() {
     }
     if (surname === undefined) {
       surname = "";
+    }
+    if (sortField === null || sortField === undefined) {
+      sortField = currentSortField;
+    }
+    if (ascending === null || ascending === undefined) {
+      ascending = currentAscending;
+    }
+    if (ascending === "asc") {
+      ascending = true;
+    } else {
+      ascending = false;
     }
 
     await API.get(
@@ -83,7 +97,11 @@ export default function UserTable() {
         "&PageNumber=" +
         pageForRequest +
         "&PageSize=" +
-        rowsPerPage,
+        rowsPerPage +
+        "&SortField=" +
+        sortField +
+        "&Ascending=" +
+        ascending,
       {
         headers: { Authorization: "Bearer " + token },
       }
@@ -159,6 +177,19 @@ export default function UserTable() {
     loadUsers(email, surname, true);
   }
 
+  function orderBy(sortField) {
+    setCurrentSortField(sortField);
+    let ascending = "";
+    if (currentAscending === "desc" || sortField !== currentSortField) {
+      setCurrentAscending("asc");
+      ascending = "asc";
+    } else {
+      setCurrentAscending("desc");
+      ascending = "desc";
+    }
+    loadUsers(undefined, undefined, undefined, sortField, ascending);
+  }
+
   return (
     <>
       <Grid
@@ -176,19 +207,49 @@ export default function UserTable() {
             <TableHead>
               <TableRow>
                 <TableCell align="right" style={{ minWidth: 100 }}>
-                  Role
+                  <TableSortLabel
+                    active={currentSortField === "Role.Name" ? true : false}
+                    direction={currentAscending}
+                    onClick={() => orderBy("Role.Name")}
+                  >
+                    Role
+                  </TableSortLabel>
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 150 }}>
-                  Email
+                  <TableSortLabel
+                    active={currentSortField === "Email" ? true : false}
+                    direction={currentAscending}
+                    onClick={() => orderBy("Email")}
+                  >
+                    Email
+                  </TableSortLabel>
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 150 }}>
-                  Name
+                  <TableSortLabel
+                    active={currentSortField === "Name" ? true : false}
+                    direction={currentAscending}
+                    onClick={() => orderBy("Name")}
+                  >
+                    Name
+                  </TableSortLabel>
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 150 }}>
-                  Surname
+                  <TableSortLabel
+                    active={currentSortField === "Surname" ? true : false}
+                    direction={currentAscending}
+                    onClick={() => orderBy("Surname")}
+                  >
+                    Surname
+                  </TableSortLabel>
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 150 }}>
-                  Phone number
+                  <TableSortLabel
+                    active={currentSortField === "PhoneNumber" ? true : false}
+                    direction={currentAscending}
+                    onClick={() => orderBy("PhoneNumber")}
+                  >
+                    Phone number
+                  </TableSortLabel>
                 </TableCell>
                 <TableCell />
               </TableRow>

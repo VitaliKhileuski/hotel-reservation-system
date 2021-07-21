@@ -10,6 +10,7 @@ import TableCell from "@material-ui/core/TableCell";
 import DeleteIcon from "@material-ui/icons/Delete";
 import ZoomInIcon from "@material-ui/icons/ZoomIn";
 import TableContainer from "@material-ui/core/TableContainer";
+import TableSortLabel from "@material-ui/core/TableSortLabel";
 import TablePagination from "@material-ui/core/TablePagination";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
@@ -265,6 +266,8 @@ export default function OrderTable() {
   const [currentSurname, setCurrentSurname] = useState("");
   const [alertSuccessStatus, setAlertSuccessStatus] = useState(true);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [currentSortField, setCurrentSortField] = useState("");
+  const [currentAscending, setCurrentAscending] = useState("asc");
   const [orderId, setOrderId] = useState("");
   const token = localStorage.getItem("token");
 
@@ -274,11 +277,29 @@ export default function OrderTable() {
     }
   }, [rowsPerPage, page, deleteDialogOpen]);
 
-  const loadOrders = async (country, city, surname, flag) => {
+  const loadOrders = async (
+    country,
+    city,
+    surname,
+    flag,
+    sortField,
+    ascending
+  ) => {
     if (flag === undefined) {
       country = hotelCountry;
       city = hotelCity;
       surname = currentSurname;
+    }
+    if (sortField === null || sortField === undefined) {
+      sortField = currentSortField;
+    }
+    if (ascending === null || ascending === undefined) {
+      ascending = currentAscending;
+    }
+    if (ascending === "asc") {
+      ascending = true;
+    } else {
+      ascending = false;
     }
 
     await API.get(
@@ -292,7 +313,11 @@ export default function OrderTable() {
         "&PageNumber=" +
         pageForRequest +
         "&PageSize=" +
-        rowsPerPage,
+        rowsPerPage +
+        "&SortField=" +
+        sortField +
+        "&Ascending=" +
+        ascending,
       {
         headers: { Authorization: "Bearer " + token },
       }
@@ -361,6 +386,26 @@ export default function OrderTable() {
     SetPageForRequest(1);
   };
 
+  function orderBy(sortField) {
+    setCurrentSortField(sortField);
+    let ascending = "";
+    if (currentAscending === "desc" || sortField !== currentSortField) {
+      setCurrentAscending("asc");
+      ascending = "asc";
+    } else {
+      setCurrentAscending("desc");
+      ascending = "desc";
+    }
+    loadOrders(
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      sortField,
+      ascending
+    );
+  }
+
   const classes = useStyles();
   return (
     <>
@@ -374,19 +419,49 @@ export default function OrderTable() {
                 Room
               </TableCell>
               <TableCell align="right" style={{ minWidth: 170 }}>
-                Order date
+                <TableSortLabel
+                  active={currentSortField === "DateOrdered" ? true : false}
+                  direction={currentAscending}
+                  onClick={() => orderBy("DateOrdered")}
+                >
+                  Order date
+                </TableSortLabel>
               </TableCell>
               <TableCell align="right" style={{ minWidth: 170 }}>
-                Check in date
+                <TableSortLabel
+                  active={currentSortField === "StartDate" ? true : false}
+                  direction={currentAscending}
+                  onClick={() => orderBy("StartDate")}
+                >
+                  Check in date
+                </TableSortLabel>
               </TableCell>
               <TableCell align="right" style={{ minWidth: 170 }}>
-                Check out date
+                <TableSortLabel
+                  active={currentSortField === "EndDate" ? true : false}
+                  direction={currentAscending}
+                  onClick={() => orderBy("EndDate")}
+                >
+                  Check out date
+                </TableSortLabel>
               </TableCell>
               <TableCell align="right" style={{ minWidth: 170 }}>
-                Number of days
+                <TableSortLabel
+                  active={currentSortField === "NumberOfDays" ? true : false}
+                  direction={currentAscending}
+                  onClick={() => orderBy("NumberOfDays")}
+                >
+                  Number of days
+                </TableSortLabel>
               </TableCell>
               <TableCell align="right" style={{ minWidth: 170 }}>
-                Full Price
+                <TableSortLabel
+                  active={currentSortField === "FullPrice" ? true : false}
+                  direction={currentAscending}
+                  onClick={() => orderBy("FullPrice")}
+                >
+                  Full price
+                </TableSortLabel>
               </TableCell>
               <TableCell />
             </TableRow>

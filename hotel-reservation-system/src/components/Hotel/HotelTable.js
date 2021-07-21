@@ -15,7 +15,7 @@ import TablePagination from "@material-ui/core/TablePagination";
 import TableHead from "@material-ui/core/TableHead";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
-import TableSortLabel from '@material-ui/core/TableSortLabel';
+import TableSortLabel from "@material-ui/core/TableSortLabel";
 import PersonAddIcon from "@material-ui/icons/PersonAdd";
 import PersonAddDisabledIcon from "@material-ui/icons/PersonAddDisabled";
 import AddPhotoAlternateIcon from "@material-ui/icons/AddPhotoAlternate";
@@ -71,6 +71,8 @@ export default function HotelTable() {
   const [hotelName, setHotelName] = useState("");
   const [hotelAdminEmail, setHotelAdminEmail] = useState("");
   const [hotelAdminSurname, setHotelAdminSurname] = useState("");
+  const [currentSortField, setCurrentSortField] = useState("");
+  const [currentAscending, setCurrentAscending] = useState("asc");
   const isLogged = useSelector((state) => state.isLogged);
   const adminId = useSelector((state) => state.userId);
 
@@ -102,8 +104,8 @@ export default function HotelTable() {
     }
   }, [rowsPerPage, page, open, openDeleteDialog]);
 
-  const loadHotels = async (email, surname, flag) => {
-    console.log(flag);
+  const loadHotels = async (email, surname, flag, sortField, ascending) => {
+    console.log("ascending", ascending);
     if (flag === undefined) {
       email = hotelAdminEmail;
       surname = hotelAdminSurname;
@@ -114,6 +116,18 @@ export default function HotelTable() {
     if (surname === null || surname === undefined) {
       surname = "";
     }
+    if (sortField === null || sortField === undefined) {
+      sortField = currentSortField;
+    }
+    if (ascending === null || ascending === undefined) {
+      ascending = currentAscending;
+    }
+    if (ascending === "asc") {
+      ascending = true;
+    } else {
+      ascending = false;
+    }
+
     await API.get(
       "/hotels/page?" +
         "userId=" +
@@ -129,9 +143,13 @@ export default function HotelTable() {
         "&surname=" +
         surname +
         "&PageNumber=" +
-        page +
+        pageForRequest +
         "&PageSize=" +
-        rowsPerPage,
+        rowsPerPage +
+        "&SortField=" +
+        sortField +
+        "&Ascending=" +
+        ascending,
       {
         headers: { Authorization: "Bearer " + token },
       }
@@ -261,6 +279,18 @@ export default function HotelTable() {
   function getValueFromHotelFilter(hotelName) {
     setHotelName(hotelName);
   }
+  function orderBy(sortField) {
+    setCurrentSortField(sortField);
+    let ascending = "";
+    if (currentAscending === "desc" || sortField !== currentSortField) {
+      setCurrentAscending("asc");
+      ascending = "asc";
+    } else {
+      setCurrentAscending("desc");
+      ascending = "desc";
+    }
+    loadHotels(undefined, undefined, undefined, sortField, ascending);
+  }
 
   if (!isLogged || role === "User") {
     return <Redirect to="/home"></Redirect>;
@@ -288,19 +318,57 @@ export default function HotelTable() {
             <TableHead>
               <TableRow>
                 <TableCell align="right" style={{ minWidth: 170 }}>
-                <TableSortLabel active={true}>Name</TableSortLabel>
+                  <TableSortLabel
+                    active={currentSortField === "Name" ? true : false}
+                    direction={currentAscending}
+                    onClick={() => orderBy("Name")}
+                  >
+                    Name
+                  </TableSortLabel>
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 170 }}>
-                  <TableSortLabel>Country</TableSortLabel>
+                  <TableSortLabel
+                    active={
+                      currentSortField === "Location.Country" ? true : false
+                    }
+                    direction={currentAscending}
+                    onClick={() => orderBy("Location.Country")}
+                  >
+                    Country
+                  </TableSortLabel>
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 170 }}>
-                <TableSortLabel>City</TableSortLabel>
+                  <TableSortLabel
+                    active={currentSortField === "Location.City" ? true : false}
+                    direction={currentAscending}
+                    onClick={() => orderBy("Location.City")}
+                  >
+                    City
+                  </TableSortLabel>
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 170 }}>
-                <TableSortLabel>Street</TableSortLabel>
+                  <TableSortLabel
+                    active={
+                      currentSortField === "Location.Street" ? true : false
+                    }
+                    direction={currentAscending}
+                    onClick={() => orderBy("Location.Street")}
+                  >
+                    Street
+                  </TableSortLabel>
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 170 }}>
-                <TableSortLabel>Building number</TableSortLabel>
+                  <TableSortLabel
+                    active={
+                      currentSortField === "Location.BuildingNumber"
+                        ? true
+                        : false
+                    }
+                    direction={currentAscending}
+                    onClick={() => orderBy("Location.BuildingNumber")}
+                  >
+                    Building number
+                  </TableSortLabel>
                 </TableCell>
                 <TableCell style={{ minWidth: 30 }} />
                 <TableCell style={{ minWidth: 30 }} />
