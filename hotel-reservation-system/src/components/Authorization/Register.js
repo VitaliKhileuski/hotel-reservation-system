@@ -73,8 +73,6 @@ export default function Register({ handleClose }) {
       .catch((error) => {
         if (!!error.response) {
           setEmailErrorLabel(error.response.data.Message);
-          console.log(error.response.data.Message);
-          console.log(error.response.data);
         }
       });
   };

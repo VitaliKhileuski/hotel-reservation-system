@@ -105,72 +105,55 @@ export default function HotelTable() {
   }, [rowsPerPage, page, open, openDeleteDialog]);
 
   const loadHotels = async (email, surname, flag, sortField, ascending) => {
-    console.log("ascending", ascending);
     if (flag === undefined) {
       email = hotelAdminEmail;
       surname = hotelAdminSurname;
-    }
-    if (email === null || email === undefined) {
-      email = "";
-    }
-    if (surname === null || surname === undefined) {
-      surname = "";
-    }
-    if (sortField === null || sortField === undefined) {
-      sortField = currentSortField;
-    }
-    if (ascending === null || ascending === undefined) {
-      ascending = currentAscending;
-    }
-    if (ascending === "asc") {
-      ascending = true;
-    } else {
-      ascending = false;
-    }
 
-    await API.get(
-      "/hotels/page?" +
-        "userId=" +
-        adminId +
-        "&checkInDate=" +
-        "&checkOutDate=" +
-        "&country=" +
-        "&city=" +
-        "&hotelName=" +
-        hotelName +
-        "&email=" +
-        email +
-        "&surname=" +
-        surname +
-        "&PageNumber=" +
-        pageForRequest +
-        "&PageSize=" +
-        rowsPerPage +
-        "&SortField=" +
-        sortField +
-        "&Ascending=" +
-        ascending,
-      {
-        headers: { Authorization: "Bearer " + token },
+      if (sortField === null || sortField === undefined) {
+        sortField = currentSortField;
       }
-    )
-      .then((response) => response.data)
-      .then((data) => {
-        setHotels(data.items);
-        setMaxNumberOfHotels(data.numberOfItems);
-      })
-      .catch((error) => {});
+      if (ascending === null || ascending === undefined) {
+        ascending = currentAscending;
+      }
+      if (ascending === "asc") {
+        ascending = true;
+      } else {
+        ascending = false;
+      }
+      await API.get(
+        "/hotels/page",
+        {
+          params: {
+            UserId: adminId,
+            HotelName: hotelName,
+            Email: email,
+            Surname: surname,
+            PageNumber: pageForRequest,
+            PageSize: rowsPerPage,
+            SortField: sortField,
+            Ascending: ascending,
+          },
+        },
+        {
+          headers: { Authorization: "Bearer " + token },
+        }
+      )
+        .then((response) => response.data)
+        .then((data) => {
+          setHotels(data.items);
+          setMaxNumberOfHotels(data.numberOfItems);
+        })
+        .catch((error) => {});
+    }
   };
 
   const loadHotelAdminHotels = async () => {
-    await API.get(
-      "hotels/hotelAdmin/" +
-        adminId +
-        "/pages?PageNumber=" +
-        pageForRequest +
-        "&PageSize=" +
-        rowsPerPage
-    )
+    await API.get("hotels/hotelAdmin/" + adminId + "/pages", {
+      params: {
+        PageNumber: pageForRequest,
+        PageSize: rowsPerPage,
+      },
+    })
       .then((response) => response.data)
       .then((data) => {
         console.log(data);

@@ -87,21 +87,18 @@ export default function UserTable() {
     } else {
       ascending = false;
     }
-
     await API.get(
-      "/users/" +
-        "?email=" +
-        email +
-        "&surname=" +
-        surname +
-        "&PageNumber=" +
-        pageForRequest +
-        "&PageSize=" +
-        rowsPerPage +
-        "&SortField=" +
-        sortField +
-        "&Ascending=" +
-        ascending,
+      "/users",
+      {
+        params: {
+          Email: undefined,
+          Surname: surname,
+          PageNumber: pageForRequest,
+          PageSize: rowsPerPage,
+          SortField: sortField,
+          Ascending: ascending,
+        },
+      },
       {
         headers: { Authorization: "Bearer " + token },
       }

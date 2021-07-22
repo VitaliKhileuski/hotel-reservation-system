@@ -76,7 +76,6 @@ export default function OrderFilter({ getValuesFromFilter }) {
           id="countries"
           options={countries}
           onChange={(event, value) => {
-            console.log(value);
             setCurrentCountry(value);
           }}
           getOptionLabel={(option) => option}

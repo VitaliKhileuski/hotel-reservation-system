@@ -303,21 +303,18 @@ export default function OrderTable() {
     }
 
     await API.get(
-      "/orders?" +
-        "country=" +
-        country +
-        "&city=" +
-        city +
-        "&surname=" +
-        surname +
-        "&PageNumber=" +
-        pageForRequest +
-        "&PageSize=" +
-        rowsPerPage +
-        "&SortField=" +
-        sortField +
-        "&Ascending=" +
-        ascending,
+      "/orders",
+      {
+        params: {
+          Country: country,
+          City: city,
+          Surname: surname,
+          PageNumber: pageForRequest,
+          PageSize: rowsPerPage,
+          SortField: sortField,
+          Ascending: ascending,
+        },
+      },
       {
         headers: { Authorization: "Bearer " + token },
       }

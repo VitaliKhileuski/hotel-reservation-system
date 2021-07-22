@@ -12,6 +12,7 @@ import TableRow from "@material-ui/core/TableRow";
 import Button from "@material-ui/core/Button";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
+import TableSortLabel from "@material-ui/core/TableSortLabel";
 import AddIcon from "@material-ui/icons/Add";
 import RemoveIcon from "@material-ui/icons/Remove";
 import API from "../../api";
@@ -46,6 +47,8 @@ export default function ServiceTable({ hotelId, serviceList }) {
   const [serviceId, setServiceId] = useState(0);
   const [service, setService] = useState();
   const [alertOpen, setAlertOpen] = useState(false);
+  const [currentSortField, setCurrentSortField] = useState("");
+  const [currentAscending, setCurrentAscending] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
   const [alertSuccessStatus, setAlertSuccessStatus] = useState(true);
 
@@ -66,25 +69,51 @@ export default function ServiceTable({ hotelId, serviceList }) {
 
   useEffect(() => {
     if (!!hotelId) {
-      const loadServices = async () => {
-        await API.get(
-          "/services/" +
-            hotelId +
-            "/pages?PageNumber=" +
-            pageForRequest +
-            "&PageSize=" +
-            rowsPerPage
-        )
-          .then((response) => response.data)
-          .then((data) => {
-            setServices(data.item1);
-            setMaxNumberOfServices(data.item2);
-          })
-          .catch((error) => console.log(error.response.data.message));
-      };
       loadServices();
     }
   }, [rowsPerPage, page, openDialog, openDeleteDialog]);
+
+  const loadServices = async (sortField, ascending) => {
+    if (sortField === null || sortField === undefined) {
+      sortField = currentSortField;
+    }
+    if (ascending === null || ascending === undefined) {
+      ascending = currentAscending;
+    }
+    if (ascending === "asc") {
+      ascending = true;
+    } else {
+      ascending = false;
+    }
+
+    await API.get("/services/" + hotelId + "/pages", {
+      params: {
+        PageNumber: pageForRequest,
+        PageSize: rowsPerPage,
+        SortField: sortField,
+        Ascending: ascending,
+      },
+    })
+      .then((response) => response.data)
+      .then((data) => {
+        setServices(data.items);
+        setMaxNumberOfServices(data.numberOfItems);
+      })
+      .catch((error) => console.log(error.response.data.message));
+  };
+
+  function orderBy(sortField) {
+    setCurrentSortField(sortField);
+    let ascending = "";
+    if (currentAscending === "desc" || sortField !== currentSortField) {
+      setCurrentAscending("asc");
+      ascending = "asc";
+    } else {
+      setCurrentAscending("desc");
+      ascending = "desc";
+    }
+    loadServices(sortField, ascending);
+  }
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -185,10 +214,22 @@ export default function ServiceTable({ hotelId, serviceList }) {
             <TableHead>
               <TableRow>
                 <TableCell align="right" style={{ minWidth: 170 }}>
-                  Name
+                  <TableSortLabel
+                    active={currentSortField === "Name" ? true : false}
+                    direction={currentAscending}
+                    onClick={() => orderBy("Name")}
+                  >
+                    Name
+                  </TableSortLabel>
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 100 }}>
-                  Payment
+                  <TableSortLabel
+                    active={currentSortField === "Payment" ? true : false}
+                    direction={currentAscending}
+                    onClick={() => orderBy("Payment")}
+                  >
+                    Payment
+                  </TableSortLabel>
                 </TableCell>
                 {!!hotelId ? (
                   ""

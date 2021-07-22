@@ -28,15 +28,12 @@ export default function DateFilter({
   const [roomIsOccupiedAlertOpen, setRoomIsOccupiedAlertOpen] = useState(false);
 
   const checkPlace = async (checkIn, checkOut) => {
-    await API.get(
-      "/rooms/" +
-        roomId +
-        "/isEmpty" +
-        "?checkInDate=" +
-        checkIn.toJSON() +
-        "&checkOutDate=" +
-        checkOut.toJSON()
-    )
+    await API.get("/rooms/" + roomId + "/isEmpty", {
+      params: {
+        checkInDate: checkIn.toJSON(),
+        checkOutDate: checkOut.toJSON(),
+      },
+    })
       .then((response) => response.data)
       .then((data) => {
         if (data === false) {

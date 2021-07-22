@@ -98,25 +98,18 @@ export default function Home() {
     dispatch({ type: CHECK_OUT_DATE, checkOutDate: checkOutDate });
 
     const getFilteredHotels = async () => {
-      await API.get(
-        "/hotels/page?" +
-          "userId=" +
-          userId +
-          "&checkInDate=" +
-          checkInDate.toJSON() +
-          "&checkOutDate=" +
-          checkOutDate.toJSON() +
-          "&country=" +
-          currentCountry +
-          "&city=" +
-          city +
-          "&hotelName=" +
-          hotelName +
-          "&PageNumber=" +
-          page +
-          "&PageSize=" +
-          pageSize
-      )
+      await API.get("/hotels/page", {
+        params: {
+          UserId: userId,
+          CheckInDate: checkInDate.toJSON(),
+          CheckOutDate: checkOutDate.toJSON(),
+          Country: currentCountry,
+          City: city,
+          HotelName: hotelName,
+          PageNumber: page,
+          PageSize: pageSize,
+        },
+      })
         .then((response) => response.data)
         .then((data) => {
           setHotels(data.items);

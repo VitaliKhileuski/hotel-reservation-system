@@ -11,10 +11,12 @@ import Button from "@material-ui/core/Button";
 import TableHead from "@material-ui/core/TableHead";
 import IconButton from "@material-ui/core/IconButton";
 import EditIcon from "@material-ui/icons/Edit";
+import { useSelector } from "react-redux";
 import DeleteIcon from "@material-ui/icons/Delete";
 import AddPhotoAlternateIcon from "@material-ui/icons/AddPhotoAlternate";
 import API from "../../api";
 import BaseDialog from "../shared/BaseDialog";
+import TableSortLabel from "@material-ui/core/TableSortLabel";
 import BaseDeleteDialog from "../shared/BaseDeleteDialog";
 import BaseImageDialog from "../shared/BaseImageDialog";
 import RoomFilter from "../Filters/RoomFilter";
@@ -49,8 +51,11 @@ export default function RoomTable({ hotelId }) {
   const [alertMessage, setAlertMessage] = useState("");
   const [alertSuccessStatus, setAlertSuccessStatus] = useState(true);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
+  const [currentSortField, setCurrentSortField] = useState("");
+  const [currentAscending, setCurrentAscending] = useState("");
   const [currentRoomNumber, setCurrentRoomNumber] = useState("");
-  console.log(hotelId);
+  const userId = useSelector((state) => state.userId);
+
   function callImageDialog(room) {
     setRoomId(room.id);
     setRoom(room);
@@ -74,21 +79,34 @@ export default function RoomTable({ hotelId }) {
     loadRooms();
   }, [rowsPerPage, page, openDialog, openDeleteDialog]);
 
-  const loadRooms = async (roomNumber, flag) => {
+  const loadRooms = async (roomNumber, flag, sortField, ascending) => {
     if (flag === undefined) {
       roomNumber = currentRoomNumber;
     }
-    console.log(roomNumber);
-    await API.get(
-      "/rooms/" +
-        hotelId +
-        "?roomNumber=" +
-        roomNumber +
-        "&PageNumber=" +
-        pageForRequest +
-        "&PageSize=" +
-        rowsPerPage
-    )
+
+    if (sortField === null || sortField === undefined) {
+      sortField = currentSortField;
+    }
+
+    if (ascending === null || ascending === undefined) {
+      ascending = currentAscending;
+    }
+
+    if (ascending === "asc") {
+      ascending = true;
+    } else {
+      ascending = false;
+    }
+
+    await API.get("/rooms/" + hotelId + "/" + userId, {
+      params: {
+        RoomNumber: roomNumber,
+        PageNumber: pageForRequest,
+        PageSize: rowsPerPage,
+        SortField: sortField,
+        Ascending: ascending,
+      },
+    })
       .then((response) => response.data)
       .then((data) => {
         setRooms(data.items);
@@ -96,6 +114,19 @@ export default function RoomTable({ hotelId }) {
       })
       .catch((error) => console.log(error.response.data.message));
   };
+
+  function orderBy(sortField) {
+    setCurrentSortField(sortField);
+    let ascending = "";
+    if (currentAscending === "desc" || sortField !== currentSortField) {
+      setCurrentAscending("asc");
+      ascending = "asc";
+    } else {
+      setCurrentAscending("desc");
+      ascending = "desc";
+    }
+    loadRooms(undefined, undefined, sortField, ascending);
+  }
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -173,13 +204,31 @@ export default function RoomTable({ hotelId }) {
             <TableHead>
               <TableRow>
                 <TableCell align="right" style={{ minWidth: 70 }}>
-                  Room number
+                  <TableSortLabel
+                    active={currentSortField === "RoomNumber" ? true : false}
+                    direction={currentAscending}
+                    onClick={() => orderBy("RoomNumber")}
+                  >
+                    Room Number
+                  </TableSortLabel>
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 70 }}>
-                  BedsNumber
+                  <TableSortLabel
+                    active={currentSortField === "BedsNumber" ? true : false}
+                    direction={currentAscending}
+                    onClick={() => orderBy("BedsNumber")}
+                  >
+                    Beds amount
+                  </TableSortLabel>
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 70 }}>
-                  Payment per day
+                  <TableSortLabel
+                    active={currentSortField === "PaymentPerDay" ? true : false}
+                    direction={currentAscending}
+                    onClick={() => orderBy("PaymentPerDay")}
+                  >
+                    Payment per day
+                  </TableSortLabel>
                 </TableCell>
                 <TableCell />
                 <TableCell />

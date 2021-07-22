@@ -9,13 +9,7 @@ import Checkbox from "@material-ui/core/Checkbox";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Grid from "@material-ui/core/Grid";
 import { useSelector, useDispatch } from "react-redux";
-import {
-  IS_LOGGED,
-  NAME,
-  ROLE,
-  EMAIL,
-  USER_ID,
-} from "./../../storage/actions/actionTypes";
+import { EMAIL } from "./../../storage/actions/actionTypes";
 import API from "./../../api";
 import BaseDialog from "../shared/BaseDialog";
 import { FillStorage, FillLocalStorage } from "../Authorization/TokenData";
