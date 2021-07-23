@@ -66,41 +66,28 @@ export default function UserTable() {
   }, [rowsPerPage, page, deleteDialogOpen, addUserDialogOpen]);
 
   const loadUsers = async (email, surname, flag, sortField, ascending) => {
+    let requestEmail = email;
+    let requestSurname = surname;
     if (flag === undefined) {
-      email = userEmail;
-      surname = userSurname;
-    }
-    if (email === undefined) {
-      email = "";
-    }
-    if (surname === undefined) {
-      surname = "";
+      requestEmail = userEmail;
+      requestSurname = userSurname;
     }
     if (sortField === null || sortField === undefined) {
       sortField = currentSortField;
     }
-    if (ascending === null || ascending === undefined) {
-      ascending = currentAscending;
-    }
-    if (ascending === "asc") {
-      ascending = true;
-    } else {
-      ascending = false;
-    }
+    let requestAscending = (ascending || currentAscending) === "asc";
     await API.get(
       "/users",
       {
         params: {
-          Email: undefined,
-          Surname: surname,
-          PageNumber: pageForRequest,
-          PageSize: rowsPerPage,
-          SortField: sortField,
-          Ascending: ascending,
+          Email: requestEmail,
+          Surname : requestSurname,
+          PageNumber : pageForRequest,
+          PageSize : rowsPerPage,
+          SortField : sortField,
+          Ascending : requestAscending
         },
-      },
-      {
-        headers: { Authorization: "Bearer " + token },
+          headers: { Authorization: "Bearer " + token },
       }
     )
       .then((response) => response.data)
@@ -205,7 +192,7 @@ export default function UserTable() {
               <TableRow>
                 <TableCell align="right" style={{ minWidth: 100 }}>
                   <TableSortLabel
-                    active={currentSortField === "Role.Name" ? true : false}
+                    active={currentSortField === "Role.Name"}
                     direction={currentAscending}
                     onClick={() => orderBy("Role.Name")}
                   >
@@ -214,7 +201,7 @@ export default function UserTable() {
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 150 }}>
                   <TableSortLabel
-                    active={currentSortField === "Email" ? true : false}
+                    active={currentSortField === "Email"}
                     direction={currentAscending}
                     onClick={() => orderBy("Email")}
                   >
@@ -223,7 +210,7 @@ export default function UserTable() {
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 150 }}>
                   <TableSortLabel
-                    active={currentSortField === "Name" ? true : false}
+                    active={currentSortField === "Name"}
                     direction={currentAscending}
                     onClick={() => orderBy("Name")}
                   >
@@ -232,7 +219,7 @@ export default function UserTable() {
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 150 }}>
                   <TableSortLabel
-                    active={currentSortField === "Surname" ? true : false}
+                    active={currentSortField === "Surname"}
                     direction={currentAscending}
                     onClick={() => orderBy("Surname")}
                   >
@@ -241,7 +228,7 @@ export default function UserTable() {
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 150 }}>
                   <TableSortLabel
-                    active={currentSortField === "PhoneNumber" ? true : false}
+                    active={currentSortField === "PhoneNumber"}
                     direction={currentAscending}
                     onClick={() => orderBy("PhoneNumber")}
                   >

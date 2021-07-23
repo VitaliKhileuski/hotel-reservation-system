@@ -132,7 +132,7 @@ export default function MainReservationDialog({
       </AppBar>
       {currentComponent}
       <div className={classes.dateFilter}>
-        {flag === true && !!room ? (
+        {flag && !!room ? (
           <DateFilter
             roomId={room.id}
             checkInDate={checkIn}

@@ -80,31 +80,22 @@ export default function RoomTable({ hotelId }) {
   }, [rowsPerPage, page, openDialog, openDeleteDialog]);
 
   const loadRooms = async (roomNumber, flag, sortField, ascending) => {
+    let requestRoomNumber = roomNumber;
     if (flag === undefined) {
-      roomNumber = currentRoomNumber;
+      requestRoomNumber = currentRoomNumber;
     }
 
     if (sortField === null || sortField === undefined) {
       sortField = currentSortField;
     }
-
-    if (ascending === null || ascending === undefined) {
-      ascending = currentAscending;
-    }
-
-    if (ascending === "asc") {
-      ascending = true;
-    } else {
-      ascending = false;
-    }
-
+    let requestAscending = (ascending || currentAscending) === "asc";
     await API.get("/rooms/" + hotelId + "/" + userId, {
       params: {
-        RoomNumber: roomNumber,
+        RoomNumber: requestRoomNumber,
         PageNumber: pageForRequest,
         PageSize: rowsPerPage,
         SortField: sortField,
-        Ascending: ascending,
+        Ascending: requestAscending,
       },
     })
       .then((response) => response.data)
@@ -205,7 +196,7 @@ export default function RoomTable({ hotelId }) {
               <TableRow>
                 <TableCell align="right" style={{ minWidth: 70 }}>
                   <TableSortLabel
-                    active={currentSortField === "RoomNumber" ? true : false}
+                    active={currentSortField === "RoomNumber"}
                     direction={currentAscending}
                     onClick={() => orderBy("RoomNumber")}
                   >
@@ -214,7 +205,7 @@ export default function RoomTable({ hotelId }) {
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 70 }}>
                   <TableSortLabel
-                    active={currentSortField === "BedsNumber" ? true : false}
+                    active={currentSortField === "BedsNumber"}
                     direction={currentAscending}
                     onClick={() => orderBy("BedsNumber")}
                   >
@@ -223,7 +214,7 @@ export default function RoomTable({ hotelId }) {
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 70 }}>
                   <TableSortLabel
-                    active={currentSortField === "PaymentPerDay" ? true : false}
+                    active={currentSortField === "PaymentPerDay"}
                     direction={currentAscending}
                     onClick={() => orderBy("PaymentPerDay")}
                   >

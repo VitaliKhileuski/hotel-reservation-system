@@ -77,21 +77,13 @@ export default function ServiceTable({ hotelId, serviceList }) {
     if (sortField === null || sortField === undefined) {
       sortField = currentSortField;
     }
-    if (ascending === null || ascending === undefined) {
-      ascending = currentAscending;
-    }
-    if (ascending === "asc") {
-      ascending = true;
-    } else {
-      ascending = false;
-    }
-
+    let requestAscending = (ascending || currentAscending) === "asc";
     await API.get("/services/" + hotelId + "/pages", {
       params: {
         PageNumber: pageForRequest,
         PageSize: rowsPerPage,
         SortField: sortField,
-        Ascending: ascending,
+        Ascending: requestAscending,
       },
     })
       .then((response) => response.data)

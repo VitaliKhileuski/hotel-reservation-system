@@ -64,7 +64,7 @@ export default function HotelAdminDialog({
         .catch((error) => console.log(error));
     };
 
-    if (assingFlag === true) {
+    if (assingFlag) {
       loadUsers();
     } else {
       loadAdmins();
@@ -103,7 +103,7 @@ export default function HotelAdminDialog({
     handleClose();
   }
   function actionWithAdmin() {
-    if (assingFlag === true) {
+    if (assingFlag) {
       updateHotelAdmin();
     } else {
       deleteHotelAdmin();

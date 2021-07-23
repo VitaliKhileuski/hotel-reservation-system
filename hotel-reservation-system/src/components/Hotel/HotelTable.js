@@ -105,33 +105,28 @@ export default function HotelTable() {
   }, [rowsPerPage, page, open, openDeleteDialog]);
 
   const loadHotels = async (email, surname, flag, sortField, ascending) => {
+    let requestEmail = email;
+    let requestSurname = surname;
     if (flag === undefined) {
-      email = hotelAdminEmail;
-      surname = hotelAdminSurname;
-
+      requestEmail = hotelAdminEmail;
+      requestSurname = hotelAdminSurname;
+    }
       if (sortField === null || sortField === undefined) {
         sortField = currentSortField;
       }
-      if (ascending === null || ascending === undefined) {
-        ascending = currentAscending;
-      }
-      if (ascending === "asc") {
-        ascending = true;
-      } else {
-        ascending = false;
-      }
+      let requestAscending = (ascending || currentAscending) === "asc";
       await API.get(
         "/hotels/page",
         {
           params: {
             UserId: adminId,
             HotelName: hotelName,
-            Email: email,
-            Surname: surname,
+            Email: requestEmail,
+            Surname: requestSurname,
             PageNumber: pageForRequest,
             PageSize: rowsPerPage,
             SortField: sortField,
-            Ascending: ascending,
+            Ascending: requestAscending,
           },
         },
         {
@@ -144,8 +139,7 @@ export default function HotelTable() {
           setMaxNumberOfHotels(data.numberOfItems);
         })
         .catch((error) => {});
-    }
-  };
+    };
 
   const loadHotelAdminHotels = async () => {
     await API.get("hotels/hotelAdmin/" + adminId + "/pages", {
@@ -255,6 +249,7 @@ export default function HotelTable() {
     setMessage("delete admin");
   }
   function getValuesFromFilter(email, surname) {
+    console.log(email);
     setHotelAdminEmail(email);
     setHotelAdminSurname(surname);
     loadHotels(email, surname, true);
@@ -302,7 +297,7 @@ export default function HotelTable() {
               <TableRow>
                 <TableCell align="right" style={{ minWidth: 170 }}>
                   <TableSortLabel
-                    active={currentSortField === "Name" ? true : false}
+                    active={currentSortField === "Name"}
                     direction={currentAscending}
                     onClick={() => orderBy("Name")}
                   >
@@ -311,9 +306,7 @@ export default function HotelTable() {
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 170 }}>
                   <TableSortLabel
-                    active={
-                      currentSortField === "Location.Country" ? true : false
-                    }
+                    active={ currentSortField === "Location.Country" }
                     direction={currentAscending}
                     onClick={() => orderBy("Location.Country")}
                   >
@@ -322,7 +315,7 @@ export default function HotelTable() {
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 170 }}>
                   <TableSortLabel
-                    active={currentSortField === "Location.City" ? true : false}
+                    active={currentSortField === "Location.City" }
                     direction={currentAscending}
                     onClick={() => orderBy("Location.City")}
                   >
@@ -331,9 +324,7 @@ export default function HotelTable() {
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 170 }}>
                   <TableSortLabel
-                    active={
-                      currentSortField === "Location.Street" ? true : false
-                    }
+                    active={ currentSortField === "Location.Street"}
                     direction={currentAscending}
                     onClick={() => orderBy("Location.Street")}
                   >
@@ -342,11 +333,7 @@ export default function HotelTable() {
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 170 }}>
                   <TableSortLabel
-                    active={
-                      currentSortField === "Location.BuildingNumber"
-                        ? true
-                        : false
-                    }
+                    active={ currentSortField === "Location.BuildingNumber" }
                     direction={currentAscending}
                     onClick={() => orderBy("Location.BuildingNumber")}
                   >
@@ -435,7 +422,7 @@ export default function HotelTable() {
         title="create/update"
         open={open}
         handleClose={handleClose}
-        form={flag === true ? component : form}
+        form={flag ? component : form}
       ></BaseDialog>
       {!!hotel ? (
         <BaseImageDialog

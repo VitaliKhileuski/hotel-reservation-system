@@ -20,7 +20,6 @@ const useStyles = makeStyles((theme) => ({
 
 export default function UsersFilter({
   getValuesFromFilter,
-  getValueFromHotelFilter,
   isHotelAdmins,
 }) {
   const classes = useStyles();
@@ -91,7 +90,6 @@ export default function UsersFilter({
             setEmail(value);
           }}
           disabled={!!surname ? true : false}
-          getOptionLabel={(option) => option}
           style={{ width: 300 }}
           renderInput={(params) => (
             <TextField
@@ -112,7 +110,6 @@ export default function UsersFilter({
             setSurname(value);
           }}
           disabled={!!email ? true : false}
-          getOptionLabel={(option) => option}
           style={{ width: 300 }}
           renderInput={(params) => (
             <TextField

@@ -48,7 +48,6 @@ export default function RoomFilter({ getValuesFromFilter, hotelId }) {
           onChange={(event, value) => {
             setRoomNumber(value);
           }}
-          getOptionLabel={(option) => option}
           style={{ width: 300 }}
           renderInput={(params) => (
             <TextField

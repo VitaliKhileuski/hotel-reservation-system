@@ -25,7 +25,7 @@ export default function BaseImageDialog({
   }, [open]);
 
   useEffect(() => {
-    if (open === true) {
+    if (open) {
       console.log("rerender");
       console.log(fileObjects);
     }
@@ -46,7 +46,7 @@ export default function BaseImageDialog({
     await imageUrls.forEach(async (item) => {
       await GetImage(item);
 
-      if (flag === true) {
+      if (flag) {
         setFlag(false);
       } else {
         setFlag(true);
@@ -74,7 +74,7 @@ export default function BaseImageDialog({
 
           tempImages.push(file);
           setFileObjects(tempImages);
-          if (flag === true) {
+          if (flag) {
             setFlag(false);
           } else {
             setFlag(true);

@@ -36,11 +36,11 @@ export default function DateFilter({
     })
       .then((response) => response.data)
       .then((data) => {
-        if (data === false) {
+        if (data) {
+          isValidInfo(true);
+        } else {
           setRoomIsOccupiedAlertOpen(true);
           isValidInfo(false);
-        } else {
-          isValidInfo(true);
         }
       })
       .catch((error) => console.log(error.response.data.message));
@@ -97,7 +97,7 @@ export default function DateFilter({
         <Typography variant="h6">Check out date</Typography>
         <KeyboardDatePicker
           disableToolbar
-          minDate={new Date(moment(checkIn).add(2, "days")._d)}
+          minDate={moment(checkIn).add(1, "days")._d}
           variant="inline"
           format="MM/dd/yyyy"
           inputVariant="outlined"

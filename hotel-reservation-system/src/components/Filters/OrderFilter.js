@@ -78,7 +78,6 @@ export default function OrderFilter({ getValuesFromFilter }) {
           onChange={(event, value) => {
             setCurrentCountry(value);
           }}
-          getOptionLabel={(option) => option}
           style={{ width: 300 }}
           renderInput={(params) => (
             <TextField
@@ -95,7 +94,7 @@ export default function OrderFilter({ getValuesFromFilter }) {
           options={cities}
           getOptionLabel={(option) => option}
           onChange={(event, value) => setCity(value)}
-          disabled={currentCountry === null ? true : false}
+          disabled={!currentCountry}
           style={{ width: 300 }}
           value={city}
           renderInput={(params) => (

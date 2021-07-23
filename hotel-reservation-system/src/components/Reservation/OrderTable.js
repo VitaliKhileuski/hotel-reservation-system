@@ -285,39 +285,33 @@ export default function OrderTable() {
     sortField,
     ascending
   ) => {
+    let requestCountry = country;
+    let requestCity = city;
+    let requestSurname = surname;
     if (flag === undefined) {
-      country = hotelCountry;
-      city = hotelCity;
-      surname = currentSurname;
+      requestCountry = hotelCountry;
+      requestCity = hotelCity;
+      requestSurname = currentSurname;
     }
     if (sortField === null || sortField === undefined) {
       sortField = currentSortField;
     }
-    if (ascending === null || ascending === undefined) {
-      ascending = currentAscending;
-    }
-    if (ascending === "asc") {
-      ascending = true;
-    } else {
-      ascending = false;
-    }
-
+    let requestAscending = (ascending || currentAscending) === "asc";
     await API.get(
       "/orders",
       {
         params: {
-          Country: country,
-          City: city,
-          Surname: surname,
+          Country: requestCountry,
+          City: requestCity,
+          Surname: requestSurname,
           PageNumber: pageForRequest,
           PageSize: rowsPerPage,
           SortField: sortField,
-          Ascending: ascending,
+          Ascending: requestAscending,
         },
-      },
-      {
         headers: { Authorization: "Bearer " + token },
-      }
+      },
+      
     )
       .then((response) => response.data)
       .then((data) => {
@@ -417,7 +411,7 @@ export default function OrderTable() {
               </TableCell>
               <TableCell align="right" style={{ minWidth: 170 }}>
                 <TableSortLabel
-                  active={currentSortField === "DateOrdered" ? true : false}
+                  active={currentSortField === "DateOrdered"}
                   direction={currentAscending}
                   onClick={() => orderBy("DateOrdered")}
                 >
@@ -426,7 +420,7 @@ export default function OrderTable() {
               </TableCell>
               <TableCell align="right" style={{ minWidth: 170 }}>
                 <TableSortLabel
-                  active={currentSortField === "StartDate" ? true : false}
+                  active={currentSortField === "StartDate"}
                   direction={currentAscending}
                   onClick={() => orderBy("StartDate")}
                 >
@@ -435,7 +429,7 @@ export default function OrderTable() {
               </TableCell>
               <TableCell align="right" style={{ minWidth: 170 }}>
                 <TableSortLabel
-                  active={currentSortField === "EndDate" ? true : false}
+                  active={currentSortField === "EndDate"}
                   direction={currentAscending}
                   onClick={() => orderBy("EndDate")}
                 >
@@ -444,7 +438,7 @@ export default function OrderTable() {
               </TableCell>
               <TableCell align="right" style={{ minWidth: 170 }}>
                 <TableSortLabel
-                  active={currentSortField === "NumberOfDays" ? true : false}
+                  active={currentSortField === "NumberOfDays"}
                   direction={currentAscending}
                   onClick={() => orderBy("NumberOfDays")}
                 >
@@ -453,7 +447,7 @@ export default function OrderTable() {
               </TableCell>
               <TableCell align="right" style={{ minWidth: 170 }}>
                 <TableSortLabel
-                  active={currentSortField === "FullPrice" ? true : false}
+                  active={currentSortField === "FullPrice"}
                   direction={currentAscending}
                   onClick={() => orderBy("FullPrice")}
                 >
