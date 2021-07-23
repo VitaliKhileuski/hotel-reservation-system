@@ -297,22 +297,18 @@ export default function OrderTable() {
       sortField = currentSortField;
     }
     let requestAscending = (ascending || currentAscending) === "asc";
-    await API.get(
-      "/orders",
-      {
-        params: {
-          Country: requestCountry,
-          City: requestCity,
-          Surname: requestSurname,
-          PageNumber: pageForRequest,
-          PageSize: rowsPerPage,
-          SortField: sortField,
-          Ascending: requestAscending,
-        },
-        headers: { Authorization: "Bearer " + token },
+    await API.get("/orders", {
+      params: {
+        Country: requestCountry,
+        City: requestCity,
+        Surname: requestSurname,
+        PageNumber: pageForRequest,
+        PageSize: rowsPerPage,
+        SortField: sortField,
+        Ascending: requestAscending,
       },
-      
-    )
+      headers: { Authorization: "Bearer " + token },
+    })
       .then((response) => response.data)
       .then((data) => {
         console.log(data);

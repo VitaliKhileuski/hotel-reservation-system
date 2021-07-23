@@ -115,7 +115,7 @@ export default function OrderConfirmation({
   };
 
   async function сreateOrder() {
-    if (checked  && emailErrorLabel === "") console.log("email");
+    if (checked && emailErrorLabel === "") console.log("email");
     if (userEmail === "" || userEmail === undefined) {
       await createUser();
       userEmail = email;

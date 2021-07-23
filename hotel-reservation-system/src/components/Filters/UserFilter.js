@@ -18,10 +18,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function UsersFilter({
-  getValuesFromFilter,
-  isHotelAdmins,
-}) {
+export default function UsersFilter({ getValuesFromFilter, isHotelAdmins }) {
   const classes = useStyles();
   const [emails, setEmails] = useState([]);
   const [surnames, setSurnames] = useState([]);

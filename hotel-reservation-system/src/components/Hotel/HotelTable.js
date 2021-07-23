@@ -111,35 +111,35 @@ export default function HotelTable() {
       requestEmail = hotelAdminEmail;
       requestSurname = hotelAdminSurname;
     }
-      if (sortField === null || sortField === undefined) {
-        sortField = currentSortField;
-      }
-      let requestAscending = (ascending || currentAscending) === "asc";
-      await API.get(
-        "/hotels/page",
-        {
-          params: {
-            UserId: adminId,
-            HotelName: hotelName,
-            Email: requestEmail,
-            Surname: requestSurname,
-            PageNumber: pageForRequest,
-            PageSize: rowsPerPage,
-            SortField: sortField,
-            Ascending: requestAscending,
-          },
+    if (sortField === null || sortField === undefined) {
+      sortField = currentSortField;
+    }
+    let requestAscending = (ascending || currentAscending) === "asc";
+    await API.get(
+      "/hotels/page",
+      {
+        params: {
+          UserId: adminId,
+          HotelName: hotelName,
+          Email: requestEmail,
+          Surname: requestSurname,
+          PageNumber: pageForRequest,
+          PageSize: rowsPerPage,
+          SortField: sortField,
+          Ascending: requestAscending,
         },
-        {
-          headers: { Authorization: "Bearer " + token },
-        }
-      )
-        .then((response) => response.data)
-        .then((data) => {
-          setHotels(data.items);
-          setMaxNumberOfHotels(data.numberOfItems);
-        })
-        .catch((error) => {});
-    };
+      },
+      {
+        headers: { Authorization: "Bearer " + token },
+      }
+    )
+      .then((response) => response.data)
+      .then((data) => {
+        setHotels(data.items);
+        setMaxNumberOfHotels(data.numberOfItems);
+      })
+      .catch((error) => {});
+  };
 
   const loadHotelAdminHotels = async () => {
     await API.get("hotels/hotelAdmin/" + adminId + "/pages", {
@@ -151,8 +151,8 @@ export default function HotelTable() {
       .then((response) => response.data)
       .then((data) => {
         console.log(data);
-        setHotels(data.item1);
-        setMaxNumberOfHotels(data.item2);
+        setHotels(data.items);
+        setMaxNumberOfHotels(data.numberOfItems);
       })
       .catch((error) => console.log(error.response.data.Message));
   };
@@ -236,6 +236,7 @@ export default function HotelTable() {
     }
     setAlertOpen(false);
   };
+  
   function SetAdmin(hotelId) {
     setMessage("add admin");
     setFlag(true);
@@ -306,7 +307,7 @@ export default function HotelTable() {
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 170 }}>
                   <TableSortLabel
-                    active={ currentSortField === "Location.Country" }
+                    active={currentSortField === "Location.Country"}
                     direction={currentAscending}
                     onClick={() => orderBy("Location.Country")}
                   >
@@ -315,7 +316,7 @@ export default function HotelTable() {
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 170 }}>
                   <TableSortLabel
-                    active={currentSortField === "Location.City" }
+                    active={currentSortField === "Location.City"}
                     direction={currentAscending}
                     onClick={() => orderBy("Location.City")}
                   >
@@ -324,7 +325,7 @@ export default function HotelTable() {
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 170 }}>
                   <TableSortLabel
-                    active={ currentSortField === "Location.Street"}
+                    active={currentSortField === "Location.Street"}
                     direction={currentAscending}
                     onClick={() => orderBy("Location.Street")}
                   >
@@ -333,7 +334,7 @@ export default function HotelTable() {
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 170 }}>
                   <TableSortLabel
-                    active={ currentSortField === "Location.BuildingNumber" }
+                    active={currentSortField === "Location.BuildingNumber"}
                     direction={currentAscending}
                     onClick={() => orderBy("Location.BuildingNumber")}
                   >

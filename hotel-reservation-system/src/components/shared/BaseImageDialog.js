@@ -16,20 +16,15 @@ export default function BaseImageDialog({
   const [flag, setFlag] = useState(false);
   const [tempImages, setTempImages] = useState([]);
 
+  console.log(open);
+
   useEffect(async () => {
     setTempImages([]);
     setFileObjects([]);
     if (!!imageUrls) {
       await loadImages();
     }
-  }, [open]);
-
-  useEffect(() => {
-    if (open) {
-      console.log("rerender");
-      console.log(fileObjects);
-    }
-  }, [flag]);
+  }, []);
 
   async function saveImages() {
     mapImagesForRequest();
@@ -118,8 +113,6 @@ export default function BaseImageDialog({
         }).catch((error) => console.log(error.response.data.message));
       };
       setImagesToHotel();
-      console.log("file objects save");
-      console.log(fileObjects);
       setFileObjects([]);
       setRequestFiles([]);
       handleClose();

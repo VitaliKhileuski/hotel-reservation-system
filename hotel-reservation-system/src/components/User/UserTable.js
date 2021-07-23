@@ -76,20 +76,17 @@ export default function UserTable() {
       sortField = currentSortField;
     }
     let requestAscending = (ascending || currentAscending) === "asc";
-    await API.get(
-      "/users",
-      {
-        params: {
-          Email: requestEmail,
-          Surname : requestSurname,
-          PageNumber : pageForRequest,
-          PageSize : rowsPerPage,
-          SortField : sortField,
-          Ascending : requestAscending
-        },
-          headers: { Authorization: "Bearer " + token },
-      }
-    )
+    await API.get("/users", {
+      params: {
+        Email: requestEmail,
+        Surname: requestSurname,
+        PageNumber: pageForRequest,
+        PageSize: rowsPerPage,
+        SortField: sortField,
+        Ascending: requestAscending,
+      },
+      headers: { Authorization: "Bearer " + token },
+    })
       .then((response) => response.data)
       .then((data) => {
         setUsers(data.items);
