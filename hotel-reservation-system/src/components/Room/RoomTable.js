@@ -1,24 +1,27 @@
 import { React, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import BaseImageDialog from "../shared/BaseImageDialog";
-import Paper from "@material-ui/core/Paper"
-import Table from "@material-ui/core/Table"
-import TableBody from "@material-ui/core/TableBody"
-import TableCell from "@material-ui/core/TableCell"
-import TableContainer from "@material-ui/core/TableContainer"
-import TablePagination from "@material-ui/core/TablePagination"
-import TableRow from "@material-ui/core/TableRow"
-import Button from "@material-ui/core/Button"
-import TableHead from "@material-ui/core/TableHead"
-import IconButton from "@material-ui/core/IconButton"
+import Paper from "@material-ui/core/Paper";
+import Table from "@material-ui/core/Table";
+import TableBody from "@material-ui/core/TableBody";
+import TableCell from "@material-ui/core/TableCell";
+import TableContainer from "@material-ui/core/TableContainer";
+import TablePagination from "@material-ui/core/TablePagination";
+import TableRow from "@material-ui/core/TableRow";
+import Button from "@material-ui/core/Button";
+import TableHead from "@material-ui/core/TableHead";
+import IconButton from "@material-ui/core/IconButton";
 import EditIcon from "@material-ui/icons/Edit";
+import { useSelector } from "react-redux";
 import DeleteIcon from "@material-ui/icons/Delete";
+import AddPhotoAlternateIcon from "@material-ui/icons/AddPhotoAlternate";
 import API from "../../api";
 import BaseDialog from "../shared/BaseDialog";
-import AddRoomForm from "./AddRoomForm";
+import TableSortLabel from "@material-ui/core/TableSortLabel";
 import BaseDeleteDialog from "../shared/BaseDeleteDialog";
+import BaseImageDialog from "../shared/BaseImageDialog";
+import RoomFilter from "../Filters/RoomFilter";
 import BaseAlert from "../shared/BaseAlert";
-import AddPhotoAlternateIcon from "@material-ui/icons/AddPhotoAlternate";
+import AddRoomForm from "./AddRoomForm";
 
 const useStyles = makeStyles({
   root: {
@@ -48,12 +51,14 @@ export default function RoomTable({ hotelId }) {
   const [alertMessage, setAlertMessage] = useState("");
   const [alertSuccessStatus, setAlertSuccessStatus] = useState(true);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
+  const [currentSortField, setCurrentSortField] = useState("");
+  const [currentAscending, setCurrentAscending] = useState("");
+  const [currentRoomNumber, setCurrentRoomNumber] = useState("");
+  const userId = useSelector((state) => state.userId);
 
   function callImageDialog(room) {
     setRoomId(room.id);
     setRoom(room);
-    console.log(room);
-    console.log(room.imageUrls);
     setImageDialogOpen(true);
   }
 
@@ -71,24 +76,48 @@ export default function RoomTable({ hotelId }) {
   );
 
   useEffect(() => {
-    const loadRooms = async () => {
-      await API.get(
-        "/rooms/" +
-          hotelId +
-          "/?PageNumber=" +
-          pageForRequest +
-          "&PageSize=" +
-          rowsPerPage
-      )
-        .then((response) => response.data)
-        .then((data) => {
-          setRooms(data.items);
-          setMaxNumberOfRooms(data.numberOfItems);
-        })
-        .catch((error) => console.log(error.response.data.message));
-    };
     loadRooms();
   }, [rowsPerPage, page, openDialog, openDeleteDialog]);
+
+  const loadRooms = async (roomNumber, flag, sortField, ascending) => {
+    let requestRoomNumber = roomNumber;
+    if (flag === undefined) {
+      requestRoomNumber = currentRoomNumber;
+    }
+
+    if (sortField === null || sortField === undefined) {
+      sortField = currentSortField;
+    }
+    let requestAscending = (ascending || currentAscending) === "asc";
+    await API.get("/rooms/" + hotelId + "/" + userId, {
+      params: {
+        RoomNumber: requestRoomNumber,
+        PageNumber: pageForRequest,
+        PageSize: rowsPerPage,
+        SortField: sortField,
+        Ascending: requestAscending,
+      },
+    })
+      .then((response) => response.data)
+      .then((data) => {
+        setRooms(data.items);
+        setMaxNumberOfRooms(data.numberOfItems);
+      })
+      .catch((error) => console.log(error.response.data.message));
+  };
+
+  function orderBy(sortField) {
+    setCurrentSortField(sortField);
+    let ascending = "";
+    if (currentAscending === "desc" || sortField !== currentSortField) {
+      setCurrentAscending("asc");
+      ascending = "asc";
+    } else {
+      setCurrentAscending("desc");
+      ascending = "desc";
+    }
+    loadRooms(undefined, undefined, sortField, ascending);
+  }
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -102,6 +131,7 @@ export default function RoomTable({ hotelId }) {
   };
 
   function OpenAddRoomDialog(room) {
+    console.log(room);
     setRoom(room);
     setOpenDialog(true);
   }
@@ -117,7 +147,7 @@ export default function RoomTable({ hotelId }) {
   function handleCloseDeleteDialog() {
     setOpenDeleteDialog(false);
   }
-  
+
   const handleCloseAlert = (event, reason) => {
     if (reason === "clickaway") {
       return;
@@ -141,30 +171,55 @@ export default function RoomTable({ hotelId }) {
         .then((data) => {
           callAlert("room deleted successfully", true);
         })
-        .catch((error) =>
-          callAlert(false)
-        );
+        .catch((error) => callAlert(false));
     };
 
     await DeleteRoom();
     handleCloseDeleteDialog();
   }
 
+  function getValuesFromFilter(roomNumber) {
+    setCurrentRoomNumber(roomNumber);
+    loadRooms(roomNumber, true);
+  }
+
   return (
     <>
+      <RoomFilter
+        hotelId={hotelId}
+        getValuesFromFilter={getValuesFromFilter}
+      ></RoomFilter>
       <Paper className={classes.root}>
         <TableContainer className={classes.container}>
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>
                 <TableCell align="right" style={{ minWidth: 70 }}>
-                  Room number
+                  <TableSortLabel
+                    active={currentSortField === "RoomNumber"}
+                    direction={currentAscending}
+                    onClick={() => orderBy("RoomNumber")}
+                  >
+                    Room Number
+                  </TableSortLabel>
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 70 }}>
-                  BedsNumber
+                  <TableSortLabel
+                    active={currentSortField === "BedsNumber"}
+                    direction={currentAscending}
+                    onClick={() => orderBy("BedsNumber")}
+                  >
+                    Beds amount
+                  </TableSortLabel>
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 70 }}>
-                  Payment per day
+                  <TableSortLabel
+                    active={currentSortField === "PaymentPerDay"}
+                    direction={currentAscending}
+                    onClick={() => orderBy("PaymentPerDay")}
+                  >
+                    Payment per day
+                  </TableSortLabel>
                 </TableCell>
                 <TableCell />
                 <TableCell />
@@ -218,7 +273,7 @@ export default function RoomTable({ hotelId }) {
         size="large"
         margin="normal"
         className={classes.createRoomButton}
-        onClick={OpenAddRoomDialog}
+        onClick={() => OpenAddRoomDialog()}
       >
         Create room
       </Button>

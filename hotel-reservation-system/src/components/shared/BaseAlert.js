@@ -9,10 +9,7 @@ function Alert(props) {
 export default function BaseAlert({ open, handleClose, message, success }) {
   return (
     <Snackbar open={open} autoHideDuration={5000} onClose={handleClose}>
-      <Alert
-        onClose={handleClose}
-        severity={success ? "success" : "error"}
-      >
+      <Alert onClose={handleClose} severity={success ? "success" : "error"}>
         {success ? message : "Something went wrong. Please, try again"}
       </Alert>
     </Snackbar>

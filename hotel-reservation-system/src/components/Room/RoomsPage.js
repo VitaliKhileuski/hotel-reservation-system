@@ -5,7 +5,6 @@ import { useSelector } from "react-redux";
 import API from "./../../api";
 import RoomList from "./RoomList";
 
-
 const useStyles = makeStyles((theme) => ({
   pagination: {
     "& > * + *": {
@@ -15,7 +14,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function RoomsPage(props) {
-
   const [rooms, setRooms] = useState([]);
   const [hotelId, setHotelId] = useState(props.location.state.hotelId);
   const [checkInDate, setCheckInDate] = useState(
@@ -33,20 +31,14 @@ export default function RoomsPage(props) {
 
   useEffect(() => {
     const loadRooms = async () => {
-      await API.get(
-        "/rooms/" +
-          hotelId +
-          "?userId=" +
-          userId +
-          "&checkInDate=" +
-          checkInDate.toJSON() +
-          "&checkOutDate=" +
-          checkOutDate.toJSON() +
-          "&PageNumber=" +
-          page +
-          "&PageSize=" +
-          pageSize
-      )
+      await API.get("/rooms/" + hotelId + "/" + userId, {
+        params: {
+          CheckInDate: checkInDate.toJSON(),
+          CheckOutDate: checkOutDate.toJSON(),
+          PageNumber: page,
+          PageSize: pageSize,
+        },
+      })
         .then((response) => response.data)
         .then((data) => {
           console.log(data);

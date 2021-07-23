@@ -39,12 +39,9 @@ export default function NavBar() {
   const classes = useStyles();
   const isLogged = useSelector((state) => state.isLogged);
   const role = useSelector((state) => state.role);
-
   const name = useSelector((state) => state.name);
-  useSelector((state) => console.log(state));
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen);
-    console.log(role);
   };
   const handleClose = (event) => {
     if (anchorRef.current && anchorRef.current.contains(event.target)) {

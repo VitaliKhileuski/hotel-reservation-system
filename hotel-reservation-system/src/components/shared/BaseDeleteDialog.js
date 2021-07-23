@@ -13,7 +13,6 @@ export default function BaseDeleteDialog({
   handleCloseDeleteDialog,
   title,
 }) {
-
   return (
     <Dialog
       open={open}

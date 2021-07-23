@@ -1,20 +1,24 @@
 import { React, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import Paper from "@material-ui/core/Paper"
-import IconButton from "@material-ui/core/IconButton"
-import Table from "@material-ui/core/Table"
-import TableBody from "@material-ui/core/TableBody"
-import TableCell from "@material-ui/core/TableCell"
-import TableContainer from "@material-ui/core/TableContainer"
-import TableHead from "@material-ui/core/TableHead"
-import TablePagination from "@material-ui/core/TablePagination"
-import TableRow from "@material-ui/core/TableRow"
-import Button from "@material-ui/core/Button"
+import Paper from "@material-ui/core/Paper";
+import IconButton from "@material-ui/core/IconButton";
+import Table from "@material-ui/core/Table";
+import TableBody from "@material-ui/core/TableBody";
+import TableCell from "@material-ui/core/TableCell";
+import TableContainer from "@material-ui/core/TableContainer";
+import TableHead from "@material-ui/core/TableHead";
+import Grid from "@material-ui/core/Grid";
+import TablePagination from "@material-ui/core/TablePagination";
+import TableSortLabel from "@material-ui/core/TableSortLabel";
+import TableRow from "@material-ui/core/TableRow";
+import Button from "@material-ui/core/Button";
 import DeleteIcon from "@material-ui/icons/Delete";
 import API from "../../api";
 import BaseDialog from "../shared/BaseDialog";
 import BaseDeleteDialog from "../shared/BaseDeleteDialog";
 import Register from "./../Authorization/Register";
+import UsersFilter from "../Filters/UserFilter";
+import BaseAlert from "../shared/BaseAlert";
 
 const useStyles = makeStyles({
   root: {
@@ -27,9 +31,15 @@ const useStyles = makeStyles({
   addButton: {
     marginTop: 30,
   },
+  grid: {
+    margin: 15,
+    alignSelf: "center",
+    alignContent: "center",
+    justifyContent: "center",
+  },
 });
 
-export default function UserTable({ hotelId }) {
+export default function UserTable() {
   const token = localStorage.getItem("token");
   const [users, setUsers] = useState([]);
   const [maxNumberOfUsers, setMaxNumberOfUsers] = useState(0);
@@ -40,35 +50,53 @@ export default function UserTable({ hotelId }) {
   const [userId, setUserId] = useState();
   const [addUserDialogOpen, setAddUserDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [userEmail, setUserEmail] = useState("");
+  const [userSurname, setUserSurname] = useState("");
+  const [currentSortField, setCurrentSortField] = useState("");
+  const [currentAscending, setCurrentAscending] = useState("");
+  const [alertSuccessStatus, setAlertSuccessStatus] = useState(true);
   const form = <Register handleClose={handleCloseAddUserDialog}></Register>;
 
   useEffect(() => {
-    const loadUsers = async () => {
-      await API.get(
-        "/users/" +
-          "?PageNumber=" +
-          pageForRequest +
-          "&PageSize=" +
-          rowsPerPage,
-        {
-          headers: { Authorization: "Bearer " + token },
-        }
-      )
-        .then((response) => response.data)
-        .then((data) => {
-          setUsers(data.items);
-          setMaxNumberOfUsers(data.numberOfItems);
-        })
-        .catch((error) => console.log(error.response.data.message));
-    };
-    if (
-      deleteDialogOpen === false &&
-      addUserDialogOpen === false &&
-      userId === undefined
-    ) {
+    if (deleteDialogOpen === false && addUserDialogOpen === false) {
       loadUsers();
     }
   }, [rowsPerPage, page, deleteDialogOpen, addUserDialogOpen]);
+
+  const loadUsers = async (email, surname, flag, sortField, ascending) => {
+    let requestEmail = email;
+    let requestSurname = surname;
+    if (flag === undefined) {
+      requestEmail = userEmail;
+      requestSurname = userSurname;
+    }
+    if (sortField === null || sortField === undefined) {
+      sortField = currentSortField;
+    }
+    let requestAscending = (ascending || currentAscending) === "asc";
+    await API.get(
+      "/users",
+      {
+        params: {
+          Email: requestEmail,
+          Surname : requestSurname,
+          PageNumber : pageForRequest,
+          PageSize : rowsPerPage,
+          SortField : sortField,
+          Ascending : requestAscending
+        },
+          headers: { Authorization: "Bearer " + token },
+      }
+    )
+      .then((response) => response.data)
+      .then((data) => {
+        setUsers(data.items);
+        setMaxNumberOfUsers(data.numberOfItems);
+      })
+      .catch((error) => console.log(error.response.data.message));
+  };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -81,13 +109,32 @@ export default function UserTable({ hotelId }) {
     SetPageForRequest(1);
   };
 
+  const handleCloseAlert = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setAlertOpen(false);
+  };
+
+  function callAlert(message, successStatus) {
+    setAlertMessage(message);
+    setAlertSuccessStatus(successStatus);
+    setAlertOpen(true);
+  }
+
   async function deleteUser() {
     const DeleteUser = async () => {
       await API.delete("/users/" + userId, {
         headers: { Authorization: "Bearer " + token },
-      }).catch((error) => console.log(error.response.data.message));
+      })
+        .then((response) => response.data)
+        .then((data) => {
+          callAlert("user deleted successfully", true);
+        })
+        .catch((error) => callAlert(false));
     };
-    DeleteUser();
+    await DeleteUser();
     handleCloseDeleteDialog();
     setUserId(undefined);
   }
@@ -108,28 +155,85 @@ export default function UserTable({ hotelId }) {
   function handleCloseAddUserDialog() {
     setAddUserDialogOpen(false);
   }
+  function getValuesFromFilter(email, surname) {
+    setUserEmail(email);
+    setUserSurname(surname);
+    loadUsers(email, surname, true);
+  }
+
+  function orderBy(sortField) {
+    setCurrentSortField(sortField);
+    let ascending = "";
+    if (currentAscending === "desc" || sortField !== currentSortField) {
+      setCurrentAscending("asc");
+      ascending = "asc";
+    } else {
+      setCurrentAscending("desc");
+      ascending = "desc";
+    }
+    loadUsers(undefined, undefined, undefined, sortField, ascending);
+  }
 
   return (
     <>
+      <Grid
+        container
+        className={classes.grid}
+        direction="row"
+        justifyContent="center"
+        alignItems="center"
+      >
+        <UsersFilter getValuesFromFilter={getValuesFromFilter}></UsersFilter>
+      </Grid>
       <Paper className={classes.root}>
         <TableContainer className={classes.container}>
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>
                 <TableCell align="right" style={{ minWidth: 100 }}>
-                  Role
+                  <TableSortLabel
+                    active={currentSortField === "Role.Name"}
+                    direction={currentAscending}
+                    onClick={() => orderBy("Role.Name")}
+                  >
+                    Role
+                  </TableSortLabel>
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 150 }}>
-                  Email
+                  <TableSortLabel
+                    active={currentSortField === "Email"}
+                    direction={currentAscending}
+                    onClick={() => orderBy("Email")}
+                  >
+                    Email
+                  </TableSortLabel>
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 150 }}>
-                  Name
+                  <TableSortLabel
+                    active={currentSortField === "Name"}
+                    direction={currentAscending}
+                    onClick={() => orderBy("Name")}
+                  >
+                    Name
+                  </TableSortLabel>
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 150 }}>
-                  Surname
+                  <TableSortLabel
+                    active={currentSortField === "Surname"}
+                    direction={currentAscending}
+                    onClick={() => orderBy("Surname")}
+                  >
+                    Surname
+                  </TableSortLabel>
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 150 }}>
-                  Phone number
+                  <TableSortLabel
+                    active={currentSortField === "PhoneNumber"}
+                    direction={currentAscending}
+                    onClick={() => orderBy("PhoneNumber")}
+                  >
+                    Phone number
+                  </TableSortLabel>
                 </TableCell>
                 <TableCell />
               </TableRow>
@@ -192,6 +296,12 @@ export default function UserTable({ hotelId }) {
         form={form}
         handleClose={handleCloseAddUserDialog}
       ></BaseDialog>
+      <BaseAlert
+        message={alertMessage}
+        open={alertOpen}
+        success={alertSuccessStatus}
+        handleClose={handleCloseAlert}
+      ></BaseAlert>
     </>
   );
 }

@@ -36,7 +36,6 @@ export default function HotelAdminDialog({
   callAlert,
   assingFlag,
 }) {
-
   const classes = useStyles();
   const [users, setUsers] = useState([]);
   const [admin, setAdmin] = useState();
@@ -65,7 +64,7 @@ export default function HotelAdminDialog({
         .catch((error) => console.log(error));
     };
 
-    if (assingFlag === true) {
+    if (assingFlag) {
       loadUsers();
     } else {
       loadAdmins();
@@ -80,9 +79,7 @@ export default function HotelAdminDialog({
       .then((data) => {
         callAlert("hotel admin assigned successfully", true);
       })
-      .catch((error) =>
-        callAlert(false)
-      );
+      .catch((error) => callAlert(false));
   };
 
   const DeleteHotelAdmin = async () => {
@@ -93,9 +90,7 @@ export default function HotelAdminDialog({
       .then((data) => {
         callAlert("hotel admin deleted successfully", true);
       })
-      .catch((error) =>
-        callAlert(false)
-      );
+      .catch((error) => callAlert(false));
   };
 
   function updateHotelAdmin() {
@@ -108,7 +103,7 @@ export default function HotelAdminDialog({
     handleClose();
   }
   function actionWithAdmin() {
-    if (assingFlag === true) {
+    if (assingFlag) {
       updateHotelAdmin();
     } else {
       deleteHotelAdmin();

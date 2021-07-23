@@ -22,7 +22,6 @@ export default function ServiceChoice({
   oldSelectedServices,
   getSelectedServices,
 }) {
-
   const classes = useStyles();
   const [services, setServices] = useState([]);
   const [selectedServices, setSelectedServices] = useState(oldSelectedServices);

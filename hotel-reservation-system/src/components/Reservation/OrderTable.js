@@ -10,6 +10,7 @@ import TableCell from "@material-ui/core/TableCell";
 import DeleteIcon from "@material-ui/icons/Delete";
 import ZoomInIcon from "@material-ui/icons/ZoomIn";
 import TableContainer from "@material-ui/core/TableContainer";
+import TableSortLabel from "@material-ui/core/TableSortLabel";
 import TablePagination from "@material-ui/core/TablePagination";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
@@ -20,6 +21,7 @@ import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
 import { useStyles } from "@material-ui/pickers/views/Calendar/SlideTransition";
 import API from "./../../api";
 import BaseDialog from "../shared/BaseDialog";
+import OrderFilter from "../Filters/OrderFilter";
 import RoomDetails from "../Room/RoomDetails";
 import BaseDeleteDialog from "../shared/BaseDeleteDialog";
 import BaseAlert from "../shared/BaseAlert";
@@ -259,31 +261,66 @@ export default function OrderTable() {
   const [maxNumberOfOrders, setMaxNumberOfOrders] = useState(0);
   const [alertOpen, setAlertOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
+  const [hotelCountry, setHotelCountry] = useState("");
+  const [hotelCity, setHotelCity] = useState("");
+  const [currentSurname, setCurrentSurname] = useState("");
   const [alertSuccessStatus, setAlertSuccessStatus] = useState(true);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [currentSortField, setCurrentSortField] = useState("");
+  const [currentAscending, setCurrentAscending] = useState("asc");
   const [orderId, setOrderId] = useState("");
   const token = localStorage.getItem("token");
 
   useEffect(() => {
-    const loadOrders = async () => {
-      await API.get(
-        "/orders?PageNumber=" + pageForRequest + "&PageSize=" + rowsPerPage,
-        {
-          headers: { Authorization: "Bearer " + token },
-        }
-      )
-        .then((response) => response.data)
-        .then((data) => {
-          console.log(data);
-          setOrders(data.items);
-          setMaxNumberOfOrders(data.numberOfItems);
-        })
-        .catch((error) => console.log(error.response.data.Message));
-    };
     if (deleteDialogOpen === false) {
       loadOrders();
     }
   }, [rowsPerPage, page, deleteDialogOpen]);
+
+  const loadOrders = async (
+    country,
+    city,
+    surname,
+    flag,
+    sortField,
+    ascending
+  ) => {
+    let requestCountry = country;
+    let requestCity = city;
+    let requestSurname = surname;
+    if (flag === undefined) {
+      requestCountry = hotelCountry;
+      requestCity = hotelCity;
+      requestSurname = currentSurname;
+    }
+    if (sortField === null || sortField === undefined) {
+      sortField = currentSortField;
+    }
+    let requestAscending = (ascending || currentAscending) === "asc";
+    await API.get(
+      "/orders",
+      {
+        params: {
+          Country: requestCountry,
+          City: requestCity,
+          Surname: requestSurname,
+          PageNumber: pageForRequest,
+          PageSize: rowsPerPage,
+          SortField: sortField,
+          Ascending: requestAscending,
+        },
+        headers: { Authorization: "Bearer " + token },
+      },
+      
+    )
+      .then((response) => response.data)
+      .then((data) => {
+        console.log(data);
+        setOrders(data.items);
+        setMaxNumberOfOrders(data.numberOfItems);
+      })
+      .catch((error) => console.log(error.response.data.Message));
+  };
 
   async function deleteOrder() {
     const DeleteOrder = async () => {
@@ -294,9 +331,7 @@ export default function OrderTable() {
         .then((data) => {
           callAlert("order deleted successfully", true);
         })
-        .catch((error) =>
-          callAlert(false)
-        ); 
+        .catch((error) => callAlert(false));
     };
     DeleteOrder();
     handleCloseDeleteDialog();
@@ -311,9 +346,16 @@ export default function OrderTable() {
   function handleCloseDeleteDialog() {
     setDeleteDialogOpen(false);
   }
+
   function handleClickDeleteIcon(orderId) {
     setOrderId(orderId);
     setDeleteDialogOpen(true);
+  }
+  function getValuesFromFilter(country, city, surname) {
+    setHotelCountry(country);
+    setHotelCity(city);
+    setCurrentSurname(surname);
+    loadOrders(country, city, surname, true);
   }
 
   const handleCloseAlert = (event, reason) => {
@@ -335,9 +377,30 @@ export default function OrderTable() {
     SetPageForRequest(1);
   };
 
+  function orderBy(sortField) {
+    setCurrentSortField(sortField);
+    let ascending = "";
+    if (currentAscending === "desc" || sortField !== currentSortField) {
+      setCurrentAscending("asc");
+      ascending = "asc";
+    } else {
+      setCurrentAscending("desc");
+      ascending = "desc";
+    }
+    loadOrders(
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      sortField,
+      ascending
+    );
+  }
+
   const classes = useStyles();
   return (
     <>
+      <OrderFilter getValuesFromFilter={getValuesFromFilter}></OrderFilter>
       <TableContainer component={Paper} className={classes.table}>
         <Table aria-label="collapsible table">
           <TableHead>
@@ -347,19 +410,49 @@ export default function OrderTable() {
                 Room
               </TableCell>
               <TableCell align="right" style={{ minWidth: 170 }}>
-                Order date
+                <TableSortLabel
+                  active={currentSortField === "DateOrdered"}
+                  direction={currentAscending}
+                  onClick={() => orderBy("DateOrdered")}
+                >
+                  Order date
+                </TableSortLabel>
               </TableCell>
               <TableCell align="right" style={{ minWidth: 170 }}>
-                Check in date
+                <TableSortLabel
+                  active={currentSortField === "StartDate"}
+                  direction={currentAscending}
+                  onClick={() => orderBy("StartDate")}
+                >
+                  Check in date
+                </TableSortLabel>
               </TableCell>
               <TableCell align="right" style={{ minWidth: 170 }}>
-                Check out date
+                <TableSortLabel
+                  active={currentSortField === "EndDate"}
+                  direction={currentAscending}
+                  onClick={() => orderBy("EndDate")}
+                >
+                  Check out date
+                </TableSortLabel>
               </TableCell>
               <TableCell align="right" style={{ minWidth: 170 }}>
-                Number of days
+                <TableSortLabel
+                  active={currentSortField === "NumberOfDays"}
+                  direction={currentAscending}
+                  onClick={() => orderBy("NumberOfDays")}
+                >
+                  Number of days
+                </TableSortLabel>
               </TableCell>
               <TableCell align="right" style={{ minWidth: 170 }}>
-                Full Price
+                <TableSortLabel
+                  active={currentSortField === "FullPrice"}
+                  direction={currentAscending}
+                  onClick={() => orderBy("FullPrice")}
+                >
+                  Full price
+                </TableSortLabel>
               </TableCell>
               <TableCell />
             </TableRow>

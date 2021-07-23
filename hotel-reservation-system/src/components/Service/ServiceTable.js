@@ -1,17 +1,18 @@
 import { React, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import Paper from "@material-ui/core/Paper"
-import IconButton from "@material-ui/core/IconButton"
-import Table from "@material-ui/core/Table"
-import TableBody from "@material-ui/core/TableBody"
-import TableCell from "@material-ui/core/TableCell"
-import TableContainer from "@material-ui/core/TableContainer"
-import TableHead from "@material-ui/core/TableHead"
-import TablePagination from "@material-ui/core/TablePagination"
-import TableRow from "@material-ui/core/TableRow"
-import Button from "@material-ui/core/Button"
+import Paper from "@material-ui/core/Paper";
+import IconButton from "@material-ui/core/IconButton";
+import Table from "@material-ui/core/Table";
+import TableBody from "@material-ui/core/TableBody";
+import TableCell from "@material-ui/core/TableCell";
+import TableContainer from "@material-ui/core/TableContainer";
+import TableHead from "@material-ui/core/TableHead";
+import TablePagination from "@material-ui/core/TablePagination";
+import TableRow from "@material-ui/core/TableRow";
+import Button from "@material-ui/core/Button";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
+import TableSortLabel from "@material-ui/core/TableSortLabel";
 import AddIcon from "@material-ui/icons/Add";
 import RemoveIcon from "@material-ui/icons/Remove";
 import API from "../../api";
@@ -46,6 +47,8 @@ export default function ServiceTable({ hotelId, serviceList }) {
   const [serviceId, setServiceId] = useState(0);
   const [service, setService] = useState();
   const [alertOpen, setAlertOpen] = useState(false);
+  const [currentSortField, setCurrentSortField] = useState("");
+  const [currentAscending, setCurrentAscending] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
   const [alertSuccessStatus, setAlertSuccessStatus] = useState(true);
 
@@ -66,25 +69,43 @@ export default function ServiceTable({ hotelId, serviceList }) {
 
   useEffect(() => {
     if (!!hotelId) {
-      const loadServices = async () => {
-        await API.get(
-          "/services/" +
-            hotelId +
-            "/pages?PageNumber=" +
-            pageForRequest +
-            "&PageSize=" +
-            rowsPerPage
-        )
-          .then((response) => response.data)
-          .then((data) => {
-            setServices(data.item1);
-            setMaxNumberOfServices(data.item2);
-          })
-          .catch((error) => console.log(error.response.data.message));
-      };
       loadServices();
     }
   }, [rowsPerPage, page, openDialog, openDeleteDialog]);
+
+  const loadServices = async (sortField, ascending) => {
+    if (sortField === null || sortField === undefined) {
+      sortField = currentSortField;
+    }
+    let requestAscending = (ascending || currentAscending) === "asc";
+    await API.get("/services/" + hotelId + "/pages", {
+      params: {
+        PageNumber: pageForRequest,
+        PageSize: rowsPerPage,
+        SortField: sortField,
+        Ascending: requestAscending,
+      },
+    })
+      .then((response) => response.data)
+      .then((data) => {
+        setServices(data.items);
+        setMaxNumberOfServices(data.numberOfItems);
+      })
+      .catch((error) => console.log(error.response.data.message));
+  };
+
+  function orderBy(sortField) {
+    setCurrentSortField(sortField);
+    let ascending = "";
+    if (currentAscending === "desc" || sortField !== currentSortField) {
+      setCurrentAscending("asc");
+      ascending = "asc";
+    } else {
+      setCurrentAscending("desc");
+      ascending = "desc";
+    }
+    loadServices(sortField, ascending);
+  }
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -117,7 +138,7 @@ export default function ServiceTable({ hotelId, serviceList }) {
   }
 
   function increaseQuantity(service) {
-   const newService = {
+    const newService = {
       id: service.id,
       name: service.name,
       payment: service.payment,
@@ -170,9 +191,7 @@ export default function ServiceTable({ hotelId, serviceList }) {
         .then((data) => {
           callAlert("service deleted successfully", true);
         })
-        .catch((error) =>
-          callAlert(false)
-        );
+        .catch((error) => callAlert(false));
     };
 
     await DeleteService();
@@ -187,10 +206,22 @@ export default function ServiceTable({ hotelId, serviceList }) {
             <TableHead>
               <TableRow>
                 <TableCell align="right" style={{ minWidth: 170 }}>
-                  Name
+                  <TableSortLabel
+                    active={currentSortField === "Name" ? true : false}
+                    direction={currentAscending}
+                    onClick={() => orderBy("Name")}
+                  >
+                    Name
+                  </TableSortLabel>
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 100 }}>
-                  Payment
+                  <TableSortLabel
+                    active={currentSortField === "Payment" ? true : false}
+                    direction={currentAscending}
+                    onClick={() => orderBy("Payment")}
+                  >
+                    Payment
+                  </TableSortLabel>
                 </TableCell>
                 {!!hotelId ? (
                   ""

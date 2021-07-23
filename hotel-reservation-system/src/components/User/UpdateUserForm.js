@@ -9,13 +9,9 @@ import Container from "@material-ui/core/Container";
 import { Formik, Form, ErrorMessage, Field } from "formik";
 import api from "./../../api/";
 import { useDispatch } from "react-redux";
-import {
-  NAME,
-  EMAIL,
-} from "../../storage/actions/actionTypes.js";
+import { NAME, EMAIL } from "../../storage/actions/actionTypes.js";
 import { UPDATE_USER_VALIDATION_SCHEMA } from "../../constants/ValidationSchemas";
 import { EMAIL_REGEX } from "../../constants/Regex";
-
 
 const useStyles = makeStyles((theme) => ({
   paper: {

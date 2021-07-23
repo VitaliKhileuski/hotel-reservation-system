@@ -85,7 +85,6 @@ export default function Login() {
     API.post("/account/login", request)
       .then((response) => {
         if (!!response && !!response.data) {
-          console.log("asdfasdf");
           FillLocalStorage(response.data[0], response.data[1]);
           FillStorage(response.data[0], dispatch);
         }

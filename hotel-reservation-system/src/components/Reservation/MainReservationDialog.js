@@ -38,7 +38,6 @@ export default function MainReservationDialog({
   checkInDate,
   checkOutDate,
 }) {
-
   const [flag, setFlag] = useState(true);
   const [selectedServices, setSelectedServices] = useState([]);
   const [checkIn, setCheckIn] = useState(checkInDate);
@@ -133,7 +132,7 @@ export default function MainReservationDialog({
       </AppBar>
       {currentComponent}
       <div className={classes.dateFilter}>
-        {flag === true && !!room ? (
+        {flag && !!room ? (
           <DateFilter
             roomId={room.id}
             checkInDate={checkIn}

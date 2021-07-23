@@ -10,10 +10,12 @@ import TableCell from "@material-ui/core/TableCell";
 import Button from "@material-ui/core/Button";
 import TableRow from "@material-ui/core/TableRow";
 import TableContainer from "@material-ui/core/TableContainer";
+import Grid from "@material-ui/core/Grid";
 import TablePagination from "@material-ui/core/TablePagination";
 import TableHead from "@material-ui/core/TableHead";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
+import TableSortLabel from "@material-ui/core/TableSortLabel";
 import PersonAddIcon from "@material-ui/icons/PersonAdd";
 import PersonAddDisabledIcon from "@material-ui/icons/PersonAddDisabled";
 import AddPhotoAlternateIcon from "@material-ui/icons/AddPhotoAlternate";
@@ -24,6 +26,8 @@ import BaseDeleteDialog from "./../shared/BaseDeleteDialog";
 import BaseImageDialog from "../shared/BaseImageDialog";
 import AddHotelForm from "./AddHotelForm";
 import HotelAdminDialog from "./HotelAdminDialog";
+import UsersFilter from "../Filters/UserFilter";
+import HotelFilter from "../Filters/HotelFilter";
 
 const useStyles = makeStyles({
   root: {
@@ -34,6 +38,12 @@ const useStyles = makeStyles({
   },
   addHotelButton: {
     marginTop: 30,
+  },
+  grid: {
+    margin: 15,
+    alignSelf: "center",
+    alignContent: "center",
+    justifyContent: "center",
   },
 });
 
@@ -58,6 +68,11 @@ export default function HotelTable() {
   const [alertMessage, setAlertMessage] = useState("");
   const [alertSuccessStatus, setAlertSuccessStatus] = useState(true);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
+  const [hotelName, setHotelName] = useState("");
+  const [hotelAdminEmail, setHotelAdminEmail] = useState("");
+  const [hotelAdminSurname, setHotelAdminSurname] = useState("");
+  const [currentSortField, setCurrentSortField] = useState("");
+  const [currentAscending, setCurrentAscending] = useState("asc");
   const isLogged = useSelector((state) => state.isLogged);
   const adminId = useSelector((state) => state.userId);
 
@@ -79,24 +94,7 @@ export default function HotelTable() {
   );
 
   useEffect(() => {
-    const loadHotels = async () => {
-      await API.get(
-        "/hotels/pages?PageNumber=" +
-          pageForRequest +
-          "&PageSize=" +
-          rowsPerPage,
-        {
-          headers: { Authorization: "Bearer " + token },
-        }
-      )
-        .then((response) => response.data)
-        .then((data) => {
-          setHotels(data.item1);
-          setMaxNumberOfHotels(data.item2);
-        })
-        .catch((error) => console.log(error.response.data.Message));
-    };
-    if (openDeleteDialog === false) {
+    if (openDeleteDialog === false && open === false) {
       if (role === "Admin") {
         loadHotels();
       }
@@ -106,15 +104,50 @@ export default function HotelTable() {
     }
   }, [rowsPerPage, page, open, openDeleteDialog]);
 
+  const loadHotels = async (email, surname, flag, sortField, ascending) => {
+    let requestEmail = email;
+    let requestSurname = surname;
+    if (flag === undefined) {
+      requestEmail = hotelAdminEmail;
+      requestSurname = hotelAdminSurname;
+    }
+      if (sortField === null || sortField === undefined) {
+        sortField = currentSortField;
+      }
+      let requestAscending = (ascending || currentAscending) === "asc";
+      await API.get(
+        "/hotels/page",
+        {
+          params: {
+            UserId: adminId,
+            HotelName: hotelName,
+            Email: requestEmail,
+            Surname: requestSurname,
+            PageNumber: pageForRequest,
+            PageSize: rowsPerPage,
+            SortField: sortField,
+            Ascending: requestAscending,
+          },
+        },
+        {
+          headers: { Authorization: "Bearer " + token },
+        }
+      )
+        .then((response) => response.data)
+        .then((data) => {
+          setHotels(data.items);
+          setMaxNumberOfHotels(data.numberOfItems);
+        })
+        .catch((error) => {});
+    };
+
   const loadHotelAdminHotels = async () => {
-    await API.get(
-      "hotels/hotelAdmin/" +
-        adminId +
-        "/pages?PageNumber=" +
-        pageForRequest +
-        "&PageSize=" +
-        rowsPerPage
-    )
+    await API.get("hotels/hotelAdmin/" + adminId + "/pages", {
+      params: {
+        PageNumber: pageForRequest,
+        PageSize: rowsPerPage,
+      },
+    })
       .then((response) => response.data)
       .then((data) => {
         console.log(data);
@@ -215,31 +248,97 @@ export default function HotelTable() {
     setAssignFlag(false);
     setMessage("delete admin");
   }
+  function getValuesFromFilter(email, surname) {
+    console.log(email);
+    setHotelAdminEmail(email);
+    setHotelAdminSurname(surname);
+    loadHotels(email, surname, true);
+  }
+  function getValueFromHotelFilter(hotelName) {
+    setHotelName(hotelName);
+  }
+  function orderBy(sortField) {
+    setCurrentSortField(sortField);
+    let ascending = "";
+    if (currentAscending === "desc" || sortField !== currentSortField) {
+      setCurrentAscending("asc");
+      ascending = "asc";
+    } else {
+      setCurrentAscending("desc");
+      ascending = "desc";
+    }
+    loadHotels(undefined, undefined, undefined, sortField, ascending);
+  }
 
   if (!isLogged || role === "User") {
     return <Redirect to="/home"></Redirect>;
   }
   return (
     <>
+      <Grid
+        className={classes.grid}
+        container
+        direction="row"
+        justifyContent="center"
+        alignItems="center"
+      >
+        <HotelFilter
+          getValuesFromFilter={getValueFromHotelFilter}
+        ></HotelFilter>
+        <UsersFilter
+          getValuesFromFilter={getValuesFromFilter}
+          isHotelAdmins={true}
+        ></UsersFilter>
+      </Grid>
       <Paper className={classes.root}>
         <TableContainer className={classes.container}>
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>
                 <TableCell align="right" style={{ minWidth: 170 }}>
-                  Name
+                  <TableSortLabel
+                    active={currentSortField === "Name"}
+                    direction={currentAscending}
+                    onClick={() => orderBy("Name")}
+                  >
+                    Name
+                  </TableSortLabel>
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 170 }}>
-                  Country
+                  <TableSortLabel
+                    active={ currentSortField === "Location.Country" }
+                    direction={currentAscending}
+                    onClick={() => orderBy("Location.Country")}
+                  >
+                    Country
+                  </TableSortLabel>
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 170 }}>
-                  City
+                  <TableSortLabel
+                    active={currentSortField === "Location.City" }
+                    direction={currentAscending}
+                    onClick={() => orderBy("Location.City")}
+                  >
+                    City
+                  </TableSortLabel>
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 170 }}>
-                  Street
+                  <TableSortLabel
+                    active={ currentSortField === "Location.Street"}
+                    direction={currentAscending}
+                    onClick={() => orderBy("Location.Street")}
+                  >
+                    Street
+                  </TableSortLabel>
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 170 }}>
-                  Building Number
+                  <TableSortLabel
+                    active={ currentSortField === "Location.BuildingNumber" }
+                    direction={currentAscending}
+                    onClick={() => orderBy("Location.BuildingNumber")}
+                  >
+                    Building number
+                  </TableSortLabel>
                 </TableCell>
                 <TableCell style={{ minWidth: 30 }} />
                 <TableCell style={{ minWidth: 30 }} />
@@ -323,7 +422,7 @@ export default function HotelTable() {
         title="create/update"
         open={open}
         handleClose={handleClose}
-        form={flag === true ? component : form}
+        form={flag ? component : form}
       ></BaseDialog>
       {!!hotel ? (
         <BaseImageDialog

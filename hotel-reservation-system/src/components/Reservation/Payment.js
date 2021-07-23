@@ -28,7 +28,6 @@ export default function Payment({
   checkInDate,
   checkOutDate,
 }) {
-
   const classes = useStyles();
 
   return (
