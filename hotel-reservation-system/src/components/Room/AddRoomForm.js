@@ -48,6 +48,7 @@ export default function AddRoomForm({ hotelId, room, handleClose, callAlert }) {
       BedsNumber: values.bedsNumber,
       PaymentPerDay: values.paymentPerDay,
     };
+
     const CreateRoom = async () => {
       await API.post("/rooms/" + hotelId, request, {
         headers: { Authorization: "Bearer " + token },

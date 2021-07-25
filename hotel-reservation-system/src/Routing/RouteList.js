@@ -15,7 +15,7 @@ import OrderTable from "./../components/Reservation/OrderTable";
 import UserProfile from "./../components/User/UserProfile";
 import UserTable from "../components/User/UserTable";
 
-export default function App() {
+export default function RouterList() {
   return (
     <Switch>
       <Route path="/login" component={Login} />

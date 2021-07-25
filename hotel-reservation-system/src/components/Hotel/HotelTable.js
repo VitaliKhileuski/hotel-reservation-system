@@ -94,7 +94,7 @@ export default function HotelTable() {
   );
 
   useEffect(() => {
-    if (openDeleteDialog === false && open === false) {
+    if (!openDeleteDialog && !open && !imageDialogOpen) {
       if (role === "Admin") {
         loadHotels();
       }
@@ -102,7 +102,7 @@ export default function HotelTable() {
         loadHotelAdminHotels();
       }
     }
-  }, [rowsPerPage, page, open, openDeleteDialog]);
+  }, [rowsPerPage, page, open, openDeleteDialog,imageDialogOpen]);
 
   const loadHotels = async (email, surname, flag, sortField, ascending) => {
     let requestEmail = email;
@@ -135,6 +135,7 @@ export default function HotelTable() {
     )
       .then((response) => response.data)
       .then((data) => {
+        console.log(data.items);
         setHotels(data.items);
         setMaxNumberOfHotels(data.numberOfItems);
       })
@@ -154,7 +155,7 @@ export default function HotelTable() {
         setHotels(data.items);
         setMaxNumberOfHotels(data.numberOfItems);
       })
-      .catch((error) => console.log(error.response.data.Message));
+      .catch((error) => console.log(error));
   };
 
   const handleChangePage = (event, newPage) => {
@@ -175,7 +176,6 @@ export default function HotelTable() {
 
   function OpenAddHotelDialog() {
     setOpen(true);
-    console.log(true);
   }
 
   function handleCloseDeleteDialog() {
@@ -236,7 +236,7 @@ export default function HotelTable() {
     }
     setAlertOpen(false);
   };
-  
+
   function SetAdmin(hotelId) {
     setMessage("add admin");
     setFlag(true);

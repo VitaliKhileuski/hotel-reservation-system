@@ -13,18 +13,13 @@ export default function BaseImageDialog({
   const [fileObjects, setFileObjects] = useState([]);
   const token = localStorage.getItem("token");
   const [requestFiles, setRequestFiles] = useState([]);
-  const [flag, setFlag] = useState(false);
-  const [tempImages, setTempImages] = useState([]);
-
-  console.log(open);
+  const [rerender, setRerender] = useState(0);
 
   useEffect(async () => {
-    setTempImages([]);
-    setFileObjects([]);
-    if (!!imageUrls) {
+    if (!!imageUrls && open) {
       await loadImages();
     }
-  }, []);
+  }, [open]);
 
   async function saveImages() {
     mapImagesForRequest();
@@ -38,18 +33,13 @@ export default function BaseImageDialog({
     }
   }
   const loadImages = async () => {
+    console.log(imageUrls);
     await imageUrls.forEach(async (item) => {
       await GetImage(item);
-
-      if (flag) {
-        setFlag(false);
-      } else {
-        setFlag(true);
-
-        console.log(fileObjects);
-        console.log(`flag ${flag}`);
-      }
     });
+    if (imageUrls.length <= fileObjects.length) {
+      setRerender((rerender) => rerender + 1);
+    }
   };
 
   const GetImage = async (item) => {
@@ -67,12 +57,9 @@ export default function BaseImageDialog({
             id: data.id,
           };
 
-          tempImages.push(file);
-          setFileObjects(tempImages);
-          if (flag) {
-            setFlag(false);
-          } else {
-            setFlag(true);
+          fileObjects.push(file);
+          if (imageUrls.length === fileObjects.length) {
+            setRerender((rerender) => rerender + 1);
           }
         }
       })
@@ -101,6 +88,11 @@ export default function BaseImageDialog({
     };
     setImagesToRoom();
     setRequestFiles([]);
+    setFileObjects([]);
+    handleClose();
+  }
+
+  function closeDialog() {
     setFileObjects([]);
     handleClose();
   }
@@ -137,7 +129,7 @@ export default function BaseImageDialog({
       fileObjects={fileObjects}
       maxFileSize={5000000}
       open={open}
-      onClose={handleClose()}
+      onClose={closeDialog}
       onSave={saveImages}
       onAdd={(newFileObjs) => {
         console.log(...newFileObjs);
