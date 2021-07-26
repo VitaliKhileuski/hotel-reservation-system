@@ -14,6 +14,8 @@ import RoomsPage from "./../components/Room/RoomsPage";
 import OrderTable from "./../components/Reservation/OrderTable";
 import UserProfile from "./../components/User/UserProfile";
 import UserTable from "../components/User/UserTable";
+import AuthRoute from "./../Routing/AuthRoute";
+import { ADMIN, HOTEL_ADMIN, USER } from "./../config/Roles"; 
 
 export default function RouterList() {
   return (
@@ -21,7 +23,8 @@ export default function RouterList() {
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
       <Route path="/home" component={Home} />
-      <Route path="/ownedHotels" component={HotelTable}></Route>
+      <AuthRoute path="/ownedHotels" component={HotelTable} requiredRoles={[ADMIN,HOTEL_ADMIN]}></AuthRoute>
+      {/* <Route path="/ownedHotels" component={HotelTable}></Route> */}
       <Route path="/orders" component={OrderTable}></Route>
       <Route path="/userProfile" component={UserProfile}></Route>
       <Route

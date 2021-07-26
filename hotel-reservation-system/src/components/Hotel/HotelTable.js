@@ -51,6 +51,7 @@ export default function HotelTable() {
   const history = useHistory();
   const role = useSelector((state) => state.role);
   const token = localStorage.getItem("token");
+  
   const [hotel, setHotel] = useState();
   const [hotels, setHotels] = useState([]);
   const classes = useStyles();
