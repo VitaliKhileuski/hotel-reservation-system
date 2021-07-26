@@ -14,11 +14,13 @@ export default function BaseImageDialog({
   const token = localStorage.getItem("token");
   const [requestFiles, setRequestFiles] = useState([]);
   const [rerender, setRerender] = useState(0);
-
+  const [flag,setFlag] = useState(true);
+  
   useEffect(async () => {
-    if (!!imageUrls && open) {
+      if (!!imageUrls && open) {
+        console.log("first")
       await loadImages();
-    }
+    } 
   }, [open]);
 
   async function saveImages() {
@@ -32,16 +34,17 @@ export default function BaseImageDialog({
       imageUrls = [];
     }
   }
-  const loadImages = async () => {
-    console.log(imageUrls);
-    await imageUrls.forEach(async (item) => {
-      await GetImage(item);
-    });
-    if (imageUrls.length <= fileObjects.length) {
-      setRerender((rerender) => rerender + 1);
-    }
-  };
 
+  const loadImages = async () => {
+
+      await imageUrls.forEach(async (item) => {
+        await GetImage(item);
+      });
+      if (fileObjects.length ===  imageUrls.length) {
+        setRerender((rerender) => rerender + 1);
+      }
+    }
+  
   const GetImage = async (item) => {
     await axios
       .get(item + "/imageInfo")
@@ -56,15 +59,14 @@ export default function BaseImageDialog({
             },
             id: data.id,
           };
-
           fileObjects.push(file);
-          if (imageUrls.length === fileObjects.length) {
+          if (fileObjects.length === imageUrls.length ) {
             setRerender((rerender) => rerender + 1);
           }
         }
       })
       .catch((error) => console.log(error));
-  };
+  }
 
   async function mapImagesForRequest() {
     fileObjects.forEach((item) => {
@@ -94,6 +96,7 @@ export default function BaseImageDialog({
 
   function closeDialog() {
     setFileObjects([]);
+    setFlag(false);
     handleClose();
   }
 
@@ -105,9 +108,8 @@ export default function BaseImageDialog({
         }).catch((error) => console.log(error.response.data.message));
       };
       setImagesToHotel();
-      setFileObjects([]);
       setRequestFiles([]);
-      handleClose();
+      closeDialog();
     }
   }
 
