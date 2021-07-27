@@ -15,24 +15,32 @@ import OrderTable from "./../components/Reservation/OrderTable";
 import UserProfile from "./../components/User/UserProfile";
 import UserTable from "../components/User/UserTable";
 import AuthRoute from "./../Routing/AuthRoute";
-import { ADMIN, HOTEL_ADMIN, USER } from "./../config/Roles"; 
+import { ADMIN, HOTEL_ADMIN, USER } from "./../config/Roles";
 
 export default function RouterList() {
   return (
     <Switch>
+      <Route path="/home" component={Home} />
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
-      <Route path="/home" component={Home} />
-      <AuthRoute path="/ownedHotels" component={HotelTable} requiredRoles={[ADMIN,HOTEL_ADMIN]}></AuthRoute>
-      {/* <Route path="/ownedHotels" component={HotelTable}></Route> */}
-      <Route path="/orders" component={OrderTable}></Route>
-      <Route path="/userProfile" component={UserProfile}></Route>
-      <Route
-        path="/hotelEditor"
-        render={(props) => <HotelEditor {...props} />}
-      />
       <Route path="/rooms" render={(props) => <RoomsPage {...props} />} />
-      <Route path="/users" component={UserTable}></Route>
+      <AuthRoute
+        path="/ownedHotels"
+        Component={HotelTable}
+        requiredRoles={[ADMIN, HOTEL_ADMIN]}
+      ></AuthRoute>
+      <AuthRoute path="/orders" Component={OrderTable}></AuthRoute>
+      <AuthRoute path="/userProfile" Component={UserProfile}></AuthRoute>
+      <AuthRoute
+        path="/hotelEditor"
+        Component={HotelEditor}
+        requiredRoles={[ADMIN, HOTEL_ADMIN]}
+      ></AuthRoute>
+      <AuthRoute
+        path="/users"
+        Component={UserTable}
+        requiredRoles={[ADMIN]}
+      ></AuthRoute>
       <Redirect to="/home" />
     </Switch>
   );

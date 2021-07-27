@@ -28,6 +28,8 @@ import AddHotelForm from "./AddHotelForm";
 import HotelAdminDialog from "./HotelAdminDialog";
 import UsersFilter from "../Filters/UserFilter";
 import HotelFilter from "../Filters/HotelFilter";
+import { getRole } from "./../Authorization/TokenData";
+import { HOTEL_ADMIN } from "../../config/Roles";
 
 const useStyles = makeStyles({
   root: {
@@ -45,13 +47,15 @@ const useStyles = makeStyles({
     alignContent: "center",
     justifyContent: "center",
   },
+  button: {
+    margin: 10,
+  },
 });
 
 export default function HotelTable() {
   const history = useHistory();
-  const role = useSelector((state) => state.role);
   const token = localStorage.getItem("token");
-  
+  const role = getRole(token);
   const [hotel, setHotel] = useState();
   const [hotels, setHotels] = useState([]);
   const classes = useStyles();
@@ -96,14 +100,9 @@ export default function HotelTable() {
 
   useEffect(() => {
     if (!openDeleteDialog && !open && !imageDialogOpen) {
-      if (role === "Admin") {
-        loadHotels();
-      }
-      if (role === "HotelAdmin") {
-        loadHotelAdminHotels();
-      }
+      loadHotels();
     }
-  }, [rowsPerPage, page, open, openDeleteDialog,imageDialogOpen]);
+  }, [rowsPerPage, page, open, openDeleteDialog, imageDialogOpen]);
 
   const loadHotels = async (email, surname, flag, sortField, ascending) => {
     let requestEmail = email;
@@ -143,12 +142,18 @@ export default function HotelTable() {
   };
 
   const loadHotelAdminHotels = async () => {
-    await API.get("hotels/hotelAdmin/" + adminId + "/pages", {
-      params: {
-        PageNumber: pageForRequest,
-        PageSize: rowsPerPage,
+    await API.get(
+      "hotels/hotelAdmin/" + adminId + "/pages",
+      {
+        params: {
+          PageNumber: pageForRequest,
+          PageSize: rowsPerPage,
+        },
       },
-    })
+      {
+        headers: { Authorization: "Bearer " + token },
+      }
+    )
       .then((response) => response.data)
       .then((data) => {
         console.log(data);
@@ -270,10 +275,6 @@ export default function HotelTable() {
     }
     loadHotels(undefined, undefined, undefined, sortField, ascending);
   }
-
-  if (!isLogged || role === "User") {
-    return <Redirect to="/home"></Redirect>;
-  }
   return (
     <>
       <Grid
@@ -286,10 +287,25 @@ export default function HotelTable() {
         <HotelFilter
           getValuesFromFilter={getValueFromHotelFilter}
         ></HotelFilter>
-        <UsersFilter
-          getValuesFromFilter={getValuesFromFilter}
-          isHotelAdmins={true}
-        ></UsersFilter>
+        {role === HOTEL_ADMIN ? (
+          <Grid item>
+            <Button
+              variant="contained"
+              onClick={() => getValuesFromFilter(null, null)}
+              className={classes.button}
+              color="primary"
+              size="large"
+              margin="normal"
+            >
+              Search
+            </Button>
+          </Grid>
+        ) : (
+          <UsersFilter
+            getValuesFromFilter={getValuesFromFilter}
+            isHotelAdmins={true}
+          ></UsersFilter>
+        )}
       </Grid>
       <Paper className={classes.root}>
         <TableContainer className={classes.container}>

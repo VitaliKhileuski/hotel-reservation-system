@@ -61,7 +61,9 @@ const useStyles = makeStyles((theme) => ({
 export default function HotelEditor(props) {
   const classes = useStyles();
   const [value, setValue] = useState(0);
-  const [hotel, setHotel] = useState(props.location.state.hotel);
+  const [hotel, setHotel] = useState(
+    !!props.location.state ? props.location.state.hotel : ""
+  );
   const [updateAlertOpen, setUpdateAlertOpen] = useState(false);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const role = useSelector((state) => state.role);

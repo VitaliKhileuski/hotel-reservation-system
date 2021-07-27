@@ -14,13 +14,13 @@ export default function BaseImageDialog({
   const token = localStorage.getItem("token");
   const [requestFiles, setRequestFiles] = useState([]);
   const [rerender, setRerender] = useState(0);
-  const [flag,setFlag] = useState(true);
-  
+  const [flag, setFlag] = useState(true);
+
   useEffect(async () => {
-      if (!!imageUrls && open) {
-        console.log("first")
+    if (!!imageUrls && open) {
+      console.log("first");
       await loadImages();
-    } 
+    }
   }, [open]);
 
   async function saveImages() {
@@ -36,15 +36,14 @@ export default function BaseImageDialog({
   }
 
   const loadImages = async () => {
-
-      await imageUrls.forEach(async (item) => {
-        await GetImage(item);
-      });
-      if (fileObjects.length ===  imageUrls.length) {
-        setRerender((rerender) => rerender + 1);
-      }
+    await imageUrls.forEach(async (item) => {
+      await GetImage(item);
+    });
+    if (fileObjects.length === imageUrls.length) {
+      setRerender((rerender) => rerender + 1);
     }
-  
+  };
+
   const GetImage = async (item) => {
     await axios
       .get(item + "/imageInfo")
@@ -60,13 +59,13 @@ export default function BaseImageDialog({
             id: data.id,
           };
           fileObjects.push(file);
-          if (fileObjects.length === imageUrls.length ) {
+          if (fileObjects.length === imageUrls.length) {
             setRerender((rerender) => rerender + 1);
           }
         }
       })
       .catch((error) => console.log(error));
-  }
+  };
 
   async function mapImagesForRequest() {
     fileObjects.forEach((item) => {

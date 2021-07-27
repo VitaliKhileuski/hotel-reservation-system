@@ -358,7 +358,6 @@ export default function OrderTable() {
     if (reason === "clickaway") {
       return;
     }
-
     setAlertOpen(false);
   };
 

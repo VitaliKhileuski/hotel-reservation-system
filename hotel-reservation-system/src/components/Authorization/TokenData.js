@@ -9,10 +9,11 @@ import {
 export function FillStorage(token, dispatch) {
   const jwt = JSON.parse(atob(token.split(".")[1]));
   dispatch({ type: IS_LOGGED, isLogged: true });
+  dispatch({ type: ROLE, role: jwt.role });
   dispatch({ type: USER_ID, userId: jwt.id });
+  dispatch({ type: ROLE, role: jwt.role });
   dispatch({ type: EMAIL, email: jwt.email });
   dispatch({ type: NAME, name: jwt.firstname });
-  dispatch({ type: ROLE, role: jwt.role });
 }
 
 export function FillLocalStorage(token, refreshToken) {
@@ -28,7 +29,14 @@ export function Logout(dispatch, history) {
   dispatch({ type: ROLE, role: "" });
   dispatch({ type: EMAIL, email: "" });
   dispatch({ type: NAME, name: "" });
-  history.push({
-    pathname: "/home",
-  });
+
+  if (!!history) {
+    console.log("awdfs");
+    history.push({
+      pathname: "/home",
+    });
+  }
+}
+export function getRole(token) {
+  return JSON.parse(atob(token.split(".")[1])).role;
 }
