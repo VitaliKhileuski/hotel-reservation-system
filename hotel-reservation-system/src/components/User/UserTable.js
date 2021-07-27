@@ -57,7 +57,12 @@ export default function UserTable() {
   const [currentSortField, setCurrentSortField] = useState("");
   const [currentAscending, setCurrentAscending] = useState("");
   const [alertSuccessStatus, setAlertSuccessStatus] = useState(true);
-  const form = <Register handleClose={handleCloseAddUserDialog}></Register>;
+  const form = (
+    <Register
+      handleClose={handleCloseAddUserDialog}
+      callAlert={callAlert}
+    ></Register>
+  );
 
   useEffect(() => {
     if (deleteDialogOpen === false && addUserDialogOpen === false) {

@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Register({ handleClose }) {
+export default function Register({ handleClose, callAlert }) {
   const isLogged = useSelector((state) => state.isLogged);
   const classes = useStyles();
   const dispatch = useDispatch();
@@ -68,6 +68,7 @@ export default function Register({ handleClose }) {
           }
         } else {
           handleClose();
+          callAlert("user Added Successfully", true);
         }
       })
       .catch((error) => {

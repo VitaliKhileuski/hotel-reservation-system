@@ -29,7 +29,7 @@ import HotelAdminDialog from "./HotelAdminDialog";
 import UsersFilter from "../Filters/UserFilter";
 import HotelFilter from "../Filters/HotelFilter";
 import { getRole } from "./../Authorization/TokenData";
-import { HOTEL_ADMIN } from "../../config/Roles";
+import { ADMIN, HOTEL_ADMIN } from "../../config/Roles";
 
 const useStyles = makeStyles({
   root: {
@@ -105,6 +105,7 @@ export default function HotelTable() {
   }, [rowsPerPage, page, open, openDeleteDialog, imageDialogOpen]);
 
   const loadHotels = async (email, surname, flag, sortField, ascending) => {
+    const path = role === ADMIN ? "page" : "pagesForHotelAdmin";
     let requestEmail = email;
     let requestSurname = surname;
     if (flag === undefined) {
@@ -116,7 +117,7 @@ export default function HotelTable() {
     }
     let requestAscending = (ascending || currentAscending) === "asc";
     await API.get(
-      "/hotels/page",
+      "/hotels/" + path,
       {
         params: {
           UserId: adminId,
@@ -128,9 +129,6 @@ export default function HotelTable() {
           SortField: sortField,
           Ascending: requestAscending,
         },
-      },
-      {
-        headers: { Authorization: "Bearer " + token },
       }
     )
       .then((response) => response.data)
