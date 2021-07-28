@@ -19,6 +19,7 @@ import BaseDeleteDialog from "../shared/BaseDeleteDialog";
 import Register from "./../Authorization/Register";
 import UsersFilter from "../Filters/UserFilter";
 import BaseAlert from "../shared/BaseAlert";
+import { ADMIN } from "./../../config/Roles";
 
 const useStyles = makeStyles({
   root: {
@@ -57,7 +58,12 @@ export default function UserTable() {
   const [currentSortField, setCurrentSortField] = useState("");
   const [currentAscending, setCurrentAscending] = useState("");
   const [alertSuccessStatus, setAlertSuccessStatus] = useState(true);
-  const form = <Register handleClose={handleCloseAddUserDialog}></Register>;
+  const form = (
+    <Register
+      handleClose={handleCloseAddUserDialog}
+      callAlert={callAlert}
+    ></Register>
+  );
 
   useEffect(() => {
     if (deleteDialogOpen === false && addUserDialogOpen === false) {
@@ -76,20 +82,17 @@ export default function UserTable() {
       sortField = currentSortField;
     }
     let requestAscending = (ascending || currentAscending) === "asc";
-    await API.get(
-      "/users",
-      {
-        params: {
-          Email: requestEmail,
-          Surname : requestSurname,
-          PageNumber : pageForRequest,
-          PageSize : rowsPerPage,
-          SortField : sortField,
-          Ascending : requestAscending
-        },
-          headers: { Authorization: "Bearer " + token },
-      }
-    )
+    await API.get("/users", {
+      params: {
+        Email: requestEmail,
+        Surname: requestSurname,
+        PageNumber: pageForRequest,
+        PageSize: rowsPerPage,
+        SortField: sortField,
+        Ascending: requestAscending,
+      },
+      headers: { Authorization: "Bearer " + token },
+    })
       .then((response) => response.data)
       .then((data) => {
         setUsers(data.items);
@@ -247,7 +250,7 @@ export default function UserTable() {
                   <TableCell align="right">{user.surname}</TableCell>
                   <TableCell align="right">{user.phoneNumber}</TableCell>
                   <TableCell>
-                    {user.role.name !== "Admin" ? (
+                    {user.role.name !== ADMIN ? (
                       <IconButton
                         color="inherit"
                         onClick={() => deleteUserById(user.id)}

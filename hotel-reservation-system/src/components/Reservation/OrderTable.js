@@ -25,6 +25,7 @@ import OrderFilter from "../Filters/OrderFilter";
 import RoomDetails from "../Room/RoomDetails";
 import BaseDeleteDialog from "../shared/BaseDeleteDialog";
 import BaseAlert from "../shared/BaseAlert";
+import { USER } from "./../../config/Roles";
 
 const useRowStyles = makeStyles({
   root: {
@@ -196,7 +197,7 @@ function Row({ order, handleClickDeleteIcon }) {
           </Collapse>
         </TableCell>
       </TableRow>
-      {role !== "User" ? (
+      {role !== USER ? (
         <TableRow>
           <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
             <Collapse in={open} timeout="auto" unmountOnExit>
@@ -297,22 +298,18 @@ export default function OrderTable() {
       sortField = currentSortField;
     }
     let requestAscending = (ascending || currentAscending) === "asc";
-    await API.get(
-      "/orders",
-      {
-        params: {
-          Country: requestCountry,
-          City: requestCity,
-          Surname: requestSurname,
-          PageNumber: pageForRequest,
-          PageSize: rowsPerPage,
-          SortField: sortField,
-          Ascending: requestAscending,
-        },
-        headers: { Authorization: "Bearer " + token },
+    await API.get("/orders", {
+      params: {
+        Country: requestCountry,
+        City: requestCity,
+        Surname: requestSurname,
+        PageNumber: pageForRequest,
+        PageSize: rowsPerPage,
+        SortField: sortField,
+        Ascending: requestAscending,
       },
-      
-    )
+      headers: { Authorization: "Bearer " + token },
+    })
       .then((response) => response.data)
       .then((data) => {
         console.log(data);
@@ -362,7 +359,6 @@ export default function OrderTable() {
     if (reason === "clickaway") {
       return;
     }
-
     setAlertOpen(false);
   };
 

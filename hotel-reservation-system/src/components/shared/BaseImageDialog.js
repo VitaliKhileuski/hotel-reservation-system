@@ -13,23 +13,15 @@ export default function BaseImageDialog({
   const [fileObjects, setFileObjects] = useState([]);
   const token = localStorage.getItem("token");
   const [requestFiles, setRequestFiles] = useState([]);
-  const [flag, setFlag] = useState(false);
-  const [tempImages, setTempImages] = useState([]);
+  const [rerender, setRerender] = useState(0);
+  const [flag, setFlag] = useState(true);
 
   useEffect(async () => {
-    setTempImages([]);
-    setFileObjects([]);
-    if (!!imageUrls) {
+    if (!!imageUrls && open) {
+      console.log("first");
       await loadImages();
     }
   }, [open]);
-
-  useEffect(() => {
-    if (open) {
-      console.log("rerender");
-      console.log(fileObjects);
-    }
-  }, [flag]);
 
   async function saveImages() {
     mapImagesForRequest();
@@ -42,19 +34,14 @@ export default function BaseImageDialog({
       imageUrls = [];
     }
   }
+
   const loadImages = async () => {
     await imageUrls.forEach(async (item) => {
       await GetImage(item);
-
-      if (flag) {
-        setFlag(false);
-      } else {
-        setFlag(true);
-
-        console.log(fileObjects);
-        console.log(`flag ${flag}`);
-      }
     });
+    if (fileObjects.length === imageUrls.length) {
+      setRerender((rerender) => rerender + 1);
+    }
   };
 
   const GetImage = async (item) => {
@@ -71,13 +58,9 @@ export default function BaseImageDialog({
             },
             id: data.id,
           };
-
-          tempImages.push(file);
-          setFileObjects(tempImages);
-          if (flag) {
-            setFlag(false);
-          } else {
-            setFlag(true);
+          fileObjects.push(file);
+          if (fileObjects.length === imageUrls.length) {
+            setRerender((rerender) => rerender + 1);
           }
         }
       })
@@ -110,6 +93,12 @@ export default function BaseImageDialog({
     handleClose();
   }
 
+  function closeDialog() {
+    setFileObjects([]);
+    setFlag(false);
+    handleClose();
+  }
+
   async function saveImagesForHotel() {
     if (!!hotelId) {
       const setImagesToHotel = async () => {
@@ -118,11 +107,8 @@ export default function BaseImageDialog({
         }).catch((error) => console.log(error.response.data.message));
       };
       setImagesToHotel();
-      console.log("file objects save");
-      console.log(fileObjects);
-      setFileObjects([]);
       setRequestFiles([]);
-      handleClose();
+      closeDialog();
     }
   }
 
@@ -144,7 +130,7 @@ export default function BaseImageDialog({
       fileObjects={fileObjects}
       maxFileSize={5000000}
       open={open}
-      onClose={handleClose()}
+      onClose={closeDialog}
       onSave={saveImages}
       onAdd={(newFileObjs) => {
         console.log(...newFileObjs);

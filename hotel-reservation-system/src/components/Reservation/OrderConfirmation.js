@@ -63,8 +63,6 @@ export default function OrderConfirmation({
   );
 
   function handleCloseMessageDialog() {
-    console.log("handle close");
-    console.log(email);
     if (!!email) {
       dispatch({ type: EMAIL, email: email });
     }
@@ -115,7 +113,7 @@ export default function OrderConfirmation({
   };
 
   async function сreateOrder() {
-    if (checked  && emailErrorLabel === "") console.log("email");
+    if (checked && emailErrorLabel === "") console.log("email");
     if (userEmail === "" || userEmail === undefined) {
       await createUser();
       userEmail = email;

@@ -12,6 +12,7 @@ import { Formik, Form, ErrorMessage, Field } from "formik";
 import { useDispatch, useSelector } from "react-redux";
 import api from "./../../api/";
 import { REGISTER_VALIDATION_SCHEMA } from "../../constants/ValidationSchemas";
+import { ADMIN } from "./../../config/Roles";
 import { EMAIL_REGEX } from "../../constants/Regex";
 import { FillStorage } from "./TokenData";
 
@@ -35,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Register({ handleClose }) {
+export default function Register({ handleClose, callAlert }) {
   const isLogged = useSelector((state) => state.isLogged);
   const classes = useStyles();
   const dispatch = useDispatch();
@@ -62,12 +63,13 @@ export default function Register({ handleClose }) {
     api
       .post("/account/register", request)
       .then((response) => {
-        if (role !== "Admin") {
+        if (role !== ADMIN) {
           if (!!response && !!response.data) {
             FillStorage(response.data[0], response.data[1], dispatch);
           }
         } else {
           handleClose();
+          callAlert("user Added Successfully", true);
         }
       })
       .catch((error) => {
@@ -87,147 +89,148 @@ export default function Register({ handleClose }) {
     }
     setEmail(email);
   }
-  if (isLogged && role !== "Admin") {
+  if (isLogged && role !== ADMIN) {
     return <Redirect to="/home"></Redirect>;
-  } else
-    return (
-      <Container component="main" maxWidth="xs">
-        <CssBaseline />
-        <div className={classes.paper}>
-          {role !== "Admin" ? (
-            <Typography component="h1" variant="h5">
-              Sign up
-            </Typography>
-          ) : (
-            ""
+  }
+
+  return (
+    <Container component="main" maxWidth="xs">
+      <CssBaseline />
+      <div className={classes.paper}>
+        {role !== ADMIN ? (
+          <Typography component="h1" variant="h5">
+            Sign up
+          </Typography>
+        ) : (
+          ""
+        )}
+        <Formik
+          initialValues={initialValues}
+          onSubmit={onSubmit}
+          validationSchema={REGISTER_VALIDATION_SCHEMA}
+        >
+          {(props) => (
+            <Form className={classes.form}>
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <Field
+                    as={TextField}
+                    variant="outlined"
+                    autoComplete="lname"
+                    name="firstName"
+                    required
+                    error={props.errors.firstName && props.touched.firstName}
+                    helperText={<ErrorMessage name="firstName" />}
+                    fullWidth
+                    id="firstName"
+                    label="First Name"
+                    autoFocus
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Field
+                    as={TextField}
+                    variant="outlined"
+                    required
+                    fullWidth
+                    id="lastName"
+                    label="Last Name"
+                    name="lastName"
+                    error={props.errors.lastName && props.touched.lastName}
+                    helperText={<ErrorMessage name="lastName" />}
+                    autoComplete="lname"
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <Field
+                    as={TextField}
+                    onClick={() => {
+                      setEmailErrorLabel("");
+                    }}
+                    variant="outlined"
+                    required
+                    fullWidth
+                    id="email"
+                    label="Email Address"
+                    name="email"
+                    value={email}
+                    onChange={(e) => ValidateEmail(e.target.value)}
+                    error={emailErrorLabel !== ""}
+                    helperText={emailErrorLabel}
+                    autoComplete="email"
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <Field
+                    as={TextField}
+                    fullWidth
+                    required
+                    label="Phone Number"
+                    variant="outlined"
+                    name="phone"
+                    error={props.errors.phone && props.touched.phone}
+                    helperText={<ErrorMessage name="phone" />}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <Field
+                    as={TextField}
+                    variant="outlined"
+                    required
+                    fullWidth
+                    name="password"
+                    label="Password"
+                    error={props.errors.password && props.touched.password}
+                    helperText={<ErrorMessage name="password" />}
+                    type="password"
+                    id="password"
+                    autoComplete="current-password"
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <Field
+                    as={TextField}
+                    variant="outlined"
+                    required
+                    fullWidth
+                    name="passwordConfirm"
+                    label="confirm your password"
+                    error={
+                      props.errors.passwordConfirm &&
+                      props.touched.passwordConfirm
+                    }
+                    helperText={<ErrorMessage name="passwordConfirm" />}
+                    type="password"
+                    id="passwordConfirm"
+                    autoComplete="current-password"
+                  />
+                </Grid>
+              </Grid>
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                color="primary"
+                className={classes.submit}
+              >
+                {role !== "Admin" ? "Sign up" : "Add user"}
+              </Button>
+              <Grid container justify="flex-end">
+                <Grid item>
+                  {role !== "Admin" ? (
+                    <Link to="/login" variant="body2">
+                      Already have an account? Sign in
+                    </Link>
+                  ) : (
+                    ""
+                  )}
+                </Grid>
+              </Grid>
+            </Form>
           )}
-          <Formik
-            initialValues={initialValues}
-            onSubmit={onSubmit}
-            validationSchema={REGISTER_VALIDATION_SCHEMA}
-          >
-            {(props) => (
-              <Form className={classes.form}>
-                <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6}>
-                    <Field
-                      as={TextField}
-                      variant="outlined"
-                      autoComplete="lname"
-                      name="firstName"
-                      required
-                      error={props.errors.firstName && props.touched.firstName}
-                      helperText={<ErrorMessage name="firstName" />}
-                      fullWidth
-                      id="firstName"
-                      label="First Name"
-                      autoFocus
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Field
-                      as={TextField}
-                      variant="outlined"
-                      required
-                      fullWidth
-                      id="lastName"
-                      label="Last Name"
-                      name="lastName"
-                      error={props.errors.lastName && props.touched.lastName}
-                      helperText={<ErrorMessage name="lastName" />}
-                      autoComplete="lname"
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Field
-                      as={TextField}
-                      onClick={() => {
-                        setEmailErrorLabel("");
-                      }}
-                      variant="outlined"
-                      required
-                      fullWidth
-                      id="email"
-                      label="Email Address"
-                      name="email"
-                      value={email}
-                      onChange={(e) => ValidateEmail(e.target.value)}
-                      error={emailErrorLabel !== ""}
-                      helperText={emailErrorLabel}
-                      autoComplete="email"
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Field
-                      as={TextField}
-                      fullWidth
-                      required
-                      label="Phone Number"
-                      variant="outlined"
-                      name="phone"
-                      error={props.errors.phone && props.touched.phone}
-                      helperText={<ErrorMessage name="phone" />}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Field
-                      as={TextField}
-                      variant="outlined"
-                      required
-                      fullWidth
-                      name="password"
-                      label="Password"
-                      error={props.errors.password && props.touched.password}
-                      helperText={<ErrorMessage name="password" />}
-                      type="password"
-                      id="password"
-                      autoComplete="current-password"
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Field
-                      as={TextField}
-                      variant="outlined"
-                      required
-                      fullWidth
-                      name="passwordConfirm"
-                      label="confirm your password"
-                      error={
-                        props.errors.passwordConfirm &&
-                        props.touched.passwordConfirm
-                      }
-                      helperText={<ErrorMessage name="passwordConfirm" />}
-                      type="password"
-                      id="passwordConfirm"
-                      autoComplete="current-password"
-                    />
-                  </Grid>
-                </Grid>
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  color="primary"
-                  className={classes.submit}
-                >
-                  {role !== "Admin" ? "Sign up" : "Add user"}
-                </Button>
-                <Grid container justify="flex-end">
-                  <Grid item>
-                    {role !== "Admin" ? (
-                      <Link to="/login" variant="body2">
-                        Already have an account? Sign in
-                      </Link>
-                    ) : (
-                      ""
-                    )}
-                  </Grid>
-                </Grid>
-              </Form>
-            )}
-          </Formik>
-        </div>
-        <Box mt={5}></Box>
-      </Container>
-    );
+        </Formik>
+      </div>
+      <Box mt={5}></Box>
+    </Container>
+  );
 }

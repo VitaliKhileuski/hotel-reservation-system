@@ -28,6 +28,8 @@ import AddHotelForm from "./AddHotelForm";
 import HotelAdminDialog from "./HotelAdminDialog";
 import UsersFilter from "../Filters/UserFilter";
 import HotelFilter from "../Filters/HotelFilter";
+import { getRole } from "./../Authorization/TokenData";
+import { ADMIN, HOTEL_ADMIN } from "../../config/Roles";
 
 const useStyles = makeStyles({
   root: {
@@ -45,12 +47,15 @@ const useStyles = makeStyles({
     alignContent: "center",
     justifyContent: "center",
   },
+  button: {
+    margin: 10,
+  },
 });
 
 export default function HotelTable() {
   const history = useHistory();
-  const role = useSelector((state) => state.role);
   const token = localStorage.getItem("token");
+  const role = getRole(token);
   const [hotel, setHotel] = useState();
   const [hotels, setHotels] = useState([]);
   const classes = useStyles();
@@ -94,67 +99,41 @@ export default function HotelTable() {
   );
 
   useEffect(() => {
-    if (openDeleteDialog === false && open === false) {
-      if (role === "Admin") {
-        loadHotels();
-      }
-      if (role === "HotelAdmin") {
-        loadHotelAdminHotels();
-      }
+    if (!openDeleteDialog && !open && !imageDialogOpen) {
+      loadHotels();
     }
-  }, [rowsPerPage, page, open, openDeleteDialog]);
+  }, [rowsPerPage, page, open, openDeleteDialog, imageDialogOpen]);
 
   const loadHotels = async (email, surname, flag, sortField, ascending) => {
+    const path = role === ADMIN ? "page" : "pagesForHotelAdmin";
     let requestEmail = email;
     let requestSurname = surname;
     if (flag === undefined) {
       requestEmail = hotelAdminEmail;
       requestSurname = hotelAdminSurname;
     }
-      if (sortField === null || sortField === undefined) {
-        sortField = currentSortField;
-      }
-      let requestAscending = (ascending || currentAscending) === "asc";
-      await API.get(
-        "/hotels/page",
-        {
-          params: {
-            UserId: adminId,
-            HotelName: hotelName,
-            Email: requestEmail,
-            Surname: requestSurname,
-            PageNumber: pageForRequest,
-            PageSize: rowsPerPage,
-            SortField: sortField,
-            Ascending: requestAscending,
-          },
-        },
-        {
-          headers: { Authorization: "Bearer " + token },
-        }
-      )
-        .then((response) => response.data)
-        .then((data) => {
-          setHotels(data.items);
-          setMaxNumberOfHotels(data.numberOfItems);
-        })
-        .catch((error) => {});
-    };
-
-  const loadHotelAdminHotels = async () => {
-    await API.get("hotels/hotelAdmin/" + adminId + "/pages", {
+    if (sortField === null || sortField === undefined) {
+      sortField = currentSortField;
+    }
+    let requestAscending = (ascending || currentAscending) === "asc";
+    await API.get("/hotels/" + path, {
       params: {
+        UserId: adminId,
+        HotelName: hotelName,
+        Email: requestEmail,
+        Surname: requestSurname,
         PageNumber: pageForRequest,
         PageSize: rowsPerPage,
+        SortField: sortField,
+        Ascending: requestAscending,
       },
     })
       .then((response) => response.data)
       .then((data) => {
-        console.log(data);
-        setHotels(data.item1);
-        setMaxNumberOfHotels(data.item2);
+        setHotels(data.items);
+        setMaxNumberOfHotels(data.numberOfItems);
       })
-      .catch((error) => console.log(error.response.data.Message));
+      .catch((error) => {});
   };
 
   const handleChangePage = (event, newPage) => {
@@ -175,7 +154,6 @@ export default function HotelTable() {
 
   function OpenAddHotelDialog() {
     setOpen(true);
-    console.log(true);
   }
 
   function handleCloseDeleteDialog() {
@@ -236,6 +214,7 @@ export default function HotelTable() {
     }
     setAlertOpen(false);
   };
+
   function SetAdmin(hotelId) {
     setMessage("add admin");
     setFlag(true);
@@ -249,7 +228,6 @@ export default function HotelTable() {
     setMessage("delete admin");
   }
   function getValuesFromFilter(email, surname) {
-    console.log(email);
     setHotelAdminEmail(email);
     setHotelAdminSurname(surname);
     loadHotels(email, surname, true);
@@ -269,10 +247,6 @@ export default function HotelTable() {
     }
     loadHotels(undefined, undefined, undefined, sortField, ascending);
   }
-
-  if (!isLogged || role === "User") {
-    return <Redirect to="/home"></Redirect>;
-  }
   return (
     <>
       <Grid
@@ -285,10 +259,25 @@ export default function HotelTable() {
         <HotelFilter
           getValuesFromFilter={getValueFromHotelFilter}
         ></HotelFilter>
-        <UsersFilter
-          getValuesFromFilter={getValuesFromFilter}
-          isHotelAdmins={true}
-        ></UsersFilter>
+        {role === HOTEL_ADMIN ? (
+          <Grid item>
+            <Button
+              variant="contained"
+              onClick={() => getValuesFromFilter(null, null)}
+              className={classes.button}
+              color="primary"
+              size="large"
+              margin="normal"
+            >
+              Search
+            </Button>
+          </Grid>
+        ) : (
+          <UsersFilter
+            getValuesFromFilter={getValuesFromFilter}
+            isHotelAdmins={true}
+          ></UsersFilter>
+        )}
       </Grid>
       <Paper className={classes.root}>
         <TableContainer className={classes.container}>
@@ -306,7 +295,7 @@ export default function HotelTable() {
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 170 }}>
                   <TableSortLabel
-                    active={ currentSortField === "Location.Country" }
+                    active={currentSortField === "Location.Country"}
                     direction={currentAscending}
                     onClick={() => orderBy("Location.Country")}
                   >
@@ -315,7 +304,7 @@ export default function HotelTable() {
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 170 }}>
                   <TableSortLabel
-                    active={currentSortField === "Location.City" }
+                    active={currentSortField === "Location.City"}
                     direction={currentAscending}
                     onClick={() => orderBy("Location.City")}
                   >
@@ -324,7 +313,7 @@ export default function HotelTable() {
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 170 }}>
                   <TableSortLabel
-                    active={ currentSortField === "Location.Street"}
+                    active={currentSortField === "Location.Street"}
                     direction={currentAscending}
                     onClick={() => orderBy("Location.Street")}
                   >
@@ -333,7 +322,7 @@ export default function HotelTable() {
                 </TableCell>
                 <TableCell align="right" style={{ minWidth: 170 }}>
                   <TableSortLabel
-                    active={ currentSortField === "Location.BuildingNumber" }
+                    active={currentSortField === "Location.BuildingNumber"}
                     direction={currentAscending}
                     onClick={() => orderBy("Location.BuildingNumber")}
                   >
@@ -404,7 +393,7 @@ export default function HotelTable() {
           onChangeRowsPerPage={handleChangeRowsPerPage}
         />
       </Paper>
-      {role === "Admin" ? (
+      {role === ADMIN ? (
         <Button
           variant="contained"
           color="primary"

@@ -4,6 +4,7 @@ import { ClickAwayListener } from "@material-ui/core";
 import AppBar from "@material-ui/core/AppBar";
 import Button from "@material-ui/core/Button";
 import Toolbar from "@material-ui/core/Toolbar";
+import { useDispatch } from "react-redux";
 import Typography from "@material-ui/core/Typography";
 import MenuItem from "@material-ui/core/MenuItem";
 import MenuList from "@material-ui/core/MenuList";
@@ -13,7 +14,7 @@ import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
 import { useSelector } from "react-redux";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
-import { useDispatch } from "react-redux";
+import { ADMIN, USER } from "./../../config/Roles";
 import { Logout } from "../Authorization/TokenData";
 import "./../../css/App.css";
 
@@ -115,7 +116,7 @@ export default function NavBar() {
                               User profile
                             </MenuItem>
                           </Link>
-                          {role === "Admin" ? (
+                          {role === ADMIN ? (
                             <Link to="/users" className={classes.link}>
                               <MenuItem onClick={handleClose}>Users</MenuItem>
                             </Link>
@@ -125,7 +126,7 @@ export default function NavBar() {
                           <Link to="/orders" className={classes.link}>
                             <MenuItem onClick={handleClose}>Orders</MenuItem>
                           </Link>
-                          {role !== "User" ? (
+                          {role !== USER ? (
                             <Link to="/ownedHotels" className={classes.link}>
                               <MenuItem onClick={handleClose}>
                                 Owned hotels
