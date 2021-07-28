@@ -42,11 +42,13 @@ export default function OrderConfirmation({
   const [checked, setChecked] = useState(false);
   const history = useHistory();
   const [email, setEmail] = useState();
+
   const [emailErrorLabel, setEmailErrorLabel] = useState("");
   const classes = useStyles();
   const dispatch = useDispatch();
   const isLogged = useSelector((state) => state.isLogged);
-  const userEmail = useSelector((state) => state.email);
+  let userEmail = useSelector((state) => state.email);
+  let token = null;
 
   const [messageDialogOpen, SetMessageDialogOpen] = useState(false);
   const messageForGuest = (
@@ -87,7 +89,9 @@ export default function OrderConfirmation({
   const createOrderRequest = async (request) => {
     await API.post("/orders/" + room.id + "/order", request)
       .then((response) => response.data)
-      .then((data) => {})
+      .then((data) => {
+        SetMessageDialogOpen(true);
+      })
       .catch((error) => {
         console.log(error.response.data.Message);
       });
@@ -102,6 +106,13 @@ export default function OrderConfirmation({
         if (!!response && !!response.data) {
           FillLocalStorage(response.data[0], response.data[1]);
           FillStorage(response.data[0], dispatch);
+          let request = {
+            StartDate: checkInDate,
+            EndDate: checkOutDate,
+            ServiceQuantities: selectedServices,
+            UserEmail: userEmail,
+          };
+          createOrderRequest(request);
         }
       })
       .catch((error) => {
@@ -113,19 +124,14 @@ export default function OrderConfirmation({
   };
 
   async function сreateOrder() {
-    if (checked && emailErrorLabel === "") console.log("email");
-    if (userEmail === "" || userEmail === undefined) {
-      await createUser();
-      userEmail = email;
+    if (checked && emailErrorLabel === "") {
+      console.log(userEmail);
+      token = localStorage.getItem("token");
+      if (userEmail === "" || userEmail === undefined) {
+        userEmail = email;
+        await createUser();
+      }
     }
-    let request = {
-      StartDate: checkInDate,
-      EndDate: checkOutDate,
-      ServiceQuantities: selectedServices,
-      UserEmail: userEmail,
-    };
-    createOrderRequest(request);
-    SetMessageDialogOpen(true);
   }
 
   return (
@@ -188,11 +194,7 @@ export default function OrderConfirmation({
       <BaseDialog
         open={messageDialogOpen}
         handleClose={handleCloseMessageDialog}
-        form={
-          !!useSelector((state) => state.email)
-            ? messageForUser
-            : messageForGuest
-        }
+        form={!!token ? messageForUser : messageForGuest}
       ></BaseDialog>
     </>
   );

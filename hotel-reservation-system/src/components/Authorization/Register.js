@@ -213,11 +213,11 @@ export default function Register({ handleClose, callAlert }) {
                 color="primary"
                 className={classes.submit}
               >
-                {role !== "Admin" ? "Sign up" : "Add user"}
+                {role !== ADMIN ? "Sign up" : "Add user"}
               </Button>
               <Grid container justify="flex-end">
                 <Grid item>
-                  {role !== "Admin" ? (
+                  {role !== ADMIN ? (
                     <Link to="/login" variant="body2">
                       Already have an account? Sign in
                     </Link>

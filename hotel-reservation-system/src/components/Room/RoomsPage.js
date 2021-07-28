@@ -31,8 +31,9 @@ export default function RoomsPage(props) {
 
   useEffect(() => {
     const loadRooms = async () => {
-      await API.get("/rooms/" + hotelId + "/" + userId, {
+      await API.get("/rooms/" + hotelId, {
         params: {
+          UserId: userId,
           CheckInDate: checkInDate.toJSON(),
           CheckOutDate: checkOutDate.toJSON(),
           PageNumber: page,
