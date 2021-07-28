@@ -31,7 +31,6 @@ export function Logout(dispatch, history) {
   dispatch({ type: NAME, name: "" });
 
   if (!!history) {
-    console.log("awdfs");
     history.push({
       pathname: "/home",
     });

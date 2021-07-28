@@ -12,6 +12,7 @@ import BaseAlert from "./../shared/BaseAlert";
 import RoomTable from "./../Room/RoomTable";
 import BaseImageDialog from "./../shared/BaseImageDialog";
 import ServiceTable from "../Service/ServiceTable";
+import { ADMIN } from "./../../config/Roles";
 import AddHotelForm from "./AddHotelForm";
 
 function TabPanel(props) {
@@ -127,7 +128,7 @@ export default function HotelEditor(props) {
           justify="space-around"
           alignItems="center"
         >
-          {role === "Admin" ? (
+          {role === ADMIN ? (
             <Grid item lg={12}>
               <AddHotelForm
                 toRoomSection={toRoomSection}

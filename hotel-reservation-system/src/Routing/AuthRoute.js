@@ -13,7 +13,6 @@ export default function AuthRoute({
   exact = false,
   requiredRoles,
 }) {
-  console.log(Component);
   const token = localStorage.getItem("token");
   const isAuthed = !!token;
   const role = !!token ? JSON.parse(atob(token.split(".")[1])).role : null;

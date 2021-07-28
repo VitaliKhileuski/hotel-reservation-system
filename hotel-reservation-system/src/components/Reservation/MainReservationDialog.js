@@ -84,7 +84,6 @@ export default function MainReservationDialog({
   }
 
   function changeStep(step) {
-    console.log(step);
     if (step === 0) {
       setFlag(true);
     } else {

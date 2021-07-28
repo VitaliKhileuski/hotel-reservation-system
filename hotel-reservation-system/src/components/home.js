@@ -162,7 +162,6 @@ export default function Home() {
             id="countries"
             options={countries}
             onChange={(event, value) => {
-              console.log(value);
               setCurrentCountry(value);
             }}
             getOptionLabel={(option) => option}

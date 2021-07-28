@@ -63,8 +63,6 @@ export default function OrderConfirmation({
   );
 
   function handleCloseMessageDialog() {
-    console.log("handle close");
-    console.log(email);
     if (!!email) {
       dispatch({ type: EMAIL, email: email });
     }

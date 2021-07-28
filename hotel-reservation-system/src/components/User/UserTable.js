@@ -19,6 +19,7 @@ import BaseDeleteDialog from "../shared/BaseDeleteDialog";
 import Register from "./../Authorization/Register";
 import UsersFilter from "../Filters/UserFilter";
 import BaseAlert from "../shared/BaseAlert";
+import { ADMIN } from "./../../config/Roles";
 
 const useStyles = makeStyles({
   root: {
@@ -249,7 +250,7 @@ export default function UserTable() {
                   <TableCell align="right">{user.surname}</TableCell>
                   <TableCell align="right">{user.phoneNumber}</TableCell>
                   <TableCell>
-                    {user.role.name !== "Admin" ? (
+                    {user.role.name !== ADMIN ? (
                       <IconButton
                         color="inherit"
                         onClick={() => deleteUserById(user.id)}

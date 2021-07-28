@@ -34,8 +34,6 @@ const useStyles = makeStyles((theme) => ({
 export default function AddRoomForm({ hotelId, room, handleClose, callAlert }) {
   const classes = useStyles();
   const token = localStorage.getItem("token");
-  console.log(hotelId);
-  console.log(room);
   const initialValues = {
     roomNumber: !!room ? room.roomNumber : "",
     bedsNumber: !!room ? room.bedsNumber : "",

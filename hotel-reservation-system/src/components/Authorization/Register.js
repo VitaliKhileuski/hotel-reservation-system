@@ -12,6 +12,7 @@ import { Formik, Form, ErrorMessage, Field } from "formik";
 import { useDispatch, useSelector } from "react-redux";
 import api from "./../../api/";
 import { REGISTER_VALIDATION_SCHEMA } from "../../constants/ValidationSchemas";
+import { ADMIN } from "./../../config/Roles";
 import { EMAIL_REGEX } from "../../constants/Regex";
 import { FillStorage } from "./TokenData";
 
@@ -62,7 +63,7 @@ export default function Register({ handleClose, callAlert }) {
     api
       .post("/account/register", request)
       .then((response) => {
-        if (role !== "Admin") {
+        if (role !== ADMIN) {
           if (!!response && !!response.data) {
             FillStorage(response.data[0], response.data[1], dispatch);
           }
@@ -88,7 +89,7 @@ export default function Register({ handleClose, callAlert }) {
     }
     setEmail(email);
   }
-  if (isLogged && role !== "Admin") {
+  if (isLogged && role !== ADMIN) {
     return <Redirect to="/home"></Redirect>;
   }
 
@@ -96,7 +97,7 @@ export default function Register({ handleClose, callAlert }) {
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
-        {role !== "Admin" ? (
+        {role !== ADMIN ? (
           <Typography component="h1" variant="h5">
             Sign up
           </Typography>

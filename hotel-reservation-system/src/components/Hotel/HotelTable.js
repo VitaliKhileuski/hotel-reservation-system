@@ -116,49 +116,24 @@ export default function HotelTable() {
       sortField = currentSortField;
     }
     let requestAscending = (ascending || currentAscending) === "asc";
-    await API.get(
-      "/hotels/" + path,
-      {
-        params: {
-          UserId: adminId,
-          HotelName: hotelName,
-          Email: requestEmail,
-          Surname: requestSurname,
-          PageNumber: pageForRequest,
-          PageSize: rowsPerPage,
-          SortField: sortField,
-          Ascending: requestAscending,
-        },
-      }
-    )
+    await API.get("/hotels/" + path, {
+      params: {
+        UserId: adminId,
+        HotelName: hotelName,
+        Email: requestEmail,
+        Surname: requestSurname,
+        PageNumber: pageForRequest,
+        PageSize: rowsPerPage,
+        SortField: sortField,
+        Ascending: requestAscending,
+      },
+    })
       .then((response) => response.data)
       .then((data) => {
         setHotels(data.items);
         setMaxNumberOfHotels(data.numberOfItems);
       })
       .catch((error) => {});
-  };
-
-  const loadHotelAdminHotels = async () => {
-    await API.get(
-      "hotels/hotelAdmin/" + adminId + "/pages",
-      {
-        params: {
-          PageNumber: pageForRequest,
-          PageSize: rowsPerPage,
-        },
-      },
-      {
-        headers: { Authorization: "Bearer " + token },
-      }
-    )
-      .then((response) => response.data)
-      .then((data) => {
-        console.log(data);
-        setHotels(data.items);
-        setMaxNumberOfHotels(data.numberOfItems);
-      })
-      .catch((error) => console.log(error));
   };
 
   const handleChangePage = (event, newPage) => {
@@ -253,7 +228,6 @@ export default function HotelTable() {
     setMessage("delete admin");
   }
   function getValuesFromFilter(email, surname) {
-    console.log(email);
     setHotelAdminEmail(email);
     setHotelAdminSurname(surname);
     loadHotels(email, surname, true);
@@ -419,7 +393,7 @@ export default function HotelTable() {
           onChangeRowsPerPage={handleChangeRowsPerPage}
         />
       </Paper>
-      {role === "Admin" ? (
+      {role === ADMIN ? (
         <Button
           variant="contained"
           color="primary"

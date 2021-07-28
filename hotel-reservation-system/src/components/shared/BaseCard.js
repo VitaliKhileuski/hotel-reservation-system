@@ -8,6 +8,7 @@ import CardContent from "@material-ui/core/CardContent";
 import CardMedia from "@material-ui/core/CardMedia";
 import Typography from "@material-ui/core/Typography";
 import defaultImage from "./../../img/room.jpg";
+import { useHistory } from "react-router";
 import API from "./../../api";
 import MainReservationDialog from "../Reservation/MainReservationDialog";
 
@@ -30,35 +31,26 @@ export default function BaseCard({
   checkOutDate,
 }) {
   const classes = useStyles();
-  const [reservationDialogOpen, setReservationDialogOpen] = useState(false);
+  const history = useHistory();
   const islogged = useSelector((state) => state.isLogged);
   const token = localStorage.getItem("token");
 
-  function callReservationDialog() {
-    console.log(islogged);
-    if (islogged) {
-      blockRoom();
-    }
-    setReservationDialogOpen(true);
-  }
-  const blockRoom = async () => {
-    await API.put("/rooms/" + room.id + "/block", {
-      headers: { Authorization: "Bearer " + token },
-    })
-      .then((response) => response.data)
-      .then((data) => {})
-      .catch((error) => console.log(error.response.data.message));
-  };
-
-  function handleCloseReservationDialog() {
-    setReservationDialogOpen(false);
+  function openRoomDetails() {
+    history.push({
+      pathname: "/roomDetails",
+      state: {
+        room,
+        checkInDate,
+        checkOutDate,
+      },
+    });
   }
 
   return (
     <>
       <Card
         className={classes.root}
-        onClick={!!room ? callReservationDialog : clickAction}
+        onClick={!!room ? () => openRoomDetails(room) : clickAction}
       >
         <CardActionArea>
           {imageUrls === undefined || imageUrls.length === 0 ? (
@@ -88,13 +80,6 @@ export default function BaseCard({
           </CardContent>
         </CardActionArea>
       </Card>
-      <MainReservationDialog
-        handleClose={handleCloseReservationDialog}
-        open={reservationDialogOpen}
-        room={room}
-        checkInDate={checkInDate}
-        checkOutDate={checkOutDate}
-      ></MainReservationDialog>
     </>
   );
 }
