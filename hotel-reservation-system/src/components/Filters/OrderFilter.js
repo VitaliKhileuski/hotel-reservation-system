@@ -1,7 +1,7 @@
 import { React, useState, useEffect } from "react";
 import Grid from "@material-ui/core/Grid";
 import Autocomplete from "@material-ui/lab/Autocomplete";
-import { TextField } from "@material-ui/core";
+import TextField from "@material-ui/core/TextField";
 import { makeStyles } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import API from "./../../api";
@@ -25,6 +25,7 @@ export default function OrderFilter({ getValuesFromFilter }) {
   const [currentCountry, setCurrentCountry] = useState(null);
   const [surnames, setSurnames] = useState([]);
   const [surname, setSurname] = useState("");
+  const [orderNumber, setOrderNumber] = useState("");
   const [city, setCity] = useState("");
   const token = localStorage.getItem("token");
 
@@ -121,13 +122,22 @@ export default function OrderFilter({ getValuesFromFilter }) {
         ></Autocomplete>
       </Grid>
       <Grid item>
+        <TextField
+          label="Find by order number"
+          variant="outlined"
+          onChange={(event) => setOrderNumber(event.target.value)}
+        ></TextField>
+      </Grid>
+      <Grid item>
         <Button
           variant="contained"
           className={classes.button}
           color="primary"
           size="large"
           margin="normal"
-          onClick={() => getValuesFromFilter(currentCountry, city, surname)}
+          onClick={() =>
+            getValuesFromFilter(currentCountry, city, surname, orderNumber)
+          }
         >
           Search
         </Button>

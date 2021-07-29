@@ -16,8 +16,8 @@ import { useSelector } from "react-redux";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import { ADMIN, USER } from "./../../config/Roles";
 import { Logout } from "../Authorization/TokenData";
+import { HOME_PATH } from "./../../constants/RoutingPaths";
 import "./../../css/App.css";
-import {HOME_PATH} from './../../constants/RoutingPaths'
 
 const useStyles = makeStyles((theme) => ({
   root: {

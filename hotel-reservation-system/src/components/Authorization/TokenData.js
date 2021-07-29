@@ -5,7 +5,7 @@ import {
   USER_ID,
   EMAIL,
 } from "../../storage/actions/actionTypes.js";
-import {HOME_PATH} from "../../constants/RoutingPaths"
+import { HOME_PATH } from "../../constants/RoutingPaths";
 
 export function FillStorage(token, dispatch) {
   const jwt = JSON.parse(atob(token.split(".")[1]));

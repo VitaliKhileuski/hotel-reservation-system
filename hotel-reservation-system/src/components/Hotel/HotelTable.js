@@ -32,7 +32,6 @@ import { ADMIN, HOTEL_ADMIN } from "../../config/Roles";
 import AddHotelForm from "./AddHotelForm";
 import HotelAdminDialog from "./HotelAdminDialog";
 
-
 const useStyles = makeStyles({
   root: {
     width: "100%",

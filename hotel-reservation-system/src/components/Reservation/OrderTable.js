@@ -69,6 +69,7 @@ function Row({ order, handleClickDeleteIcon }) {
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCell>
+        <TableCell align="right">{order.number}</TableCell>
         <TableCell align="right">
           <IconButton
             color="inherit"
@@ -100,7 +101,7 @@ function Row({ order, handleClickDeleteIcon }) {
         ""
       ) : (
         <TableRow>
-          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
+          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8}>
             <Collapse in={open} timeout="auto" unmountOnExit>
               <Box margin={1}>
                 <Typography variant="h6" gutterBottom component="div">
@@ -149,7 +150,7 @@ function Row({ order, handleClickDeleteIcon }) {
       )}
 
       <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box margin={1}>
               <Typography variant="h6" gutterBottom component="div">
@@ -199,7 +200,7 @@ function Row({ order, handleClickDeleteIcon }) {
       </TableRow>
       {role !== USER ? (
         <TableRow>
-          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
+          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8}>
             <Collapse in={open} timeout="auto" unmountOnExit>
               <Box margin={1}>
                 <Typography variant="h6" gutterBottom component="div">
@@ -265,6 +266,7 @@ export default function OrderTable() {
   const [hotelCountry, setHotelCountry] = useState("");
   const [hotelCity, setHotelCity] = useState("");
   const [currentSurname, setCurrentSurname] = useState("");
+  const [currentOrderNumber, setCurrentOrderNumber] = useState("");
   const [alertSuccessStatus, setAlertSuccessStatus] = useState(true);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [currentSortField, setCurrentSortField] = useState("");
@@ -282,6 +284,7 @@ export default function OrderTable() {
     country,
     city,
     surname,
+    orderNumber,
     flag,
     sortField,
     ascending
@@ -289,20 +292,24 @@ export default function OrderTable() {
     let requestCountry = country;
     let requestCity = city;
     let requestSurname = surname;
+    let requestOrderNumber = orderNumber;
     if (flag === undefined) {
       requestCountry = hotelCountry;
       requestCity = hotelCity;
       requestSurname = currentSurname;
+      requestOrderNumber = currentOrderNumber;
     }
     if (sortField === null || sortField === undefined) {
       sortField = currentSortField;
     }
+
     let requestAscending = (ascending || currentAscending) === "asc";
     await API.get("/orders", {
       params: {
         Country: requestCountry,
         City: requestCity,
         Surname: requestSurname,
+        Number: requestOrderNumber,
         PageNumber: pageForRequest,
         PageSize: rowsPerPage,
         SortField: sortField,
@@ -348,11 +355,13 @@ export default function OrderTable() {
     setOrderId(orderId);
     setDeleteDialogOpen(true);
   }
-  function getValuesFromFilter(country, city, surname) {
+  function getValuesFromFilter(country, city, surname, orderNumber) {
+    const orderNumberNoSpaces = orderNumber.trim();
     setHotelCountry(country);
     setHotelCity(city);
     setCurrentSurname(surname);
-    loadOrders(country, city, surname, true);
+    setCurrentOrderNumber(orderNumberNoSpaces);
+    loadOrders(country, city, surname, orderNumberNoSpaces, true);
   }
 
   const handleCloseAlert = (event, reason) => {
@@ -402,6 +411,9 @@ export default function OrderTable() {
           <TableHead>
             <TableRow>
               <TableCell />
+              <TableCell align="right" style={{ minWidth: 170 }}>
+                Order number
+              </TableCell>
               <TableCell align="right" style={{ minWidth: 170 }}>
                 Room
               </TableCell>

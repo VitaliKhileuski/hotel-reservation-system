@@ -9,8 +9,7 @@ import CardMedia from "@material-ui/core/CardMedia";
 import Typography from "@material-ui/core/Typography";
 import { useHistory } from "react-router";
 import defaultImage from "./../../img/room.jpg";
-import {ROOM_DETAILS_PATH} from "./../../constants/RoutingPaths"
-
+import { ROOM_DETAILS_PATH } from "./../../constants/RoutingPaths";
 
 const useStyles = makeStyles({
   root: {

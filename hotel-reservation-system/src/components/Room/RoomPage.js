@@ -29,8 +29,8 @@ export default function RoomPage(props) {
     props.location.state.checkOutDate
   );
   const islogged = useSelector((state) => state.isLogged);
+  const userId = useSelector((state) => state.userId);
   const token = localStorage.getItem("token");
-
   const handleCloseAlert = (event, reason) => {
     if (reason === "clickaway") {
       return;
@@ -52,7 +52,9 @@ export default function RoomPage(props) {
     setReservationDialogOpen(true);
   }
   const isRoomBlocked = async () => {
-    await API.get("rooms/" + room.id + "/isRoomBlocked")
+    await API.get("rooms/" + room.id + "/isRoomBlocked", {
+      params: { userId: userId },
+    })
       .then((response) => response.data)
       .then((data) => {
         if (data) {

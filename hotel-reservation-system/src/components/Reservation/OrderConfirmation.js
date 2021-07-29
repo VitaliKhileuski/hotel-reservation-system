@@ -98,7 +98,7 @@ export default function OrderConfirmation({
       });
   };
 
-  const createUser = async () => {
+  const createUser = async (requestForOrder) => {
     let request = {
       Email: email,
     };
@@ -107,13 +107,7 @@ export default function OrderConfirmation({
         if (!!response && !!response.data) {
           FillLocalStorage(response.data[0], response.data[1]);
           FillStorage(response.data[0], dispatch);
-          let request = {
-            StartDate: checkInDate,
-            EndDate: checkOutDate,
-            ServiceQuantities: selectedServices,
-            UserEmail: userEmail,
-          };
-          createOrderRequest(request);
+          createOrderRequest(requestForOrder);
         }
       })
       .catch((error) => {
@@ -126,11 +120,18 @@ export default function OrderConfirmation({
 
   async function сreateOrder() {
     if (checked && emailErrorLabel === "") {
-      console.log(userEmail);
+      let requestForOrder = {
+        StartDate: checkInDate,
+        EndDate: checkOutDate,
+        ServiceQuantities: selectedServices,
+        UserEmail: userEmail,
+      };
       token = localStorage.getItem("token");
       if (userEmail === "" || userEmail === undefined) {
         userEmail = email;
-        await createUser();
+        await createUser(requestForOrder);
+      } else {
+        createOrderRequest(requestForOrder);
       }
     }
   }

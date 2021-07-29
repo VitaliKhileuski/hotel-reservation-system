@@ -17,16 +17,18 @@ import UserTable from "../components/User/UserTable";
 import AuthRoute from "./../Routing/AuthRoute";
 import RoomPage from "./../components/Room/RoomPage";
 import { ADMIN, HOTEL_ADMIN } from "./../config/Roles";
-import {HOME_PATH,
-       LOGIN_PATH,
-       REGISTER_PATH,
-       ROOMS_PATH,
-       ROOM_DETAILS_PATH,
-       OWNED_HOTELS_PATH,
-       ORDERS_PATH,
-       USER_PROFILE_PATH,
-       HOTEL_EDITOR_PATH,
-       USERS_PATH} from "./../constants/RoutingPaths"
+import {
+  HOME_PATH,
+  LOGIN_PATH,
+  REGISTER_PATH,
+  ROOMS_PATH,
+  ROOM_DETAILS_PATH,
+  OWNED_HOTELS_PATH,
+  ORDERS_PATH,
+  USER_PROFILE_PATH,
+  HOTEL_EDITOR_PATH,
+  USERS_PATH,
+} from "./../constants/RoutingPaths";
 
 export default function RouterList() {
   return (
@@ -35,7 +37,10 @@ export default function RouterList() {
       <Route path={LOGIN_PATH} component={Login} />
       <Route path={REGISTER_PATH} component={Register} />
       <Route path={ROOMS_PATH} render={(props) => <RoomsPage {...props} />} />
-      <Route path={ROOM_DETAILS_PATH} render={(props) => <RoomPage {...props} />} />
+      <Route
+        path={ROOM_DETAILS_PATH}
+        render={(props) => <RoomPage {...props} />}
+      />
       <AuthRoute
         path={OWNED_HOTELS_PATH}
         Component={HotelTable}

@@ -6,7 +6,7 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import { useHistory } from "react-router";
-import {HOME_PATH} from "./../../constants/RoutingPaths"
+import { HOME_PATH } from "./../../constants/RoutingPaths";
 
 export default function RoomIsOccupiedAlert({ open, handleClose }) {
   {
