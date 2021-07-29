@@ -14,6 +14,7 @@ import API from "./../../api";
 import BaseDialog from "../shared/BaseDialog";
 import { FillStorage, FillLocalStorage } from "../Authorization/TokenData";
 import { EMAIL_REGEX } from "../../constants/Regex";
+import { HOME_PATH } from "../../constants/RoutingPaths";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -70,7 +71,7 @@ export default function OrderConfirmation({
     }
     SetMessageDialogOpen(false);
     history.push({
-      pathname: "/home",
+      pathname: HOME_PATH,
     });
   }
 

@@ -2,6 +2,7 @@ import { React } from "react";
 import { useHistory } from "react-router";
 import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
+import { ROOMS_PATH } from "../../constants/RoutingPaths";
 import BaseCard from "./../shared/BaseCard";
 
 export default function HotelList({
@@ -14,7 +15,7 @@ export default function HotelList({
 
   function toRoomsPage(hotelId) {
     history.push({
-      pathname: "/rooms",
+      pathname: ROOMS_PATH,
       state: {
         hotelId,
         checkInDate,

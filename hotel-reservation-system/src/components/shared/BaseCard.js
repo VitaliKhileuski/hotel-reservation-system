@@ -7,10 +7,10 @@ import CardActionArea from "@material-ui/core/CardActionArea";
 import CardContent from "@material-ui/core/CardContent";
 import CardMedia from "@material-ui/core/CardMedia";
 import Typography from "@material-ui/core/Typography";
-import defaultImage from "./../../img/room.jpg";
 import { useHistory } from "react-router";
-import API from "./../../api";
-import MainReservationDialog from "../Reservation/MainReservationDialog";
+import defaultImage from "./../../img/room.jpg";
+import {ROOM_DETAILS_PATH} from "./../../constants/RoutingPaths"
+
 
 const useStyles = makeStyles({
   root: {
@@ -37,7 +37,7 @@ export default function BaseCard({
 
   function openRoomDetails() {
     history.push({
-      pathname: "/roomDetails",
+      pathname: ROOM_DETAILS_PATH,
       state: {
         room,
         checkInDate,

@@ -20,16 +20,18 @@ import PersonAddIcon from "@material-ui/icons/PersonAdd";
 import PersonAddDisabledIcon from "@material-ui/icons/PersonAddDisabled";
 import AddPhotoAlternateIcon from "@material-ui/icons/AddPhotoAlternate";
 import API from "./../../api";
+import { HOTEL_EDITOR_PATH } from "../../constants/RoutingPaths";
 import BaseAlert from "./../shared/BaseAlert";
 import BaseDialog from "../shared/BaseDialog";
 import BaseDeleteDialog from "./../shared/BaseDeleteDialog";
 import BaseImageDialog from "../shared/BaseImageDialog";
-import AddHotelForm from "./AddHotelForm";
-import HotelAdminDialog from "./HotelAdminDialog";
 import UsersFilter from "../Filters/UserFilter";
 import HotelFilter from "../Filters/HotelFilter";
 import { getRole } from "./../Authorization/TokenData";
 import { ADMIN, HOTEL_ADMIN } from "../../config/Roles";
+import AddHotelForm from "./AddHotelForm";
+import HotelAdminDialog from "./HotelAdminDialog";
+
 
 const useStyles = makeStyles({
   root: {
@@ -186,7 +188,7 @@ export default function HotelTable() {
 
   function toHotelEditor(hotel) {
     history.push({
-      pathname: "/hotelEditor",
+      pathname: HOTEL_EDITOR_PATH,
       state: {
         hotel,
       },

@@ -17,6 +17,7 @@ import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import { ADMIN, USER } from "./../../config/Roles";
 import { Logout } from "../Authorization/TokenData";
 import "./../../css/App.css";
+import {HOME_PATH} from './../../constants/RoutingPaths'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -60,7 +61,7 @@ export default function NavBar() {
   }
   function toHomePage() {
     history.push({
-      pathname: "/home",
+      pathname: HOME_PATH,
     });
   }
 
