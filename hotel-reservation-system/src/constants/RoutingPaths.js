@@ -6,5 +6,5 @@ export const ROOM_DETAILS_PATH = "/roomDetails";
 export const OWNED_HOTELS_PATH = "/ownedHotels";
 export const ORDERS_PATH = "/orders";
 export const USER_PROFILE_PATH = "/userProfile";
-export const HOTEL_EDITOR_PATH = "/hotelEditors";
+export const HOTEL_EDITOR_PATH = "/hotelEditor";
 export const USERS_PATH = "/users";

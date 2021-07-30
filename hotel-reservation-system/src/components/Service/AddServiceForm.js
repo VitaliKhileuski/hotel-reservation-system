@@ -6,8 +6,10 @@ import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
+import { useDispatch } from "react-redux";
 import { Formik, Form, ErrorMessage, Field } from "formik";
 import API from "../../api";
+import CallAlert from "../../Notifications/NotificationHandler";
 import { SERVICE_VALIDATION_SCHEMA } from "../../constants/ValidationSchemas";
 
 const useStyles = makeStyles((theme) => ({
@@ -31,13 +33,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function AddServiceForm({
-  hotelId,
-  service,
-  handleClose,
-  callAlert,
-}) {
+export default function AddServiceForm({ hotelId, service, handleClose }) {
+  console.log(hotelId);
   const classes = useStyles();
+  const dispatch = useDispatch();
   const [serviceName, setServiceName] = useState(!!service ? service.name : "");
   const token = localStorage.getItem("token");
   const [serviceNameErrorLabel, setServiceNameErrorLabel] = useState("");
@@ -53,24 +52,28 @@ export default function AddServiceForm({
       Payment: values.payment,
     };
 
-    const CreateService = async () => {
-      await API.post("/services/" + hotelId, request, {
-        headers: { Authorization: "Bearer " + token },
-      })
-        .then((response) => response.data)
-        .then((data) => {
-          handleClose();
-          callAlert("service added successfully", true);
-        })
-        .catch((error) => {
-          setServiceNameErrorLabel(error.response.data.Message);
-        });
-    };
     if (!!service) {
+      console.log(service);
       await UpdateService(request);
     } else {
-      await CreateService();
+      console.log(hotelId);
+      await CreateService(request);
     }
+  };
+
+  const CreateService = async (request) => {
+    console.log(hotelId);
+    await API.post("/services/" + hotelId, request, {
+      headers: { Authorization: "Bearer " + token },
+    })
+      .then((response) => response.data)
+      .then((data) => {
+        handleClose();
+        CallAlert(dispatch, true, "service added successfully");
+      })
+      .catch((error) => {
+        setServiceNameErrorLabel(error.response.data.Message);
+      });
   };
 
   const UpdateService = async (request) => {
@@ -80,7 +83,7 @@ export default function AddServiceForm({
       .then((response) => response.data)
       .then((data) => {
         handleClose();
-        callAlert("service updated successfully", true);
+        CallAlert(dispatch, true, "service updated successfully");
       })
       .catch((error) => {
         console.log(error.response.data.Message);

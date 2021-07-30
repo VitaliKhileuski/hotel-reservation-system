@@ -11,6 +11,7 @@ import Grid from "@material-ui/core/Grid";
 import { useSelector, useDispatch } from "react-redux";
 import { EMAIL } from "./../../storage/actions/actionTypes";
 import API from "./../../api";
+import CallAlert from "../../Notifications/NotificationHandler";
 import BaseDialog from "../shared/BaseDialog";
 import { FillStorage, FillLocalStorage } from "../Authorization/TokenData";
 import { EMAIL_REGEX } from "../../constants/Regex";
@@ -23,14 +24,11 @@ const useStyles = makeStyles((theme) => ({
     height: "70%",
   },
   paperGrid: {
-    marginTop: "10%",
+    marginTop: "5%",
   },
   paper: {
-    height: "95%",
+    height: "85%",
     marginTop: theme.spacing(3),
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
   },
 }));
 
@@ -40,16 +38,16 @@ export default function OrderConfirmation({
   checkInDate,
   checkOutDate,
 }) {
+  const dispatch = useDispatch();
   const [checked, setChecked] = useState(false);
   const history = useHistory();
   const [email, setEmail] = useState();
 
   const [emailErrorLabel, setEmailErrorLabel] = useState("");
   const classes = useStyles();
-  const dispatch = useDispatch();
   const isLogged = useSelector((state) => state.isLogged);
   let userEmail = useSelector((state) => state.email);
-  let token = null;
+  const token = localStorage.getItem("token");
 
   const [messageDialogOpen, SetMessageDialogOpen] = useState(false);
   const messageForGuest = (
@@ -94,11 +92,12 @@ export default function OrderConfirmation({
         SetMessageDialogOpen(true);
       })
       .catch((error) => {
-        console.log(error.response.data.Message);
+        CallAlert(dispatch, false, "", "room already booked on this dates");
       });
   };
 
   const createUser = async (requestForOrder) => {
+    console.log("create user");
     let request = {
       Email: email,
     };
@@ -126,9 +125,9 @@ export default function OrderConfirmation({
         ServiceQuantities: selectedServices,
         UserEmail: userEmail,
       };
-      token = localStorage.getItem("token");
       if (userEmail === "" || userEmail === undefined) {
         userEmail = email;
+        requestForOrder.UserEmail = email;
         await createUser(requestForOrder);
       } else {
         createOrderRequest(requestForOrder);

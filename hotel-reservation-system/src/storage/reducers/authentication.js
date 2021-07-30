@@ -7,6 +7,10 @@ import {
   USER_ID,
   CHECK_IN_DATE,
   CHECK_OUT_DATE,
+  OPEN_ALERT,
+  MESSAGE,
+  ALERT_SUCCESS_STATUS,
+  FAILURE_MESSAGE,
 } from "../actions/actionTypes.js";
 
 export default function authentication(state = initialState, action) {
@@ -25,6 +29,14 @@ export default function authentication(state = initialState, action) {
       return { ...state, checkInDate: action.checkInDate };
     case CHECK_OUT_DATE:
       return { ...state, checkOutDate: action.checkOutDate };
+    case OPEN_ALERT:
+      return { ...state, openAlert: action.openAlert };
+    case MESSAGE:
+      return { ...state, message: action.message };
+    case ALERT_SUCCESS_STATUS:
+      return { ...state, alertSuccessStatus: action.alertSuccessStatus };
+    case FAILURE_MESSAGE:
+      return { ...state, failureMessage: action.failureMessage };
     default:
       return state;
   }

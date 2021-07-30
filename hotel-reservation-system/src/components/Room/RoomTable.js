@@ -11,16 +11,16 @@ import Button from "@material-ui/core/Button";
 import TableHead from "@material-ui/core/TableHead";
 import IconButton from "@material-ui/core/IconButton";
 import EditIcon from "@material-ui/icons/Edit";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import DeleteIcon from "@material-ui/icons/Delete";
 import AddPhotoAlternateIcon from "@material-ui/icons/AddPhotoAlternate";
 import API from "../../api";
 import BaseDialog from "../shared/BaseDialog";
+import CallAlert from "../../Notifications/NotificationHandler";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
 import BaseDeleteDialog from "../shared/BaseDeleteDialog";
 import BaseImageDialog from "../shared/BaseImageDialog";
 import RoomFilter from "../Filters/RoomFilter";
-import BaseAlert from "../shared/BaseAlert";
 import AddRoomForm from "./AddRoomForm";
 
 const useStyles = makeStyles({
@@ -36,6 +36,7 @@ const useStyles = makeStyles({
 });
 
 export default function RoomTable({ hotelId }) {
+  const dispatch = useDispatch();
   const token = localStorage.getItem("token");
   const [rooms, setRooms] = useState([]);
   const [maxNumberOfRooms, setMaxNumberOfRooms] = useState(0);
@@ -47,9 +48,6 @@ export default function RoomTable({ hotelId }) {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [roomId, setRoomId] = useState(0);
   const [room, setRoom] = useState();
-  const [alertOpen, setAlertOpen] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
-  const [alertSuccessStatus, setAlertSuccessStatus] = useState(true);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [currentSortField, setCurrentSortField] = useState("");
   const [currentAscending, setCurrentAscending] = useState("");
@@ -71,7 +69,6 @@ export default function RoomTable({ hotelId }) {
       handleClose={handleClose}
       hotelId={hotelId}
       room={room}
-      callAlert={callAlert}
     ></AddRoomForm>
   );
 
@@ -89,8 +86,9 @@ export default function RoomTable({ hotelId }) {
       sortField = currentSortField;
     }
     let requestAscending = (ascending || currentAscending) === "asc";
-    await API.get("/rooms/" + hotelId + "/" + userId, {
+    await API.get("/rooms/" + hotelId, {
       params: {
+        UserId: userId,
         RoomNumber: requestRoomNumber,
         PageNumber: pageForRequest,
         PageSize: rowsPerPage,
@@ -148,20 +146,6 @@ export default function RoomTable({ hotelId }) {
     setOpenDeleteDialog(false);
   }
 
-  const handleCloseAlert = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    setAlertOpen(false);
-  };
-
-  function callAlert(message, successStatus) {
-    setAlertMessage(message);
-    setAlertSuccessStatus(successStatus);
-    setAlertOpen(true);
-  }
-
   async function deleteRoom() {
     const DeleteRoom = async () => {
       await API.delete("/rooms/" + roomId, {
@@ -169,9 +153,9 @@ export default function RoomTable({ hotelId }) {
       })
         .then((response) => response.data)
         .then((data) => {
-          callAlert("room deleted successfully", true);
+          CallAlert(dispatch, true, "room deleted successfully");
         })
-        .catch((error) => callAlert(false));
+        .catch((error) => CallAlert(dispatch, false));
     };
 
     await DeleteRoom();
@@ -296,12 +280,6 @@ export default function RoomTable({ hotelId }) {
         imageUrls={!!room ? room.imageUrls : undefined}
         filesLimit={5}
       ></BaseImageDialog>
-      <BaseAlert
-        open={alertOpen}
-        handleClose={handleCloseAlert}
-        message={alertMessage}
-        success={alertSuccessStatus}
-      ></BaseAlert>
     </>
   );
 }

@@ -1,4 +1,5 @@
 import { React, useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import IconButton from "@material-ui/core/IconButton";
@@ -14,6 +15,7 @@ import TableRow from "@material-ui/core/TableRow";
 import Button from "@material-ui/core/Button";
 import DeleteIcon from "@material-ui/icons/Delete";
 import API from "../../api";
+import CallAlert from "../../Notifications/NotificationHandler";
 import BaseDialog from "../shared/BaseDialog";
 import BaseDeleteDialog from "../shared/BaseDeleteDialog";
 import Register from "./../Authorization/Register";
@@ -42,6 +44,7 @@ const useStyles = makeStyles({
 
 export default function UserTable() {
   const token = localStorage.getItem("token");
+  const dispatch = useDispatch();
   const [users, setUsers] = useState([]);
   const [maxNumberOfUsers, setMaxNumberOfUsers] = useState(0);
   const classes = useStyles();
@@ -51,19 +54,12 @@ export default function UserTable() {
   const [userId, setUserId] = useState();
   const [addUserDialogOpen, setAddUserDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [alertOpen, setAlertOpen] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
   const [userEmail, setUserEmail] = useState("");
   const [userSurname, setUserSurname] = useState("");
   const [currentSortField, setCurrentSortField] = useState("");
   const [currentAscending, setCurrentAscending] = useState("");
-  const [alertSuccessStatus, setAlertSuccessStatus] = useState(true);
-  const form = (
-    <Register
-      handleClose={handleCloseAddUserDialog}
-      callAlert={callAlert}
-    ></Register>
-  );
+
+  const form = <Register handleClose={handleCloseAddUserDialog}></Register>;
 
   useEffect(() => {
     if (deleteDialogOpen === false && addUserDialogOpen === false) {
@@ -112,20 +108,6 @@ export default function UserTable() {
     SetPageForRequest(1);
   };
 
-  const handleCloseAlert = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    setAlertOpen(false);
-  };
-
-  function callAlert(message, successStatus) {
-    setAlertMessage(message);
-    setAlertSuccessStatus(successStatus);
-    setAlertOpen(true);
-  }
-
   async function deleteUser() {
     const DeleteUser = async () => {
       await API.delete("/users/" + userId, {
@@ -133,9 +115,9 @@ export default function UserTable() {
       })
         .then((response) => response.data)
         .then((data) => {
-          callAlert("user deleted successfully", true);
+          CallAlert(dispatch, true, "user deleted successfully");
         })
-        .catch((error) => callAlert(false));
+        .catch((error) => CallAlert(dispatch, false));
     };
     await DeleteUser();
     handleCloseDeleteDialog();
@@ -299,12 +281,6 @@ export default function UserTable() {
         form={form}
         handleClose={handleCloseAddUserDialog}
       ></BaseDialog>
-      <BaseAlert
-        message={alertMessage}
-        open={alertOpen}
-        success={alertSuccessStatus}
-        handleClose={handleCloseAlert}
-      ></BaseAlert>
     </>
   );
 }

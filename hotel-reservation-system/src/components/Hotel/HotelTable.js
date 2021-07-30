@@ -1,6 +1,6 @@
 import { React, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { Redirect, useHistory } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { useHistory } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import IconButton from "@material-ui/core/IconButton";
@@ -25,6 +25,7 @@ import BaseAlert from "./../shared/BaseAlert";
 import BaseDialog from "../shared/BaseDialog";
 import BaseDeleteDialog from "./../shared/BaseDeleteDialog";
 import BaseImageDialog from "../shared/BaseImageDialog";
+import CallAlert from "../../Notifications/NotificationHandler";
 import UsersFilter from "../Filters/UserFilter";
 import HotelFilter from "../Filters/HotelFilter";
 import { getRole } from "./../Authorization/TokenData";
@@ -55,6 +56,7 @@ const useStyles = makeStyles({
 
 export default function HotelTable() {
   const history = useHistory();
+  const dispatch = useDispatch();
   const token = localStorage.getItem("token");
   const role = getRole(token);
   const [hotel, setHotel] = useState();
@@ -70,9 +72,6 @@ export default function HotelTable() {
   const [flag, setFlag] = useState(false);
   const [message, setMessage] = useState("");
   const [assingFlag, setAssignFlag] = useState(false);
-  const [alertOpen, setAlertOpen] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
-  const [alertSuccessStatus, setAlertSuccessStatus] = useState(true);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [hotelName, setHotelName] = useState("");
   const [hotelAdminEmail, setHotelAdminEmail] = useState("");
@@ -82,19 +81,13 @@ export default function HotelTable() {
   const isLogged = useSelector((state) => state.isLogged);
   const adminId = useSelector((state) => state.userId);
 
-  const form = (
-    <AddHotelForm
-      handleClose={handleClose}
-      callAlert={callAlert}
-    ></AddHotelForm>
-  );
+  const form = <AddHotelForm handleClose={handleClose}></AddHotelForm>;
 
   const component = (
     <HotelAdminDialog
       hotelId={hotelId}
       message={message}
       handleClose={handleClose}
-      callAlert={callAlert}
       assingFlag={assingFlag}
     ></HotelAdminDialog>
   );
@@ -169,11 +162,10 @@ export default function HotelTable() {
         .then((response) => response.data)
         .then((data) => {
           handleClose();
-          setAlertMessage("hotel deleted successfully", true);
-          setAlertOpen(true);
+          CallAlert(dispatch, true, "hotel deleted successfully");
         })
         .catch((error) => {
-          callAlert(false);
+          CallAlert(dispatch, false);
         });
     };
     await DeleteHotel();
@@ -194,12 +186,6 @@ export default function HotelTable() {
     });
   }
 
-  function callAlert(message, successStatus) {
-    setAlertMessage(message);
-    setAlertSuccessStatus(successStatus);
-    setAlertOpen(true);
-  }
-
   function callImageDialog(hotel) {
     setHotel(hotel);
     setImageDialogOpen(true);
@@ -208,13 +194,6 @@ export default function HotelTable() {
   function handleCloseImageDialog() {
     setImageDialogOpen(false);
   }
-
-  const handleCloseAlert = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setAlertOpen(false);
-  };
 
   function SetAdmin(hotelId) {
     setMessage("add admin");
@@ -431,12 +410,6 @@ export default function HotelTable() {
         title={"Are you sure to delete this hotel?"}
         message={"the hotel will be permanently deleted"}
       ></BaseDeleteDialog>
-      <BaseAlert
-        open={alertOpen}
-        handleClose={handleCloseAlert}
-        message={alertMessage}
-        success={alertSuccessStatus}
-      ></BaseAlert>
     </>
   );
 }

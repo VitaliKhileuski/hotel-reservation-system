@@ -12,6 +12,7 @@ import { Formik, Form, ErrorMessage, Field } from "formik";
 import { useDispatch, useSelector } from "react-redux";
 import api from "./../../api/";
 import { REGISTER_VALIDATION_SCHEMA } from "../../constants/ValidationSchemas";
+import CallAlert from "../../Notifications/NotificationHandler";
 import { ADMIN } from "./../../config/Roles";
 import { EMAIL_REGEX } from "../../constants/Regex";
 import { FillStorage } from "./TokenData";
@@ -36,7 +37,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Register({ handleClose, callAlert }) {
+export default function Register({ handleClose }) {
   const isLogged = useSelector((state) => state.isLogged);
   const classes = useStyles();
   const dispatch = useDispatch();
@@ -69,7 +70,7 @@ export default function Register({ handleClose, callAlert }) {
           }
         } else {
           handleClose();
-          callAlert("user Added Successfully", true);
+          CallAlert(dispatch, "user was added successfully", true);
         }
       })
       .catch((error) => {

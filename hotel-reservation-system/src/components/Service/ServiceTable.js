@@ -15,8 +15,9 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
 import AddIcon from "@material-ui/icons/Add";
 import RemoveIcon from "@material-ui/icons/Remove";
+import { useDispatch } from "react-redux";
 import API from "../../api";
-import BaseAlert from "../shared/BaseAlert";
+import CallAlert from "../../Notifications/NotificationHandler";
 import BaseDialog from "../shared/BaseDialog";
 import BaseDeleteDialog from "../shared/BaseDeleteDialog";
 import AddServiceForm from "./AddServiceForm";
@@ -35,6 +36,7 @@ const useStyles = makeStyles({
 });
 
 export default function ServiceTable({ hotelId, serviceList }) {
+  const dispatch = useDispatch();
   const token = localStorage.getItem("token");
   const [services, setServices] = useState([]);
   const [maxNumberOfServices, setMaxNumberOfServices] = useState(0);
@@ -49,15 +51,12 @@ export default function ServiceTable({ hotelId, serviceList }) {
   const [alertOpen, setAlertOpen] = useState(false);
   const [currentSortField, setCurrentSortField] = useState("");
   const [currentAscending, setCurrentAscending] = useState("");
-  const [alertMessage, setAlertMessage] = useState("");
-  const [alertSuccessStatus, setAlertSuccessStatus] = useState(true);
 
   const form = (
     <AddServiceForm
       handleClose={handleClose}
       hotelId={hotelId}
       service={service}
-      callAlert={callAlert}
     ></AddServiceForm>
   );
 
@@ -120,6 +119,7 @@ export default function ServiceTable({ hotelId, serviceList }) {
   };
 
   function OpenAddServiceDialog(service) {
+    console.log(service);
     setService(service);
     setOpenDialog(true);
   }
@@ -158,18 +158,6 @@ export default function ServiceTable({ hotelId, serviceList }) {
       setService(newService);
     }
   }
-  function callAlert(message, successStatus) {
-    setAlertMessage(message);
-    setAlertSuccessStatus(successStatus);
-    setAlertOpen(true);
-  }
-
-  const handleCloseAlert = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setAlertOpen(false);
-  };
 
   function slice(services) {
     if (!!hotelId) {
@@ -189,9 +177,9 @@ export default function ServiceTable({ hotelId, serviceList }) {
       })
         .then((response) => response.data)
         .then((data) => {
-          callAlert("service deleted successfully", true);
+          CallAlert(dispatch, true, "service deleted successfully");
         })
-        .catch((error) => callAlert(false));
+        .catch((error) => CallAlert(dispatch, false));
     };
 
     await DeleteService();
@@ -296,7 +284,7 @@ export default function ServiceTable({ hotelId, serviceList }) {
             size="large"
             margin="normal"
             className={classes.createRoomButton}
-            onClick={OpenAddServiceDialog}
+            onClick={() => OpenAddServiceDialog()}
           >
             Create Service
           </Button>
@@ -312,12 +300,6 @@ export default function ServiceTable({ hotelId, serviceList }) {
             title={"Are you sure to delete this service?"}
             message={"service will be permanently deleted"}
           ></BaseDeleteDialog>
-          <BaseAlert
-            open={alertOpen}
-            handleClose={handleCloseAlert}
-            message={alertMessage}
-            success={alertSuccessStatus}
-          ></BaseAlert>
         </>
       ) : (
         ""

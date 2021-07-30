@@ -93,6 +93,11 @@ export default function Home() {
     setCity("");
   }, [currentCountry]);
 
+  async function handleSearchButton() {
+    setPage(1);
+    await SearchFilteredHotels();
+  }
+
   async function SearchFilteredHotels() {
     dispatch({ type: CHECK_IN_DATE, checkInDate: checkInDate });
     dispatch({ type: CHECK_OUT_DATE, checkOutDate: checkOutDate });
@@ -218,7 +223,7 @@ export default function Home() {
             color="primary"
             size="large"
             disabled={!isValidDates}
-            onClick={SearchFilteredHotels}
+            onClick={handleSearchButton}
           >
             Search
           </Button>

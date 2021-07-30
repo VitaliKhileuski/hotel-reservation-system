@@ -5,8 +5,10 @@ import TextField from "@material-ui/core/TextField";
 import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
 import { makeStyles } from "@material-ui/core/styles";
+import { useDispatch } from "react-redux";
 import Container from "@material-ui/core/Container";
 import Autocomplete from "@material-ui/lab/Autocomplete";
+import CallAlert from "../../Notifications/NotificationHandler";
 import API from "./../../api/";
 
 const useStyles = makeStyles((theme) => ({
@@ -33,10 +35,10 @@ export default function HotelAdminDialog({
   hotelId,
   message,
   handleClose,
-  callAlert,
   assingFlag,
 }) {
   const classes = useStyles();
+  const dispatch = useDispatch();
   const [users, setUsers] = useState([]);
   const [admin, setAdmin] = useState();
   const token = localStorage.getItem("token");
@@ -77,9 +79,9 @@ export default function HotelAdminDialog({
     })
       .then((response) => response.data)
       .then((data) => {
-        callAlert("hotel admin assigned successfully", true);
+        CallAlert(dispatch, true, "hotel admin assigned successfully");
       })
-      .catch((error) => callAlert(false));
+      .catch((error) => CallAlert(dispatch, false));
   };
 
   const DeleteHotelAdmin = async () => {
@@ -88,9 +90,9 @@ export default function HotelAdminDialog({
     })
       .then((response) => response.data)
       .then((data) => {
-        callAlert("hotel admin deleted successfully", true);
+        CallAlert(dispatch, true, "hotel admin deleted successfully");
       })
-      .catch((error) => callAlert(false));
+      .catch((error) => CallAlert(dispatch, false));
   };
 
   function updateHotelAdmin() {

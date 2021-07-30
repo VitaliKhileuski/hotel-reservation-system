@@ -8,7 +8,6 @@ import Typography from "@material-ui/core/Typography";
 import { Box } from "@material-ui/core/";
 import Grid from "@material-ui/core/Grid";
 import API from "./../../api";
-import BaseAlert from "./../shared/BaseAlert";
 import RoomTable from "./../Room/RoomTable";
 import BaseImageDialog from "./../shared/BaseImageDialog";
 import ServiceTable from "../Service/ServiceTable";
@@ -60,6 +59,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function HotelEditor(props) {
+  console.log(props);
   const classes = useStyles();
   const [value, setValue] = useState(0);
   const [hotel, setHotel] = useState(
@@ -76,13 +76,6 @@ export default function HotelEditor(props) {
   function callUpdateAlert() {
     setUpdateAlertOpen(true);
   }
-
-  const handleCloseUpdateAlert = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setUpdateAlertOpen(false);
-  };
 
   function toRoomSection() {
     setValue(1);
@@ -156,11 +149,6 @@ export default function HotelEditor(props) {
         updateMainInfo={updateMainInfo}
         imageUrls={hotel.imageUrls}
       ></BaseImageDialog>
-      <BaseAlert
-        open={updateAlertOpen}
-        handleClose={handleCloseUpdateAlert}
-        message={"hotel updated succesfully"}
-      ></BaseAlert>
     </div>
   );
 }

@@ -4,7 +4,7 @@ import Box from "@material-ui/core/Box";
 import Collapse from "@material-ui/core/Collapse";
 import IconButton from "@material-ui/core/IconButton";
 import Table from "@material-ui/core/Table";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import DeleteIcon from "@material-ui/icons/Delete";
@@ -24,6 +24,7 @@ import BaseDialog from "../shared/BaseDialog";
 import OrderFilter from "../Filters/OrderFilter";
 import RoomDetails from "../Room/RoomDetails";
 import BaseDeleteDialog from "../shared/BaseDeleteDialog";
+import CallAlert from "../../Notifications/NotificationHandler";
 import BaseAlert from "../shared/BaseAlert";
 import { USER } from "./../../config/Roles";
 
@@ -256,18 +257,16 @@ function Row({ order, handleClickDeleteIcon }) {
 }
 
 export default function OrderTable() {
+  const dispatch = useDispatch();
   const [orders, setOrders] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [pageForRequest, SetPageForRequest] = useState(0);
+  const [pageForRequest, setPageForRequest] = useState(0);
   const [maxNumberOfOrders, setMaxNumberOfOrders] = useState(0);
-  const [alertOpen, setAlertOpen] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
   const [hotelCountry, setHotelCountry] = useState("");
   const [hotelCity, setHotelCity] = useState("");
   const [currentSurname, setCurrentSurname] = useState("");
   const [currentOrderNumber, setCurrentOrderNumber] = useState("");
-  const [alertSuccessStatus, setAlertSuccessStatus] = useState(true);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [currentSortField, setCurrentSortField] = useState("");
   const [currentAscending, setCurrentAscending] = useState("asc");
@@ -333,18 +332,12 @@ export default function OrderTable() {
       })
         .then((response) => response.data)
         .then((data) => {
-          callAlert("order deleted successfully", true);
+          CallAlert(dispatch, true, "order deleted successfully");
         })
-        .catch((error) => callAlert(false));
+        .catch((error) => CallAlert(dispatch, false));
     };
     DeleteOrder();
     handleCloseDeleteDialog();
-  }
-
-  function callAlert(message, successStatus) {
-    setAlertMessage(message);
-    setAlertSuccessStatus(successStatus);
-    setAlertOpen(true);
   }
 
   function handleCloseDeleteDialog() {
@@ -364,22 +357,15 @@ export default function OrderTable() {
     loadOrders(country, city, surname, orderNumberNoSpaces, true);
   }
 
-  const handleCloseAlert = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setAlertOpen(false);
-  };
-
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
-    SetPageForRequest(newPage + 1);
+    setPageForRequest(newPage + 1);
   };
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
-    SetPageForRequest(1);
+    setPageForRequest(1);
   };
 
   function orderBy(sortField) {
@@ -492,12 +478,6 @@ export default function OrderTable() {
         message="order will be canceled."
         deleteItem={deleteOrder}
       ></BaseDeleteDialog>
-      <BaseAlert
-        open={alertOpen}
-        handleClose={handleCloseAlert}
-        message={alertMessage}
-        success={alertSuccessStatus}
-      ></BaseAlert>
     </>
   );
 }

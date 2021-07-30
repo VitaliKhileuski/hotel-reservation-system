@@ -1,4 +1,4 @@
-import { React, useState } from "react";
+import { React } from "react";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import TextField from "@material-ui/core/TextField";
@@ -6,8 +6,10 @@ import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
+import { useDispatch } from "react-redux";
 import { Formik, Form, ErrorMessage, Field } from "formik";
 import API from "../../api";
+import CallAlert from "../../Notifications/NotificationHandler";
 import { ROOM_VALIDATION_SCHEMA } from "../../constants/ValidationSchemas";
 
 const useStyles = makeStyles((theme) => ({
@@ -31,8 +33,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function AddRoomForm({ hotelId, room, handleClose, callAlert }) {
+export default function AddRoomForm({ hotelId, room, handleClose }) {
   const classes = useStyles();
+  const dispatch = useDispatch();
   const token = localStorage.getItem("token");
   const initialValues = {
     roomNumber: !!room ? room.roomNumber : "",
@@ -53,9 +56,9 @@ export default function AddRoomForm({ hotelId, room, handleClose, callAlert }) {
       })
         .then((response) => response.data)
         .then((data) => {
-          callAlert("room added successfully", true);
+          CallAlert(dispatch, true, "room added successfully");
         })
-        .catch((error) => callAlert(false));
+        .catch((error) => CallAlert(dispatch, false));
     };
     if (!!room) {
       console.log(room);
@@ -73,9 +76,9 @@ export default function AddRoomForm({ hotelId, room, handleClose, callAlert }) {
     })
       .then((response) => response.data)
       .then((data) => {
-        callAlert("room updated successfully", true);
+        CallAlert(dispatch, true, "room updated successfully");
       })
-      .catch((error) => callAlert(false));
+      .catch((error) => CallAlert(dispatch, false));
   };
 
   return (
