@@ -113,7 +113,7 @@ export default function Login() {
         </Typography>
         <Formik initialValues={initialValues} onSubmit={onSubmit}>
           {(props) => (
-            <Form className={classes.form}>
+            <Form className={classes.form} noValidate>
               <Field
                 as={TextField}
                 variant="outlined"

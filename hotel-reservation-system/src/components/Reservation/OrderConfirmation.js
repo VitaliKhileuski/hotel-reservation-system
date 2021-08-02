@@ -74,15 +74,16 @@ export default function OrderConfirmation({
   }
 
   function validateEmail(email) {
+    const emailWithoutSpaces = email.trim();
     setEmailErrorLabel("");
-    const flag = EMAIL_REGEX.test(email);
+    setEmail(emailWithoutSpaces);
+    const flag = EMAIL_REGEX.test(emailWithoutSpaces);
     if (!flag) {
       setEmailErrorLabel("invalid email");
     }
-    if (email === "") {
+    if (emailWithoutSpaces === "") {
       setEmailErrorLabel("email is required");
     }
-    setEmail(email);
   }
 
   const createOrderRequest = async (request) => {

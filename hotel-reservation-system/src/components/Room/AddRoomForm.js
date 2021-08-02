@@ -92,7 +92,7 @@ export default function AddRoomForm({ hotelId, room, handleClose }) {
             validationSchema={ROOM_VALIDATION_SCHEMA}
           >
             {(props) => (
-              <Form className={classes.form}>
+              <Form className={classes.form} noValidate>
                 <Grid container spacing={2}>
                   <Grid item xs={12}></Grid>
                   <Grid item xs={12}>

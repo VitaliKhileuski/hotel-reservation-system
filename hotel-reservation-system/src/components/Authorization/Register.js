@@ -80,15 +80,19 @@ export default function Register({ handleClose }) {
       });
   };
   function ValidateEmail(email) {
+    setEmail(email);
     setEmailErrorLabel("");
+    if (email === "") {
+      setEmailErrorLabel("email is reqired");
+      return false;
+    }
     const flag = EMAIL_REGEX.test(email);
     if (!flag) {
       setEmailErrorLabel("invalid email");
-    }
-    if (email === "") {
-      setEmailErrorLabel("email is reqired");
+      return false;
     }
     setEmail(email);
+    return true;
   }
   if (isLogged && role !== ADMIN) {
     return <Redirect to="/home"></Redirect>;
@@ -107,11 +111,15 @@ export default function Register({ handleClose }) {
         )}
         <Formik
           initialValues={initialValues}
-          onSubmit={onSubmit}
+          onSubmit={(values) => {
+            ValidateEmail(email);
+            if (ValidateEmail(email.trim()) && emailErrorLabel === "")
+              onSubmit(values);
+          }}
           validationSchema={REGISTER_VALIDATION_SCHEMA}
         >
           {(props) => (
-            <Form className={classes.form}>
+            <Form className={classes.form} noValidate>
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>
                   <Field
@@ -130,6 +138,7 @@ export default function Register({ handleClose }) {
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <Field
+                    novalidate
                     as={TextField}
                     variant="outlined"
                     required

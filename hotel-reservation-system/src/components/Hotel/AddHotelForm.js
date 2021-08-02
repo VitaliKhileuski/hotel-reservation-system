@@ -115,7 +115,7 @@ export default function AddHotelForm({ hotel, handleClose, updateMainInfo }) {
             validationSchema={HOTEL_VALIDATION_SCHEMA}
           >
             {(props) => (
-              <Form className={classes.form}>
+              <Form className={classes.form} noValidate>
                 <Grid container spacing={2}>
                   <Grid item xs={12}>
                     <Field

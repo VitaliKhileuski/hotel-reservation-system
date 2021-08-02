@@ -92,12 +92,14 @@ export default function AddServiceForm({ hotelId, service, handleClose }) {
   };
 
   function ValidateServiceName(serviceName) {
+    setServiceName(serviceName);
     setServiceNameErrorLabel("");
-
+    console.log(serviceName);
     if (serviceName === "") {
       setServiceNameErrorLabel("name is reqired");
+      return false;
     }
-    setServiceName(serviceName);
+    return true;
   }
 
   return (
@@ -107,11 +109,18 @@ export default function AddServiceForm({ hotelId, service, handleClose }) {
         <div className={classes.paper}>
           <Formik
             initialValues={initialValues}
-            onSubmit={onSubmit}
+            onSubmit={(values) => {
+              if (
+                ValidateServiceName(serviceName.trim()) &&
+                serviceNameErrorLabel === ""
+              ) {
+                onSubmit(values);
+              }
+            }}
             validationSchema={SERVICE_VALIDATION_SCHEMA}
           >
             {(props) => (
-              <Form className={classes.form}>
+              <Form className={classes.form} noValidate>
                 <Grid container spacing={2}>
                   <Grid item xs={12}></Grid>
                   <Grid item xs={12}>

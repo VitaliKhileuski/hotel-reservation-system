@@ -2,8 +2,8 @@ import * as Yup from "yup";
 import { PHONE_REGEX, PASSWORD_REGEX } from "./Regex";
 
 export const REGISTER_VALIDATION_SCHEMA = Yup.object().shape({
-  firstName: Yup.string().required("first name is required"),
-  lastName: Yup.string().required("last name is required"),
+  firstName: Yup.string().trim().required("first name is required"),
+  lastName: Yup.string().trim().required("last name is required"),
   phone: Yup.string()
     .required("phone number is required")
     .matches(PHONE_REGEX, "enter valid phone"),
@@ -27,19 +27,19 @@ export const HOTEL_VALIDATION_SCHEMA = Yup.object().shape({
 });
 
 export const SERVICE_VALIDATION_SCHEMA = Yup.object().shape({
-  payment: Yup.number("payment must be a number").required(
-    "payment is required"
-  ),
+  payment: Yup.number()
+    .typeError("you must specify a number")
+    .required("payment is required"),
 });
 
 export const ROOM_VALIDATION_SCHEMA = Yup.object().shape({
-  roomNumber: Yup.string().required("room Number is required").trim(),
-  bedsNumber: Yup.number("beds number must be a number").required(
-    "beds number is required"
-  ),
-  paymentPerDay: Yup.number("payment per day must be a number").required(
-    "payment per day is required"
-  ),
+  roomNumber: Yup.string().required("room number is required").trim(),
+  bedsNumber: Yup.number()
+    .typeError("you must specify a number")
+    .required("beds number is required"),
+  paymentPerDay: Yup.number()
+    .typeError("you must specify a number")
+    .required("payment per day is required"),
 });
 
 export const UPDATE_USER_VALIDATION_SCHEMA = Yup.object().shape({
