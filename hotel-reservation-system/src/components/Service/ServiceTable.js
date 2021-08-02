@@ -169,6 +169,9 @@ export default function ServiceTable({ hotelId, serviceList }) {
       );
     }
   }
+  function ccyFormat(num) {
+    return `${num.toFixed(2)}`;
+  }
 
   async function deleteService() {
     const DeleteService = async () => {
@@ -193,7 +196,9 @@ export default function ServiceTable({ hotelId, serviceList }) {
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>
-                <TableCell align="right" style={{ minWidth: 170 }}>
+                {!!hotelId ? (
+                  <>
+                  <TableCell align="right" style={{ minWidth: 170 }}>
                   <TableSortLabel
                     active={currentSortField === "Name" ? true : false}
                     direction={currentAscending}
@@ -211,22 +216,33 @@ export default function ServiceTable({ hotelId, serviceList }) {
                     Payment
                   </TableSortLabel>
                 </TableCell>
-                {!!hotelId ? (
-                  ""
+                <TableCell></TableCell>
+                </>
                 ) : (
+                  <>
+                  <TableCell align="right" style={{ minWidth: 50 }}>
+                    Name
+                  </TableCell>
+                  <TableCell align="right" style={{ minWidth: 170 }}>
+                    Payment
+                  </TableCell>
                   <TableCell align="right" style={{ minWidth: 50 }}>
                     Quantity
                   </TableCell>
+                  <TableCell />
+                <TableCell align="center" style={{ minWidth: 50 }}>
+                    Total sum
+                  </TableCell>
+                  </>
                 )}
-                <TableCell />
-                <TableCell />
+                
               </TableRow>
             </TableHead>
             <TableBody>
               {slice(services).map((service) => (
                 <TableRow key={service.id}>
                   <TableCell align="right">{service.name}</TableCell>
-                  <TableCell align="right">{service.payment}</TableCell>
+                  <TableCell align="right">{ccyFormat(service.payment)}</TableCell>
                   {!!hotelId ? (
                     <TableCell>
                       <Tooltip title="edit">
@@ -266,6 +282,9 @@ export default function ServiceTable({ hotelId, serviceList }) {
                             <RemoveIcon></RemoveIcon>
                           </IconButton>
                         </Tooltip>
+                      </TableCell>
+                      <TableCell align="center">
+                        {ccyFormat(service.quantity*service.payment)}
                       </TableCell>
                     </>
                   )}
