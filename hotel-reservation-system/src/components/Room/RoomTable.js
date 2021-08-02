@@ -233,28 +233,28 @@ export default function RoomTable({ hotelId }) {
                   <TableCell align="right">{room.paymentPerDay}</TableCell>
                   <TableCell>
                     <Tooltip title="edit">
-                    <IconButton
-                      color="inherit"
-                      onClick={() => OpenAddRoomDialog(room)}
-                    >
-                      <EditIcon></EditIcon>
-                    </IconButton>
+                      <IconButton
+                        color="inherit"
+                        onClick={() => OpenAddRoomDialog(room)}
+                      >
+                        <EditIcon></EditIcon>
+                      </IconButton>
                     </Tooltip>
                     <Tooltip title="delete">
-                    <IconButton
-                      color="inherit"
-                      onClick={() => callDeleteDialog(room.id)}
-                    >
-                      <DeleteIcon></DeleteIcon>
-                    </IconButton>
+                      <IconButton
+                        color="inherit"
+                        onClick={() => callDeleteDialog(room.id)}
+                      >
+                        <DeleteIcon></DeleteIcon>
+                      </IconButton>
                     </Tooltip>
                     <Tooltip title="add images to room">
-                    <IconButton
-                      color="inherit"
-                      onClick={() => callImageDialog(room)}
-                    >
-                      <AddPhotoAlternateIcon></AddPhotoAlternateIcon>
-                    </IconButton>
+                      <IconButton
+                        color="inherit"
+                        onClick={() => callImageDialog(room)}
+                      >
+                        <AddPhotoAlternateIcon></AddPhotoAlternateIcon>
+                      </IconButton>
                     </Tooltip>
                   </TableCell>
                 </TableRow>

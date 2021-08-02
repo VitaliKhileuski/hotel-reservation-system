@@ -73,12 +73,12 @@ function Row({ order, handleClickDeleteIcon }) {
         <TableCell align="right">{order.number}</TableCell>
         <TableCell align="right">
           <Tooltip title="look to room details">
-          <IconButton
-            color="inherit"
-            onClick={() => openRoomDetails(order.room)}
-          >
-            <ZoomInIcon></ZoomInIcon>
-          </IconButton>
+            <IconButton
+              color="inherit"
+              onClick={() => openRoomDetails(order.room)}
+            >
+              <ZoomInIcon></ZoomInIcon>
+            </IconButton>
           </Tooltip>
         </TableCell>
         <TableCell align="right">
@@ -94,11 +94,11 @@ function Row({ order, handleClickDeleteIcon }) {
         <TableCell align="right">{ccyFormat(order.fullPrice)}</TableCell>
         <TableCell>
           <Tooltip title="delete">
-          <IconButton color="inherit">
-            <DeleteIcon
-              onClick={() => handleClickDeleteIcon(order.id)}
-            ></DeleteIcon>
-          </IconButton>
+            <IconButton color="inherit">
+              <DeleteIcon
+                onClick={() => handleClickDeleteIcon(order.id)}
+              ></DeleteIcon>
+            </IconButton>
           </Tooltip>
         </TableCell>
       </TableRow>

@@ -25,6 +25,7 @@ const useStyles = makeStyles((theme) => ({
   },
   title: {
     flexGrow: 1,
+    cursor: "pointer",
   },
   navElement: {
     marginLeft: theme.spacing(1),
@@ -70,6 +71,7 @@ export default function NavBar() {
       <AppBar position="static">
         <Toolbar>
           <Typography
+            as={Button}
             onClick={toHomePage}
             align="left"
             variant="h6"

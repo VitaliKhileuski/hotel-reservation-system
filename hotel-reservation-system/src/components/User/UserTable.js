@@ -257,11 +257,11 @@ export default function UserTable() {
                     {user.role.name !== ADMIN ? (
                       <Tooltip title="delete">
                         <IconButton
-                        color="inherit"
-                        onClick={() => deleteUserById(user.id)}
-                      >
-                        <DeleteIcon></DeleteIcon>
-                      </IconButton>
+                          color="inherit"
+                          onClick={() => deleteUserById(user.id)}
+                        >
+                          <DeleteIcon></DeleteIcon>
+                        </IconButton>
                       </Tooltip>
                     ) : (
                       ""

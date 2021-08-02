@@ -230,20 +230,20 @@ export default function ServiceTable({ hotelId, serviceList }) {
                   {!!hotelId ? (
                     <TableCell>
                       <Tooltip title="edit">
-                      <IconButton
-                        color="inherit"
-                        onClick={() => OpenAddServiceDialog(service)}
-                      >
-                        <EditIcon></EditIcon>
-                      </IconButton>
+                        <IconButton
+                          color="inherit"
+                          onClick={() => OpenAddServiceDialog(service)}
+                        >
+                          <EditIcon></EditIcon>
+                        </IconButton>
                       </Tooltip>
                       <Tooltip title="delete">
-                      <IconButton
-                        color="inherit"
-                        onClick={() => callDeleteDialog(service.id)}
-                      >
-                        <DeleteIcon></DeleteIcon>
-                      </IconButton>
+                        <IconButton
+                          color="inherit"
+                          onClick={() => callDeleteDialog(service.id)}
+                        >
+                          <DeleteIcon></DeleteIcon>
+                        </IconButton>
                       </Tooltip>
                     </TableCell>
                   ) : (
@@ -251,20 +251,20 @@ export default function ServiceTable({ hotelId, serviceList }) {
                       <TableCell align="right">{service.quantity}</TableCell>
                       <TableCell>
                         <Tooltip title="add">
-                        <IconButton
-                          onClick={() => increaseQuantity(service)}
-                          color="inherit"
-                        >
-                          <AddIcon></AddIcon>
-                        </IconButton>
+                          <IconButton
+                            onClick={() => increaseQuantity(service)}
+                            color="inherit"
+                          >
+                            <AddIcon></AddIcon>
+                          </IconButton>
                         </Tooltip>
                         <Tooltip title="substract">
-                        <IconButton
-                          onClick={() => reduceQuantity(service)}
-                          color="inherit"
-                        >
-                          <RemoveIcon></RemoveIcon>
-                        </IconButton>
+                          <IconButton
+                            onClick={() => reduceQuantity(service)}
+                            color="inherit"
+                          >
+                            <RemoveIcon></RemoveIcon>
+                          </IconButton>
                         </Tooltip>
                       </TableCell>
                     </>
