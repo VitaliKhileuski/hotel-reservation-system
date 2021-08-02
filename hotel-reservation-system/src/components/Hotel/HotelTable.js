@@ -21,7 +21,6 @@ import PersonAddDisabledIcon from "@material-ui/icons/PersonAddDisabled";
 import AddPhotoAlternateIcon from "@material-ui/icons/AddPhotoAlternate";
 import API from "./../../api";
 import { HOTEL_EDITOR_PATH } from "../../constants/RoutingPaths";
-import BaseAlert from "./../shared/BaseAlert";
 import BaseDialog from "../shared/BaseDialog";
 import BaseDeleteDialog from "./../shared/BaseDeleteDialog";
 import BaseImageDialog from "../shared/BaseImageDialog";
@@ -80,6 +79,7 @@ export default function HotelTable() {
   const [currentAscending, setCurrentAscending] = useState("asc");
   const isLogged = useSelector((state) => state.isLogged);
   const adminId = useSelector((state) => state.userId);
+  const [filterFlag, setFilterFlag] = useState(true);
 
   const form = <AddHotelForm handleClose={handleClose}></AddHotelForm>;
 
@@ -93,15 +93,23 @@ export default function HotelTable() {
   );
 
   useEffect(() => {
-    if (!openDeleteDialog && !open && !imageDialogOpen) {
+    if (!openDeleteDialog && !open && !imageDialogOpen && filterFlag) {
       loadHotels();
     }
   }, [rowsPerPage, page, open, openDeleteDialog, imageDialogOpen]);
 
-  const loadHotels = async (email, surname, flag, sortField, ascending) => {
+  const loadHotels = async (
+    email,
+    surname,
+    flag,
+    pageNumber,
+    sortField,
+    ascending
+  ) => {
     const path = role === ADMIN ? "page" : "pagesForHotelAdmin";
     let requestEmail = email;
     let requestSurname = surname;
+    let requestPageNumber = !!pageNumber ? pageNumber : pageForRequest;
     if (flag === undefined) {
       requestEmail = hotelAdminEmail;
       requestSurname = hotelAdminSurname;
@@ -116,7 +124,7 @@ export default function HotelTable() {
         HotelName: hotelName,
         Email: requestEmail,
         Surname: requestSurname,
-        PageNumber: pageForRequest,
+        PageNumber: requestPageNumber,
         PageSize: rowsPerPage,
         SortField: sortField,
         Ascending: requestAscending,
@@ -128,6 +136,7 @@ export default function HotelTable() {
         setMaxNumberOfHotels(data.numberOfItems);
       })
       .catch((error) => {});
+    setFilterFlag(true);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -208,9 +217,12 @@ export default function HotelTable() {
     setMessage("delete admin");
   }
   function getValuesFromFilter(email, surname) {
+    setFilterFlag(false);
+    setPage(0);
+    SetPageForRequest(1);
     setHotelAdminEmail(email);
     setHotelAdminSurname(surname);
-    loadHotels(email, surname, true);
+    loadHotels(email, surname, true, 1);
   }
   function getValueFromHotelFilter(hotelName) {
     setHotelName(hotelName);
@@ -225,7 +237,14 @@ export default function HotelTable() {
       setCurrentAscending("desc");
       ascending = "desc";
     }
-    loadHotels(undefined, undefined, undefined, sortField, ascending);
+    loadHotels(
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      sortField,
+      ascending
+    );
   }
   return (
     <>

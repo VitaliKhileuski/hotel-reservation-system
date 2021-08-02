@@ -53,6 +53,7 @@ export default function RoomTable({ hotelId }) {
   const [currentAscending, setCurrentAscending] = useState("");
   const [currentRoomNumber, setCurrentRoomNumber] = useState("");
   const userId = useSelector((state) => state.userId);
+  const [filterFlag, setFilterFlag] = useState(true);
 
   function callImageDialog(room) {
     setRoomId(room.id);
@@ -73,11 +74,20 @@ export default function RoomTable({ hotelId }) {
   );
 
   useEffect(() => {
-    loadRooms();
+    if (filterFlag) {
+      loadRooms();
+    }
   }, [rowsPerPage, page, openDialog, openDeleteDialog]);
 
-  const loadRooms = async (roomNumber, flag, sortField, ascending) => {
+  const loadRooms = async (
+    roomNumber,
+    flag,
+    pageNumber,
+    sortField,
+    ascending
+  ) => {
     let requestRoomNumber = roomNumber;
+    let requestPageNumber = !!pageNumber ? pageNumber : pageForRequest;
     if (flag === undefined) {
       requestRoomNumber = currentRoomNumber;
     }
@@ -90,7 +100,7 @@ export default function RoomTable({ hotelId }) {
       params: {
         UserId: userId,
         RoomNumber: requestRoomNumber,
-        PageNumber: pageForRequest,
+        PageNumber: requestPageNumber,
         PageSize: rowsPerPage,
         SortField: sortField,
         Ascending: requestAscending,
@@ -102,6 +112,7 @@ export default function RoomTable({ hotelId }) {
         setMaxNumberOfRooms(data.numberOfItems);
       })
       .catch((error) => console.log(error.response.data.message));
+    setFilterFlag(true);
   };
 
   function orderBy(sortField) {
@@ -114,7 +125,7 @@ export default function RoomTable({ hotelId }) {
       setCurrentAscending("desc");
       ascending = "desc";
     }
-    loadRooms(undefined, undefined, sortField, ascending);
+    loadRooms(undefined, undefined, undefined, sortField, ascending);
   }
 
   const handleChangePage = (event, newPage) => {
@@ -163,8 +174,11 @@ export default function RoomTable({ hotelId }) {
   }
 
   function getValuesFromFilter(roomNumber) {
+    setFilterFlag(false);
+    setPage(0);
+    SetPageForRequest(1);
     setCurrentRoomNumber(roomNumber);
-    loadRooms(roomNumber, true);
+    loadRooms(roomNumber, true, 1);
   }
 
   return (

@@ -58,18 +58,27 @@ export default function UserTable() {
   const [userSurname, setUserSurname] = useState("");
   const [currentSortField, setCurrentSortField] = useState("");
   const [currentAscending, setCurrentAscending] = useState("");
+  const [filterFlag, setFilterFlag] = useState(true);
 
   const form = <Register handleClose={handleCloseAddUserDialog}></Register>;
 
   useEffect(() => {
-    if (deleteDialogOpen === false && addUserDialogOpen === false) {
+    if (!deleteDialogOpen && !addUserDialogOpen && filterFlag) {
       loadUsers();
     }
   }, [rowsPerPage, page, deleteDialogOpen, addUserDialogOpen]);
 
-  const loadUsers = async (email, surname, flag, sortField, ascending) => {
+  const loadUsers = async (
+    email,
+    surname,
+    flag,
+    pageNumber,
+    sortField,
+    ascending
+  ) => {
     let requestEmail = email;
     let requestSurname = surname;
+    let requestPageNumber = !!pageNumber ? pageNumber : pageForRequest;
     if (flag === undefined) {
       requestEmail = userEmail;
       requestSurname = userSurname;
@@ -82,7 +91,7 @@ export default function UserTable() {
       params: {
         Email: requestEmail,
         Surname: requestSurname,
-        PageNumber: pageForRequest,
+        PageNumber: requestPageNumber,
         PageSize: rowsPerPage,
         SortField: sortField,
         Ascending: requestAscending,
@@ -95,6 +104,7 @@ export default function UserTable() {
         setMaxNumberOfUsers(data.numberOfItems);
       })
       .catch((error) => console.log(error.response.data.message));
+    setFilterFlag(true);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -141,9 +151,12 @@ export default function UserTable() {
     setAddUserDialogOpen(false);
   }
   function getValuesFromFilter(email, surname) {
+    setFilterFlag(false);
+    setPage(0);
+    SetPageForRequest(1);
     setUserEmail(email);
     setUserSurname(surname);
-    loadUsers(email, surname, true);
+    loadUsers(email, surname, true, 1);
   }
 
   function orderBy(sortField) {
@@ -156,7 +169,15 @@ export default function UserTable() {
       setCurrentAscending("desc");
       ascending = "desc";
     }
-    loadUsers(undefined, undefined, undefined, sortField, ascending);
+    loadUsers(
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      sortField,
+      ascending
+    );
   }
 
   return (

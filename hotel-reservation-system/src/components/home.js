@@ -53,6 +53,7 @@ export default function Home() {
   const userId = useSelector((state) => state.userId);
   const dispatch = useDispatch();
   const token = localStorage.getItem("token");
+  const [filterFlag, setFilterFlag] = useState(true);
 
   useEffect(() => {
     loadCountries();
@@ -94,14 +95,15 @@ export default function Home() {
   }, [currentCountry]);
 
   async function handleSearchButton() {
+    setFilterFlag(false);
     setPage(1);
-    await SearchFilteredHotels();
+    await SearchFilteredHotels(1);
   }
 
-  async function SearchFilteredHotels() {
+  async function SearchFilteredHotels(pageNumber) {
     dispatch({ type: CHECK_IN_DATE, checkInDate: checkInDate });
     dispatch({ type: CHECK_OUT_DATE, checkOutDate: checkOutDate });
-
+    let requestPageNumber = !!pageNumber ? pageNumber : page;
     const getFilteredHotels = async () => {
       await API.get("/hotels/page", {
         params: {
@@ -111,7 +113,7 @@ export default function Home() {
           Country: currentCountry,
           City: city,
           HotelName: hotelName,
-          PageNumber: page,
+          PageNumber: requestPageNumber,
           PageSize: pageSize,
         },
       })
@@ -121,6 +123,7 @@ export default function Home() {
           setMaxPage(data.numberOfPages);
         })
         .catch((error) => console.log(error));
+      setFilterFlag(true);
     };
     if (!!token && !!userId) {
       getFilteredHotels();
@@ -138,7 +141,9 @@ export default function Home() {
   }
 
   useEffect(() => {
-    SearchFilteredHotels();
+    if (filterFlag) {
+      SearchFilteredHotels();
+    }
   }, [page, userId]);
 
   const classes = useStyles();

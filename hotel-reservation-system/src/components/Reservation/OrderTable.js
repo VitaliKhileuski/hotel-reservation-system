@@ -272,9 +272,11 @@ export default function OrderTable() {
   const [currentAscending, setCurrentAscending] = useState("asc");
   const [orderId, setOrderId] = useState("");
   const token = localStorage.getItem("token");
+  const [filterflag, setFilterFlag] = useState(true);
 
   useEffect(() => {
-    if (deleteDialogOpen === false) {
+    if (deleteDialogOpen === false && filterflag) {
+      console.log("load users from useEffect");
       loadOrders();
     }
   }, [rowsPerPage, page, deleteDialogOpen]);
@@ -285,6 +287,7 @@ export default function OrderTable() {
     surname,
     orderNumber,
     flag,
+    pageNumber,
     sortField,
     ascending
   ) => {
@@ -292,6 +295,8 @@ export default function OrderTable() {
     let requestCity = city;
     let requestSurname = surname;
     let requestOrderNumber = orderNumber;
+    console.log(pageNumber);
+    let requestPageNumber = !!pageNumber ? pageNumber : pageForRequest;
     if (flag === undefined) {
       requestCountry = hotelCountry;
       requestCity = hotelCity;
@@ -301,7 +306,6 @@ export default function OrderTable() {
     if (sortField === null || sortField === undefined) {
       sortField = currentSortField;
     }
-
     let requestAscending = (ascending || currentAscending) === "asc";
     await API.get("/orders", {
       params: {
@@ -309,7 +313,7 @@ export default function OrderTable() {
         City: requestCity,
         Surname: requestSurname,
         Number: requestOrderNumber,
-        PageNumber: pageForRequest,
+        PageNumber: requestPageNumber,
         PageSize: rowsPerPage,
         SortField: sortField,
         Ascending: requestAscending,
@@ -318,11 +322,11 @@ export default function OrderTable() {
     })
       .then((response) => response.data)
       .then((data) => {
-        console.log(data);
         setOrders(data.items);
         setMaxNumberOfOrders(data.numberOfItems);
       })
       .catch((error) => console.log(error.response.data.Message));
+    setFilterFlag(true);
   };
 
   async function deleteOrder() {
@@ -349,12 +353,15 @@ export default function OrderTable() {
     setDeleteDialogOpen(true);
   }
   function getValuesFromFilter(country, city, surname, orderNumber) {
+    setFilterFlag(false);
+    setPage(0);
+    setPageForRequest(1);
     const orderNumberNoSpaces = orderNumber.trim();
     setHotelCountry(country);
     setHotelCity(city);
     setCurrentSurname(surname);
     setCurrentOrderNumber(orderNumberNoSpaces);
-    loadOrders(country, city, surname, orderNumberNoSpaces, true);
+    loadOrders(country, city, surname, orderNumberNoSpaces, true, 1);
   }
 
   const handleChangePage = (event, newPage) => {
@@ -379,6 +386,7 @@ export default function OrderTable() {
       ascending = "desc";
     }
     loadOrders(
+      undefined,
       undefined,
       undefined,
       undefined,
