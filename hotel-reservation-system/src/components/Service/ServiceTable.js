@@ -11,6 +11,7 @@ import TablePagination from "@material-ui/core/TablePagination";
 import TableRow from "@material-ui/core/TableRow";
 import Button from "@material-ui/core/Button";
 import EditIcon from "@material-ui/icons/Edit";
+import Tooltip from "@material-ui/core/Tooltip";
 import DeleteIcon from "@material-ui/icons/Delete";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
 import AddIcon from "@material-ui/icons/Add";
@@ -48,7 +49,6 @@ export default function ServiceTable({ hotelId, serviceList }) {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [serviceId, setServiceId] = useState(0);
   const [service, setService] = useState();
-  const [alertOpen, setAlertOpen] = useState(false);
   const [currentSortField, setCurrentSortField] = useState("");
   const [currentAscending, setCurrentAscending] = useState("");
 
@@ -229,35 +229,43 @@ export default function ServiceTable({ hotelId, serviceList }) {
                   <TableCell align="right">{service.payment}</TableCell>
                   {!!hotelId ? (
                     <TableCell>
+                      <Tooltip title="edit">
                       <IconButton
                         color="inherit"
                         onClick={() => OpenAddServiceDialog(service)}
                       >
                         <EditIcon></EditIcon>
                       </IconButton>
+                      </Tooltip>
+                      <Tooltip title="delete">
                       <IconButton
                         color="inherit"
                         onClick={() => callDeleteDialog(service.id)}
                       >
                         <DeleteIcon></DeleteIcon>
                       </IconButton>
+                      </Tooltip>
                     </TableCell>
                   ) : (
                     <>
                       <TableCell align="right">{service.quantity}</TableCell>
                       <TableCell>
+                        <Tooltip title="add">
                         <IconButton
                           onClick={() => increaseQuantity(service)}
                           color="inherit"
                         >
                           <AddIcon></AddIcon>
                         </IconButton>
+                        </Tooltip>
+                        <Tooltip title="substract">
                         <IconButton
                           onClick={() => reduceQuantity(service)}
                           color="inherit"
                         >
                           <RemoveIcon></RemoveIcon>
                         </IconButton>
+                        </Tooltip>
                       </TableCell>
                     </>
                   )}

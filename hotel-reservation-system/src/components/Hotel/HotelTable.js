@@ -6,6 +6,7 @@ import Paper from "@material-ui/core/Paper";
 import IconButton from "@material-ui/core/IconButton";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
+import Tooltip from "@material-ui/core/Tooltip";
 import TableCell from "@material-ui/core/TableCell";
 import Button from "@material-ui/core/Button";
 import TableRow from "@material-ui/core/TableRow";
@@ -346,36 +347,46 @@ export default function HotelTable() {
                     {hotel.location.buildingNumber}
                   </TableCell>
                   <TableCell>
+                    <Tooltip title="edit">
                     <IconButton
                       color="inherit"
                       onClick={() => toHotelEditor(hotel)}
                     >
                       <EditIcon></EditIcon>
                     </IconButton>
+                    </Tooltip>
+                    <Tooltip title="delete">
                     <IconButton
                       color="inherit"
                       onClick={() => callAlertDialog(hotel.id)}
                     >
                       <DeleteIcon></DeleteIcon>
                     </IconButton>
+                    </Tooltip>
+                    <Tooltip title="assign hotel admin">
                     <IconButton
                       color="inherit"
                       onClick={() => SetAdmin(hotel.id)}
                     >
                       <PersonAddIcon></PersonAddIcon>
                     </IconButton>
+                    </Tooltip>
+                    <Tooltip title="delete hotel admin">
                     <IconButton
                       color="inherit"
                       onClick={() => DeleteAdmin(hotel.id)}
                     >
                       <PersonAddDisabledIcon></PersonAddDisabledIcon>
                     </IconButton>
+                    </Tooltip>
+                    <Tooltip title="add images to hotel">
                     <IconButton
                       color="inherit"
                       onClick={() => callImageDialog(hotel)}
                     >
                       <AddPhotoAlternateIcon></AddPhotoAlternateIcon>
                     </IconButton>
+                    </Tooltip>
                   </TableCell>
                 </TableRow>
               ))}

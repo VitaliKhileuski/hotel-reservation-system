@@ -11,6 +11,7 @@ import Button from "@material-ui/core/Button";
 import TableHead from "@material-ui/core/TableHead";
 import IconButton from "@material-ui/core/IconButton";
 import EditIcon from "@material-ui/icons/Edit";
+import Tooltip from "@material-ui/core/Tooltip";
 import { useSelector, useDispatch } from "react-redux";
 import DeleteIcon from "@material-ui/icons/Delete";
 import AddPhotoAlternateIcon from "@material-ui/icons/AddPhotoAlternate";
@@ -231,24 +232,30 @@ export default function RoomTable({ hotelId }) {
                   <TableCell align="right">{room.bedsNumber}</TableCell>
                   <TableCell align="right">{room.paymentPerDay}</TableCell>
                   <TableCell>
+                    <Tooltip title="edit">
                     <IconButton
                       color="inherit"
                       onClick={() => OpenAddRoomDialog(room)}
                     >
                       <EditIcon></EditIcon>
                     </IconButton>
+                    </Tooltip>
+                    <Tooltip title="delete">
                     <IconButton
                       color="inherit"
                       onClick={() => callDeleteDialog(room.id)}
                     >
                       <DeleteIcon></DeleteIcon>
                     </IconButton>
+                    </Tooltip>
+                    <Tooltip title="add images to room">
                     <IconButton
                       color="inherit"
                       onClick={() => callImageDialog(room)}
                     >
                       <AddPhotoAlternateIcon></AddPhotoAlternateIcon>
                     </IconButton>
+                    </Tooltip>
                   </TableCell>
                 </TableRow>
               ))}

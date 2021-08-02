@@ -9,6 +9,7 @@ import TableCell from "@material-ui/core/TableCell";
 import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import Grid from "@material-ui/core/Grid";
+import Tooltip from "@material-ui/core/Tooltip";
 import TablePagination from "@material-ui/core/TablePagination";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
 import TableRow from "@material-ui/core/TableRow";
@@ -254,12 +255,14 @@ export default function UserTable() {
                   <TableCell align="right">{user.phoneNumber}</TableCell>
                   <TableCell>
                     {user.role.name !== ADMIN ? (
-                      <IconButton
+                      <Tooltip title="delete">
+                        <IconButton
                         color="inherit"
                         onClick={() => deleteUserById(user.id)}
                       >
                         <DeleteIcon></DeleteIcon>
                       </IconButton>
+                      </Tooltip>
                     ) : (
                       ""
                     )}

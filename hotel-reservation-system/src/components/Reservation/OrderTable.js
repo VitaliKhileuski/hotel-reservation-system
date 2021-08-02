@@ -16,6 +16,7 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Typography from "@material-ui/core/Typography";
 import Paper from "@material-ui/core/Paper";
+import Tooltip from "@material-ui/core/Tooltip";
 import KeyboardArrowDownIcon from "@material-ui/icons/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
 import { useStyles } from "@material-ui/pickers/views/Calendar/SlideTransition";
@@ -25,7 +26,6 @@ import OrderFilter from "../Filters/OrderFilter";
 import RoomDetails from "../Room/RoomDetails";
 import BaseDeleteDialog from "../shared/BaseDeleteDialog";
 import CallAlert from "../../Notifications/NotificationHandler";
-import BaseAlert from "../shared/BaseAlert";
 import { USER } from "./../../config/Roles";
 
 const useRowStyles = makeStyles({
@@ -72,12 +72,14 @@ function Row({ order, handleClickDeleteIcon }) {
         </TableCell>
         <TableCell align="right">{order.number}</TableCell>
         <TableCell align="right">
+          <Tooltip title="look to room details">
           <IconButton
             color="inherit"
             onClick={() => openRoomDetails(order.room)}
           >
             <ZoomInIcon></ZoomInIcon>
           </IconButton>
+          </Tooltip>
         </TableCell>
         <TableCell align="right">
           {new Date(order.dateOrdered).toLocaleDateString("en-GB")}
@@ -91,11 +93,13 @@ function Row({ order, handleClickDeleteIcon }) {
         <TableCell align="right">{order.numberOfDays}</TableCell>
         <TableCell align="right">{ccyFormat(order.fullPrice)}</TableCell>
         <TableCell>
+          <Tooltip title="delete">
           <IconButton color="inherit">
             <DeleteIcon
               onClick={() => handleClickDeleteIcon(order.id)}
             ></DeleteIcon>
           </IconButton>
+          </Tooltip>
         </TableCell>
       </TableRow>
       {order.services.length === 0 ? (
