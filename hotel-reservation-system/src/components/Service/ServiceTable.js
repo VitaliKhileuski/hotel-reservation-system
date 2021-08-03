@@ -198,51 +198,52 @@ export default function ServiceTable({ hotelId, serviceList }) {
               <TableRow>
                 {!!hotelId ? (
                   <>
-                  <TableCell align="right" style={{ minWidth: 170 }}>
-                  <TableSortLabel
-                    active={currentSortField === "Name" ? true : false}
-                    direction={currentAscending}
-                    onClick={() => orderBy("Name")}
-                  >
-                    Name
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell align="right" style={{ minWidth: 100 }}>
-                  <TableSortLabel
-                    active={currentSortField === "Payment" ? true : false}
-                    direction={currentAscending}
-                    onClick={() => orderBy("Payment")}
-                  >
-                    Payment
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell></TableCell>
-                </>
+                    <TableCell align="right" style={{ minWidth: 170 }}>
+                      <TableSortLabel
+                        active={currentSortField === "Name" ? true : false}
+                        direction={currentAscending}
+                        onClick={() => orderBy("Name")}
+                      >
+                        Name
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell align="right" style={{ minWidth: 100 }}>
+                      <TableSortLabel
+                        active={currentSortField === "Payment" ? true : false}
+                        direction={currentAscending}
+                        onClick={() => orderBy("Payment")}
+                      >
+                        Payment
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell></TableCell>
+                  </>
                 ) : (
                   <>
-                  <TableCell align="right" style={{ minWidth: 50 }}>
-                    Name
-                  </TableCell>
-                  <TableCell align="right" style={{ minWidth: 170 }}>
-                    Payment
-                  </TableCell>
-                  <TableCell align="right" style={{ minWidth: 50 }}>
-                    Quantity
-                  </TableCell>
-                  <TableCell />
-                <TableCell align="center" style={{ minWidth: 50 }}>
-                    Total sum
-                  </TableCell>
+                    <TableCell align="right" style={{ minWidth: 50 }}>
+                      Name
+                    </TableCell>
+                    <TableCell align="right" style={{ minWidth: 170 }}>
+                      Payment
+                    </TableCell>
+                    <TableCell align="right" style={{ minWidth: 50 }}>
+                      Quantity
+                    </TableCell>
+                    <TableCell />
+                    <TableCell align="center" style={{ minWidth: 50 }}>
+                      Total sum
+                    </TableCell>
                   </>
                 )}
-                
               </TableRow>
             </TableHead>
             <TableBody>
               {slice(services).map((service) => (
                 <TableRow key={service.id}>
                   <TableCell align="right">{service.name}</TableCell>
-                  <TableCell align="right">{ccyFormat(service.payment)}</TableCell>
+                  <TableCell align="right">
+                    {ccyFormat(service.payment)}
+                  </TableCell>
                   {!!hotelId ? (
                     <TableCell>
                       <Tooltip title="edit">
@@ -284,7 +285,7 @@ export default function ServiceTable({ hotelId, serviceList }) {
                         </Tooltip>
                       </TableCell>
                       <TableCell align="center">
-                        {ccyFormat(service.quantity*service.payment)}
+                        {ccyFormat(service.quantity * service.payment)}
                       </TableCell>
                     </>
                   )}

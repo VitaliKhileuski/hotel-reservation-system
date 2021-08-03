@@ -11,7 +11,7 @@ import API from "../api";
 import { CHECK_IN_DATE, CHECK_OUT_DATE } from "../storage/actions/actionTypes";
 import HotelList from "./Hotel/HotelList";
 import DateFilter from "./Filters/DateFilter";
-
+import AsyncAutocomplete from "./../components/shared/AsyncAutocomplete";
 const useStyles = makeStyles((theme) => ({
   option: {
     fontSize: 15,
@@ -57,7 +57,6 @@ export default function Home() {
 
   useEffect(() => {
     loadCountries();
-    loadHotelNames();
   }, []);
 
   const loadCountries = async () => {
@@ -69,11 +68,26 @@ export default function Home() {
       .catch((error) => console.log(error));
   };
 
-  const loadHotelNames = async () => {
-    await API.get("/hotels/hotelNames")
+  const loadHotelNames = async (
+    value,
+    setNewItems,
+    setCurrentLoading,
+    limit
+  ) => {
+    setCurrentLoading(true);
+    setHotelName(value);
+    await API.get("/hotels/hotelNames", {
+      params: {
+        hotelName: value,
+        limit: limit,
+      },
+    })
       .then((response) => response.data)
       .then((data) => {
-        if (!!data) setHotelNames(data);
+        if (!!data) {
+          setCurrentLoading(false);
+          setNewItems(data);
+        }
       })
       .catch((error) => console.log(error));
   };
@@ -206,16 +220,10 @@ export default function Home() {
         </Grid>
         <Grid>
           <Typography variant="h6">Find by name</Typography>
-          <Autocomplete
-            id="hotelNames"
-            options={hotelNames}
-            getOptionLabel={(option) => option}
-            onChange={(event, value) => setHotelName(value)}
-            style={{ width: 300 }}
-            renderInput={(params) => (
-              <TextField {...params} label="find by name" variant="outlined" />
-            )}
-          />
+          <AsyncAutocomplete
+            request={loadHotelNames}
+            label="find by hotel name"
+          ></AsyncAutocomplete>
         </Grid>
         <Grid
           container

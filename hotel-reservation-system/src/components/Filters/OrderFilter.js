@@ -5,6 +5,7 @@ import TextField from "@material-ui/core/TextField";
 import { makeStyles } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import API from "./../../api";
+import AsyncAutocomplete from "../shared/AsyncAutocomplete";
 
 const useStyles = makeStyles((theme) => ({
   grid: {
@@ -31,7 +32,6 @@ export default function OrderFilter({ getValuesFromFilter }) {
 
   useEffect(() => {
     loadCountries();
-    loadCustomersSurnames();
   }, []);
 
   const loadCountries = async () => {
@@ -43,13 +43,27 @@ export default function OrderFilter({ getValuesFromFilter }) {
       .catch((error) => console.log(error));
   };
 
-  const loadCustomersSurnames = async () => {
+  const loadCustomersSurnames = async (
+    value,
+    setNewItems,
+    setCurrentLoading,
+    limit
+  ) => {
+    setSurname(value);
+    setCurrentLoading(true);
     await API.get("/users/customersSurnames", {
+      params: {
+        surname: value,
+        limit: limit,
+      },
       headers: { Authorization: "Bearer " + token },
     })
       .then((response) => response.data)
       .then((data) => {
-        if (!!data) setSurnames(data);
+        if (!!data) {
+          setCurrentLoading(false);
+          setNewItems(data);
+        }
       })
       .catch((error) => console.log(error));
   };
@@ -108,18 +122,10 @@ export default function OrderFilter({ getValuesFromFilter }) {
         />
       </Grid>
       <Grid item>
-        <Autocomplete
-          id="surnames"
-          options={surnames}
-          onChange={(event, value) => {
-            setSurname(value);
-          }}
-          getOptionLabel={(option) => option}
-          style={{ width: 300 }}
-          renderInput={(params) => (
-            <TextField {...params} label="find by surname" variant="outlined" />
-          )}
-        ></Autocomplete>
+        <AsyncAutocomplete
+          request={loadCustomersSurnames}
+          label="find by surname"
+        ></AsyncAutocomplete>
       </Grid>
       <Grid item>
         <TextField

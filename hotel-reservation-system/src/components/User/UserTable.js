@@ -152,6 +152,7 @@ export default function UserTable() {
     setAddUserDialogOpen(false);
   }
   function getValuesFromFilter(email, surname) {
+    console.log(email);
     setFilterFlag(false);
     setPage(0);
     SetPageForRequest(1);
@@ -170,15 +171,7 @@ export default function UserTable() {
       setCurrentAscending("desc");
       ascending = "desc";
     }
-    loadUsers(
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      sortField,
-      ascending
-    );
+    loadUsers(undefined, undefined, undefined, undefined, sortField, ascending);
   }
 
   return (

@@ -4,7 +4,9 @@ import Autocomplete from "@material-ui/lab/Autocomplete";
 import { TextField } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
+import CircularProgress from "@material-ui/core/CircularProgress";
 import API from "./../../api";
+import AsyncAutocomplete from "../shared/AsyncAutocomplete";
 
 const useStyles = makeStyles((theme) => ({
   grid: {
@@ -20,59 +22,88 @@ const useStyles = makeStyles((theme) => ({
 
 export default function UsersFilter({ getValuesFromFilter, isHotelAdmins }) {
   const classes = useStyles();
-  const [emails, setEmails] = useState([]);
-  const [surnames, setSurnames] = useState([]);
+
   const [email, setEmail] = useState("");
   const [surname, setSurname] = useState("");
   const token = localStorage.getItem("token");
 
-  useEffect(() => {
-    if (isHotelAdmins) {
-      loadHotelAdminsEmails();
-      loadHotelAdminsSurnames();
-    } else {
-      loadEmails();
-      loadSurnames();
-    }
-  }, []);
-
-  const loadEmails = async () => {
+  const loadEmails = async (value, setNewItems, setCurrentLoading, limit) => {
+    setEmail(value);
+    console.log(email);
+    setCurrentLoading(true);
     await API.get("/users/emails", {
+      params: {
+        email: value,
+        limit: limit,
+      },
       headers: { Authorization: "Bearer " + token },
     })
       .then((response) => response.data)
       .then((data) => {
-        setEmails(data);
+        setCurrentLoading(false);
+        setNewItems(data);
       })
       .catch((error) => {});
   };
-  const loadSurnames = async () => {
+  const loadSurnames = async (value, setNewItems, setCurrentLoading, limit) => {
+    setSurname(value);
+    setCurrentLoading(true);
     await API.get("/users/surnames", {
+      params: {
+        surname: value,
+        limit: limit,
+      },
       headers: { Authorization: "Bearer " + token },
     })
       .then((response) => response.data)
       .then((data) => {
-        setSurnames(data);
+        setCurrentLoading(false);
+        setNewItems(data);
       })
       .catch((error) => {});
   };
-  const loadHotelAdminsSurnames = async () => {
+
+  const loadHotelAdminsSurnames = async (
+    value,
+    setNewItems,
+    setCurrentLoading,
+    limit
+  ) => {
+    setCurrentLoading(true);
+    setSurname(value);
     await API.get("/users/hotelAdminsSurnames", {
+      params: {
+        surname: value,
+        limit: limit,
+      },
       headers: { Authorization: "Bearer " + token },
     })
       .then((response) => response.data)
       .then((data) => {
-        setSurnames(data);
+        setCurrentLoading(false);
+        setNewItems(data);
       })
       .catch((error) => {});
   };
-  const loadHotelAdminsEmails = async () => {
+  const loadHotelAdminsEmails = async (
+    value,
+    setNewItems,
+    setCurrentLoading,
+    limit
+  ) => {
+    setCurrentLoading(true);
+    setEmail(value);
     await API.get("/users/hotelAdminsEmails", {
+      params: {
+        email: value,
+        limit: limit,
+      },
       headers: { Authorization: "Bearer " + token },
     })
       .then((response) => response.data)
       .then((data) => {
-        setEmails(data);
+        setCurrentLoading(false);
+        setNewItems(data);
       })
       .catch((error) => {});
   };
@@ -80,46 +111,20 @@ export default function UsersFilter({ getValuesFromFilter, isHotelAdmins }) {
   return (
     <>
       <Grid item>
-        <Autocomplete
-          id="emails"
-          options={emails}
-          onChange={(event, value) => {
-            setEmail(value);
-          }}
-          disabled={!!surname ? true : false}
-          style={{ width: 300 }}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label={
-                isHotelAdmins ? "find by hotel admin's email" : "find by email"
-              }
-              variant="outlined"
-            />
-          )}
-        ></Autocomplete>
+        <AsyncAutocomplete
+          request={isHotelAdmins ? loadHotelAdminsEmails : loadEmails}
+          label={
+            isHotelAdmins ? "find by hotel admin's email" : "find by email"
+          }
+        ></AsyncAutocomplete>
       </Grid>
       <Grid item>
-        <Autocomplete
-          id="surnames"
-          options={surnames}
-          onChange={(event, value) => {
-            setSurname(value);
-          }}
-          disabled={!!email ? true : false}
-          style={{ width: 300 }}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label={
-                isHotelAdmins
-                  ? "find by hotel admin's surname"
-                  : "find by surname"
-              }
-              variant="outlined"
-            />
-          )}
-        ></Autocomplete>
+        <AsyncAutocomplete
+          request={isHotelAdmins ? loadHotelAdminsSurnames : loadSurnames}
+          label={
+            isHotelAdmins ? "find by hotel admin's surname" : "find by surname"
+          }
+        ></AsyncAutocomplete>
       </Grid>
       <Grid item>
         <Button
