@@ -6,6 +6,11 @@ import Typography from "@material-ui/core/Typography";
 import Paper from "@material-ui/core/Paper";
 import TextField from "@material-ui/core/TextField";
 import Checkbox from "@material-ui/core/Checkbox";
+import DateFnsUtils from "@date-io/date-fns";
+import {
+  MuiPickersUtilsProvider,
+  KeyboardDatePicker,
+} from "@material-ui/pickers";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Grid from "@material-ui/core/Grid";
 import { useSelector, useDispatch } from "react-redux";
@@ -38,6 +43,9 @@ export default function OrderConfirmation({
   checkInDate,
   checkOutDate,
 }) {
+  console.log(selectedServices);
+  console.log(checkInDate);
+  console.log(checkOutDate);
   const dispatch = useDispatch();
   const [checked, setChecked] = useState(false);
   const history = useHistory();
@@ -147,6 +155,23 @@ export default function OrderConfirmation({
           justify="space-around"
           alignItems="center"
         >
+          <Grid item xs={12}>
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+              <Typography variant="h6">Select a new check in date</Typography>
+              <KeyboardDatePicker
+                disableToolbar
+                disablePast
+                variant="inline"
+                inputVariant="outlined"
+                format="MM/dd/yyyy"
+                //value={checkIn}
+                onChange={() => console.log("change")}
+                KeyboardButtonProps={{
+                  "aria-label": "change date",
+                }}
+              />
+            </MuiPickersUtilsProvider>
+          </Grid>
           <Grid item xs={12}>
             <Typography>
               check in date: {checkInDate.toLocaleDateString("en-GB")}

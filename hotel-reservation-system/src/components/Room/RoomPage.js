@@ -1,14 +1,18 @@
 import { React, useState } from "react";
+import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
 import { makeStyles } from "@material-ui/core/styles";
+import { useHistory } from "react-router";
 import { useSelector, useDispatch } from "react-redux";
-import MainReservationDialog from "../Reservation/MainReservationDialog";
 import API from "./../../api";
+import MainReservationDialog from "../Reservation/MainReservationDialog";
+import OrderConfirmation from "./../Reservation/OrderConfirmation";
 import CallAlert from "../../Notifications/NotificationHandler";
 import RoomDetails from "./RoomDetails";
 
 const useStyles = makeStyles((theme) => ({
-  button: {
+  buttons: {
+    justifyContent: "center",
     position: "absolute",
     bottom: 0,
     marginBottom: 50,
@@ -16,9 +20,11 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function RoomPage(props) {
+  const history = useHistory();
   const classes = useStyles();
   const dispatch = useDispatch();
   const [room, setRoom] = useState(props.history.location.state.room);
+  const [openUpdateOrder, setOpenUpdateOrder] = useState(false);
   const [reservationDialogOpen, setReservationDialogOpen] = useState(false);
   const [checkInDate, setCheckInDate] = useState(
     props.location.state.checkInDate
@@ -37,6 +43,11 @@ export default function RoomPage(props) {
     }
     setReservationDialogOpen(true);
   }
+
+  function handleCloseUpdateOrderDialog() {
+    setOpenUpdateOrder(false);
+  }
+
   const isRoomBlocked = async () => {
     await API.get("rooms/" + room.id + "/isRoomBlocked", {
       params: { userId: userId },
@@ -53,6 +64,9 @@ export default function RoomPage(props) {
   function toOrderPage() {
     console.log("click");
     isRoomBlocked();
+  }
+  function toRoomsPage() {
+    history.goBack();
   }
 
   const blockRoom = async () => {
@@ -71,15 +85,28 @@ export default function RoomPage(props) {
   return (
     <>
       <RoomDetails room={room}></RoomDetails>
-      <Button
-        className={classes.button}
-        variant="contained"
-        onClick={toOrderPage}
-        size="large"
-        color="primary"
-      >
-        Start to order room
-      </Button>
+      <Grid className={classes.buttons} container spacing={2} direction="row">
+        <Grid item>
+          <Button
+            variant="contained"
+            onClick={toRoomsPage}
+            size="large"
+            color="primary"
+          >
+            back to rooms page
+          </Button>
+        </Grid>
+        <Grid item>
+          <Button
+            variant="contained"
+            onClick={toOrderPage}
+            size="large"
+            color="primary"
+          >
+            Start to order room
+          </Button>
+        </Grid>
+      </Grid>
       <MainReservationDialog
         handleClose={handleCloseReservationDialog}
         open={reservationDialogOpen}

@@ -70,7 +70,7 @@ export default function Register({ handleClose }) {
           }
         } else {
           handleClose();
-          CallAlert(dispatch, "user was added successfully", true);
+          CallAlert(dispatch, true, "user was added successfully");
         }
       })
       .catch((error) => {
@@ -94,10 +94,10 @@ export default function Register({ handleClose }) {
     setEmail(email);
     return true;
   }
+
   if (isLogged && role !== ADMIN) {
     return <Redirect to="/home"></Redirect>;
   }
-
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />

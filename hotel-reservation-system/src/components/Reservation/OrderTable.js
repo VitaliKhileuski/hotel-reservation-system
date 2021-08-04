@@ -15,14 +15,16 @@ import TablePagination from "@material-ui/core/TablePagination";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Typography from "@material-ui/core/Typography";
+import UpdateIcon from "@material-ui/icons/Update";
 import Paper from "@material-ui/core/Paper";
 import Tooltip from "@material-ui/core/Tooltip";
 import KeyboardArrowDownIcon from "@material-ui/icons/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
+import BaseDialog from "../shared/BaseDialog";
 import { useStyles } from "@material-ui/pickers/views/Calendar/SlideTransition";
 import API from "./../../api";
-import BaseDialog from "../shared/BaseDialog";
 import OrderFilter from "../Filters/OrderFilter";
+import Payment from "./Payment";
 import RoomDetails from "../Room/RoomDetails";
 import BaseDeleteDialog from "../shared/BaseDeleteDialog";
 import CallAlert from "../../Notifications/NotificationHandler";
@@ -42,7 +44,7 @@ function ccyFormat(num) {
   return `${num.toFixed(2)}`;
 }
 
-function Row({ order, handleClickDeleteIcon }) {
+function Row({ order, handleClickDeleteIcon, handleClickUpdateOrder }) {
   const [open, setOpen] = useState(false);
   const classes = useRowStyles();
   const [roomDetailsOpen, setRoomDetailsOpen] = useState(false);
@@ -93,6 +95,14 @@ function Row({ order, handleClickDeleteIcon }) {
         <TableCell align="right">{order.numberOfDays}</TableCell>
         <TableCell align="right">{ccyFormat(order.fullPrice)}</TableCell>
         <TableCell>
+          <Tooltip title="update check In date">
+            <IconButton
+              color="inherit"
+              onClick={() => handleClickUpdateOrder(order)}
+            >
+              <UpdateIcon></UpdateIcon>
+            </IconButton>
+          </Tooltip>
           <Tooltip title="delete">
             <IconButton color="inherit">
               <DeleteIcon
@@ -273,14 +283,25 @@ export default function OrderTable() {
   const [currentOrderNumber, setCurrentOrderNumber] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [currentSortField, setCurrentSortField] = useState("");
+  const [openUpdateOrder, setOpenUpdateOrder] = useState(false);
   const [currentAscending, setCurrentAscending] = useState("asc");
   const [orderId, setOrderId] = useState("");
+  const [currentOrder, setCurrentOrder] = useState();
   const token = localStorage.getItem("token");
   const [filterflag, setFilterFlag] = useState(true);
+  const updateOrderForm = !!currentOrder ? (
+    <Payment
+      selectedServices={currentOrder.services}
+      room={currentOrder.room}
+      checkInDate={new Date(currentOrder.startDate)}
+      checkOutDate={new Date(currentOrder.endDate)}
+    ></Payment>
+  ) : (
+    ""
+  );
 
   useEffect(() => {
     if (deleteDialogOpen === false && filterflag) {
-      console.log("load users from useEffect");
       loadOrders();
     }
   }, [rowsPerPage, page, deleteDialogOpen]);
@@ -299,7 +320,6 @@ export default function OrderTable() {
     let requestCity = city;
     let requestSurname = surname;
     let requestOrderNumber = orderNumber;
-    console.log(pageNumber);
     let requestPageNumber = !!pageNumber ? pageNumber : pageForRequest;
     if (flag === undefined) {
       requestCountry = hotelCountry;
@@ -395,9 +415,34 @@ export default function OrderTable() {
       undefined,
       undefined,
       undefined,
+      undefined,
       sortField,
       ascending
     );
+  }
+  function handleCloseUpdateOrderDialog() {
+    setOpenUpdateOrder(false);
+  }
+
+  function handleClickUpdateOrder(order) {
+    let currentOrder = Object.assign({}, order);
+    let newServices = [];
+    currentOrder.services.forEach((item) => {
+      let serviceId = item.service.id;
+      let payment = item.service.payment;
+      let quantity = item.quantity;
+      let name = item.service.name;
+      let newService = {
+        ServiceId: serviceId,
+        name: name,
+        payment: payment,
+        quantity: quantity,
+      };
+      newServices.push(newService);
+    });
+    currentOrder.services = newServices;
+    setCurrentOrder(currentOrder);
+    setOpenUpdateOrder(true);
   }
 
   const classes = useStyles();
@@ -469,6 +514,7 @@ export default function OrderTable() {
                 key={order.id}
                 order={order}
                 handleClickDeleteIcon={handleClickDeleteIcon}
+                handleClickUpdateOrder={handleClickUpdateOrder}
               />
             ))}
           </TableBody>
@@ -490,6 +536,13 @@ export default function OrderTable() {
         message="order will be canceled."
         deleteItem={deleteOrder}
       ></BaseDeleteDialog>
+      <BaseDialog
+        title="update check In Date"
+        open={openUpdateOrder}
+        handleClose={handleCloseUpdateOrderDialog}
+        form={updateOrderForm}
+        fullWidth={true}
+      ></BaseDialog>
     </>
   );
 }

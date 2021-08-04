@@ -21,6 +21,7 @@ export default function ReservationPaymentTable({
   checkInDate,
   checkOutDate,
 }) {
+  console.log(selectedServices);
   const classes = useStyles();
   const numberOfDays = Math.round(
     Math.abs(checkInDate - checkOutDate) / (1000 * 3600 * 24)
@@ -29,6 +30,7 @@ export default function ReservationPaymentTable({
     return `${num.toFixed(2)}`;
   }
   function calculateTotalSum() {
+    console.log(selectedServices);
     let sum = 0;
     selectedServices.map((item) => {
       sum += item.payment * item.quantity;
