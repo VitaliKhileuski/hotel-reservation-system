@@ -18,6 +18,7 @@ import { EMAIL } from "./../../storage/actions/actionTypes";
 import API from "./../../api";
 import CallAlert from "../../Notifications/NotificationHandler";
 import BaseDialog from "../shared/BaseDialog";
+import Hours from "./Hours";
 import { FillStorage, FillLocalStorage } from "../Authorization/TokenData";
 import { EMAIL_REGEX } from "../../constants/Regex";
 import { HOME_PATH } from "../../constants/RoutingPaths";
@@ -42,6 +43,7 @@ export default function OrderConfirmation({
   room,
   checkInDate,
   checkOutDate,
+  isOrderEdit,
 }) {
   console.log(selectedServices);
   console.log(checkInDate);
@@ -155,23 +157,30 @@ export default function OrderConfirmation({
           justify="space-around"
           alignItems="center"
         >
-          <Grid item xs={12}>
-            <MuiPickersUtilsProvider utils={DateFnsUtils}>
-              <Typography variant="h6">Select a new check in date</Typography>
-              <KeyboardDatePicker
-                disableToolbar
-                disablePast
-                variant="inline"
-                inputVariant="outlined"
-                format="MM/dd/yyyy"
-                //value={checkIn}
-                onChange={() => console.log("change")}
-                KeyboardButtonProps={{
-                  "aria-label": "change date",
-                }}
-              />
-            </MuiPickersUtilsProvider>
+          <Grid item>
+            <Hours></Hours>
           </Grid>
+          {isOrderEdit ? (
+            <Grid item xs={12}>
+              <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                <Typography variant="h6">Select a new check in date</Typography>
+                <KeyboardDatePicker
+                  disableToolbar
+                  disablePast
+                  variant="inline"
+                  inputVariant="outlined"
+                  format="MM/dd/yyyy"
+                  //value={checkIn}
+                  onChange={() => console.log("change")}
+                  KeyboardButtonProps={{
+                    "aria-label": "change date",
+                  }}
+                />
+              </MuiPickersUtilsProvider>
+            </Grid>
+          ) : (
+            ""
+          )}
           <Grid item xs={12}>
             <Typography>
               check in date: {checkInDate.toLocaleDateString("en-GB")}

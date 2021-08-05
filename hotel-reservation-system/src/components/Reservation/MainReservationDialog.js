@@ -57,6 +57,7 @@ export default function MainReservationDialog({
       room={room}
       checkInDate={checkIn}
       checkOutDate={checkOut}
+      isEditOrder={false}
     ></Payment>
   );
   const classes = useStyles();

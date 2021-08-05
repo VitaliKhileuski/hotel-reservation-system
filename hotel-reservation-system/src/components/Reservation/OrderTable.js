@@ -295,6 +295,7 @@ export default function OrderTable() {
       room={currentOrder.room}
       checkInDate={new Date(currentOrder.startDate)}
       checkOutDate={new Date(currentOrder.endDate)}
+      isEditOrder={true}
     ></Payment>
   ) : (
     ""

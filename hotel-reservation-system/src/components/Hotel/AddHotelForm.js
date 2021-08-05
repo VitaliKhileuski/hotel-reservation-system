@@ -5,6 +5,7 @@ import TextField from "@material-ui/core/TextField";
 import Checkbox from "@material-ui/core/Checkbox";
 import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
+import { useSelector } from "react-redux";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
@@ -13,6 +14,7 @@ import { useDispatch } from "react-redux";
 import API from "./../../api/";
 import { HOTEL_VALIDATION_SCHEMA } from "../../constants/ValidationSchemas";
 import { NUMBER_REGEX } from "./../../constants/Regex";
+import { ADMIN } from "../../config/Roles";
 import CallAlert from "../../Notifications/NotificationHandler";
 
 const useStyles = makeStyles((theme) => ({
@@ -44,22 +46,27 @@ export default function AddHotelForm({ hotel, handleClose, updateMainInfo }) {
   const [buildingNumber, setBuildingNumber] = useState(
     !!hotel ? hotel.location.buildingNumber : ""
   );
-  const [checked, setChecked] = useState(true);
-  const [limitDays, setLimitDays] = useState("");
+  const [checked, setChecked] = useState(!!hotel ? !!hotel.limitDays : false);
+  const [limitDays, setLimitDays] = useState(!!hotel ? hotel.limitDays : "");
   const [limitDaysLabelError, setLimitDaysLabelError] = useState("");
-  const [checkInTime, setCheckInTime] = useState();
-  const [checkOutTime, setCheckOutTime] = useState();
-
+  const [checkInTime, setCheckInTime] = useState(
+    !!hotel ? hotel.checkInTime : "14:00"
+  );
+  const [checkOutTime, setCheckOutTime] = useState(
+    !!hotel ? hotel.checkOutTime : "12:00"
+  );
+  const role = useSelector((state) => state.role);
   const initialValues = {
     name: !!hotel ? hotel.name : "",
     country: !!hotel ? hotel.location.country : "",
     city: !!hotel ? hotel.location.city : "",
     street: !!hotel ? hotel.location.street : "",
     buildingNumber: !!hotel ? hotel.location.buildingNumber : "",
-    limitDays: !!hotel ? hotel.limitTags : "",
   };
 
   const onSubmit = async (values) => {
+    console.log(checkOutTime);
+    console.log(checkInTime);
     const request = {
       Name: values.name.trim(),
       Location: {
@@ -68,7 +75,11 @@ export default function AddHotelForm({ hotel, handleClose, updateMainInfo }) {
         Street: values.street.trim(),
         buildingNumber: buildingNumber.trim(),
       },
+      LimitDays: limitDays,
+      CheckInTime: checkInTime,
+      CheckOutTime: checkOutTime,
     };
+
     const CreateHotel = async () => {
       await API.post("/hotels/", request, {
         headers: { Authorization: "Bearer " + token },
@@ -126,13 +137,15 @@ export default function AddHotelForm({ hotel, handleClose, updateMainInfo }) {
     setLimitDaysLabelError("");
 
     if (limitDays === "") {
-      setLimitDaysLabelError("building number is reqired");
+      setLimitDaysLabelError("limit days is reqired");
+      return false;
     }
     const flag = NUMBER_REGEX.test(limitDays);
     if (!flag) {
       setLimitDaysLabelError("you should write a number");
       return false;
     }
+    return true;
   }
 
   return (
@@ -142,7 +155,15 @@ export default function AddHotelForm({ hotel, handleClose, updateMainInfo }) {
         <div className={classes.paper}>
           <Formik
             initialValues={initialValues}
-            onSubmit={onSubmit}
+            onSubmit={(values) => {
+              if (
+                role === ADMIN ||
+                (checked && ValidateLimitDays(limitDays)) ||
+                !checked
+              ) {
+                onSubmit(values);
+              }
+            }}
             validationSchema={HOTEL_VALIDATION_SCHEMA}
           >
             {(props) => (
@@ -249,6 +270,7 @@ export default function AddHotelForm({ hotel, handleClose, updateMainInfo }) {
                       id="time"
                       label="check-in"
                       type="time"
+                      value={checkInTime}
                       defaultValue="14:00"
                       className={classes.textField}
                       onChange={(e) => setCheckInTime(e.target.value)}
@@ -263,6 +285,7 @@ export default function AddHotelForm({ hotel, handleClose, updateMainInfo }) {
                       label="check-out"
                       type="time"
                       defaultValue="12:00"
+                      value={checkOutTime}
                       className={classes.textField}
                       InputLabelProps={{
                         shrink: true,

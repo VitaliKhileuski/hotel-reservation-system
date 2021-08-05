@@ -18,6 +18,7 @@ import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
 import PersonAddIcon from "@material-ui/icons/PersonAdd";
+import InfoIcon from "@material-ui/icons/Info";
 import PersonAddDisabledIcon from "@material-ui/icons/PersonAddDisabled";
 import AddPhotoAlternateIcon from "@material-ui/icons/AddPhotoAlternate";
 import API from "./../../api";
@@ -94,10 +95,16 @@ export default function HotelTable() {
   );
 
   useEffect(() => {
-    if (!openDeleteDialog && !open && !imageDialogOpen && filterFlag) {
+    if (
+      !openDeleteDialog &&
+      !open &&
+      !imageDialogOpen &&
+      filterFlag &&
+      !!adminId
+    ) {
       loadHotels();
     }
-  }, [rowsPerPage, page, open, openDeleteDialog, imageDialogOpen]);
+  }, [rowsPerPage, page, open, openDeleteDialog, imageDialogOpen, adminId]);
 
   const loadHotels = async (
     email,
@@ -118,6 +125,7 @@ export default function HotelTable() {
     if (sortField === null || sortField === undefined) {
       sortField = currentSortField;
     }
+    console.log(adminId);
     let requestAscending = (ascending || currentAscending) === "asc";
     await API.get("/hotels/" + path, {
       params: {
@@ -133,6 +141,7 @@ export default function HotelTable() {
     })
       .then((response) => response.data)
       .then((data) => {
+        console.log(data);
         setHotels(data.items);
         setMaxNumberOfHotels(data.numberOfItems);
       })
@@ -284,7 +293,7 @@ export default function HotelTable() {
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>
-                <TableCell align="right" style={{ minWidth: 170 }}>
+                <TableCell align="right" style={{ minWidth: 150 }}>
                   <TableSortLabel
                     active={currentSortField === "Name"}
                     direction={currentAscending}
@@ -293,7 +302,7 @@ export default function HotelTable() {
                     Name
                   </TableSortLabel>
                 </TableCell>
-                <TableCell align="right" style={{ minWidth: 170 }}>
+                <TableCell align="right" style={{ minWidth: 150 }}>
                   <TableSortLabel
                     active={currentSortField === "Location.Country"}
                     direction={currentAscending}
@@ -302,7 +311,7 @@ export default function HotelTable() {
                     Country
                   </TableSortLabel>
                 </TableCell>
-                <TableCell align="right" style={{ minWidth: 170 }}>
+                <TableCell align="right" style={{ minWidth: 150 }}>
                   <TableSortLabel
                     active={currentSortField === "Location.City"}
                     direction={currentAscending}
@@ -311,7 +320,7 @@ export default function HotelTable() {
                     City
                   </TableSortLabel>
                 </TableCell>
-                <TableCell align="right" style={{ minWidth: 170 }}>
+                <TableCell align="right" style={{ minWidth: 150 }}>
                   <TableSortLabel
                     active={currentSortField === "Location.Street"}
                     direction={currentAscending}
@@ -320,13 +329,40 @@ export default function HotelTable() {
                     Street
                   </TableSortLabel>
                 </TableCell>
-                <TableCell align="right" style={{ minWidth: 170 }}>
+                <TableCell align="right" style={{ minWidth: 150 }}>
                   <TableSortLabel
                     active={currentSortField === "Location.BuildingNumber"}
                     direction={currentAscending}
                     onClick={() => orderBy("Location.BuildingNumber")}
                   >
                     Building number
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell align="right" style={{ minWidth: 150 }}>
+                  <TableSortLabel
+                    active={currentSortField === "LimitDays"}
+                    direction={currentAscending}
+                    onClick={() => orderBy("LimitDays")}
+                  >
+                    limit days
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell align="right" style={{ minWidth: 100 }}>
+                  <TableSortLabel
+                    active={currentSortField === "CheckInTime"}
+                    direction={currentAscending}
+                    onClick={() => orderBy("CheckInTime")}
+                  >
+                    Check-in time
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell align="right" style={{ minWidth: 100 }}>
+                  <TableSortLabel
+                    active={currentSortField === "CheckOutTime"}
+                    direction={currentAscending}
+                    onClick={() => orderBy("CheckOutTime")}
+                  >
+                    Check-out time
                   </TableSortLabel>
                 </TableCell>
                 <TableCell style={{ minWidth: 30 }} />
@@ -346,6 +382,17 @@ export default function HotelTable() {
                   <TableCell align="right">
                     {hotel.location.buildingNumber}
                   </TableCell>
+                  <TableCell align="right">
+                    {!!hotel.limitDays ? (
+                      hotel.limitDays
+                    ) : (
+                      <Tooltip title="customers of your hotel can't shift check-in and check-out dates. You can enable this abilitity at edit hotel page">
+                        <InfoIcon></InfoIcon>
+                      </Tooltip>
+                    )}
+                  </TableCell>
+                  <TableCell align="right">{hotel.checkInTime}</TableCell>
+                  <TableCell align="right">{hotel.checkOutTime}</TableCell>
                   <TableCell>
                     <Tooltip title="edit">
                       <IconButton
