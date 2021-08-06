@@ -1,4 +1,5 @@
 import { React, useState } from "react";
+import moment from "moment";
 import { makeStyles } from "@material-ui/core/styles";
 import { useHistory } from "react-router";
 import Button from "@material-ui/core/Button";
@@ -18,10 +19,10 @@ import { EMAIL } from "./../../storage/actions/actionTypes";
 import API from "./../../api";
 import CallAlert from "../../Notifications/NotificationHandler";
 import BaseDialog from "../shared/BaseDialog";
-import Hours from "./Hours";
 import { FillStorage, FillLocalStorage } from "../Authorization/TokenData";
 import { EMAIL_REGEX } from "../../constants/Regex";
 import { HOME_PATH } from "../../constants/RoutingPaths";
+import ShiftCheckOutTimeAlert from "./ShiftCheckOutTimeAlert";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -45,19 +46,26 @@ export default function OrderConfirmation({
   checkOutDate,
   isOrderEdit,
 }) {
-  console.log(selectedServices);
-  console.log(checkInDate);
-  console.log(checkOutDate);
   const dispatch = useDispatch();
   const [checked, setChecked] = useState(false);
   const history = useHistory();
   const [email, setEmail] = useState();
-
   const [emailErrorLabel, setEmailErrorLabel] = useState("");
   const classes = useStyles();
   const isLogged = useSelector((state) => state.isLogged);
   let userEmail = useSelector((state) => state.email);
   const token = localStorage.getItem("token");
+  const hotelCheckInTime = useSelector((state) => state.checkInTime);
+  const hotelCheckOutTime = useSelector((state) => state.checkOutTime);
+  const [checkInTime, setCheckInTime] = useState(
+    useSelector((state) => state.checkInTime)
+  );
+  const [checkOutTime, setCheckOutTime] = useState(
+    useSelector((state) => state.checkOutTime)
+  );
+  const [isCheckInTimeIncorrect, setIsCheckInTimeIncorrect] = useState(false);
+  const [isCheckOutTimeIncorrect, setIsCheckOutTimeIncorrect] = useState(false);
+  const [shiftAlertOpen, setShiftAlertOpen] = useState(false);
 
   const [messageDialogOpen, SetMessageDialogOpen] = useState(false);
   const messageForGuest = (
@@ -72,6 +80,32 @@ export default function OrderConfirmation({
       Order successfully created.You can track it in my Orders tab.
     </Typography>
   );
+
+  function ValidateCheckInTime(value) {
+    setIsCheckInTimeIncorrect(false);
+    if (value < convertTimeSpan(hotelCheckInTime)) {
+      setIsCheckInTimeIncorrect(true);
+    }
+    setCheckInTime(value);
+  }
+
+  function ValidateCheckOutTime(value) {
+    setIsCheckOutTimeIncorrect(false);
+    console.log(moment(checkOutDate, "DD-MM-YYYY").add(1, "days").toJSON());
+    if (value > convertTimeSpan(hotelCheckOutTime)) {
+      isAvaivableToShiftCheckOutTime();
+    }
+    setCheckOutTime(value);
+  }
+
+  function handleCloseShiftAlert() {
+    setShiftAlertOpen(false);
+  }
+
+  function convertTimeSpan(value) {
+    let timeParts = value.split(":");
+    return timeParts[0] + ":" + timeParts[1];
+  }
 
   function handleCloseMessageDialog() {
     if (!!email) {
@@ -94,6 +128,31 @@ export default function OrderConfirmation({
     if (emailWithoutSpaces === "") {
       setEmailErrorLabel("email is required");
     }
+  }
+  const isAvaivableToShiftCheckOutTime = async () => {
+    await API.get("/rooms/" + room.id + "/isPossibleToShiftCheckOutTime", {
+      params: {
+        checkOutDate: moment(checkOutDate, "DD-MM-YYYY")
+          .add(2, "days")
+          .toJSON(),
+      },
+    })
+      .then((response) => response.data)
+      .then((data) => {
+        if (!data) {
+          setIsCheckOutTimeIncorrect(true);
+        } else {
+          console.log("asdfdsf");
+          setShiftAlertOpen(true);
+        }
+      })
+      .catch((error) => {
+        CallAlert(dispatch, false, "", "room already booked on this dates");
+      });
+  };
+  function shiftCheckOutDate() {
+    handleCloseShiftAlert();
+    console.log("shift");
   }
 
   const createOrderRequest = async (request) => {
@@ -158,7 +217,50 @@ export default function OrderConfirmation({
           alignItems="center"
         >
           <Grid item>
-            <Hours></Hours>
+            <Grid container spacing={6}>
+              <Grid item sm={6}>
+                <TextField
+                  id="time"
+                  label="check-in"
+                  type="time"
+                  value={checkInTime}
+                  //className={classes.textField}
+                  onChange={(e) => {
+                    ValidateCheckInTime(e.target.value);
+                  }}
+                  error={isCheckInTimeIncorrect}
+                  helperText={
+                    isCheckInTimeIncorrect
+                      ? `arrival hour should be later then ${hotelCheckInTime}`
+                      : ""
+                  }
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+              </Grid>
+              <Grid item sm={6}>
+                <TextField
+                  id="time"
+                  label="check-out"
+                  type="time"
+                  value={checkOutTime}
+                  error={isCheckOutTimeIncorrect}
+                  helperText={
+                    isCheckOutTimeIncorrect
+                      ? `hour when you should leave should be earlier then ${hotelCheckOutTime}`
+                      : ""
+                  }
+                  //className={classes.textField}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  onChange={(e) => {
+                    ValidateCheckOutTime(e.target.value);
+                  }}
+                />
+              </Grid>
+            </Grid>
           </Grid>
           {isOrderEdit ? (
             <Grid item xs={12}>
@@ -221,7 +323,12 @@ export default function OrderConfirmation({
             variant="contained"
             onClick={сreateOrder}
             color="primary"
-            disabled={!checked || emailErrorLabel !== "" || email === ""}
+            disabled={
+              !checked ||
+              emailErrorLabel !== "" ||
+              email === "" ||
+              checkInTime < hotelCheckInTime
+            }
           >
             Order
           </Button>
@@ -232,6 +339,12 @@ export default function OrderConfirmation({
         handleClose={handleCloseMessageDialog}
         form={!!token ? messageForUser : messageForGuest}
       ></BaseDialog>
+      <ShiftCheckOutTimeAlert
+        open={shiftAlertOpen}
+        handleClose={handleCloseShiftAlert}
+        checkOutTime={hotelCheckOutTime}
+        shiftCheckOutDate={shiftCheckOutDate}
+      ></ShiftCheckOutTimeAlert>
     </>
   );
 }

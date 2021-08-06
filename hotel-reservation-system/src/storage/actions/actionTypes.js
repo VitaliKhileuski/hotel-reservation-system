@@ -9,3 +9,5 @@ export const OPEN_ALERT = "OPEN_ALERT";
 export const MESSAGE = "MESSAGE";
 export const ALERT_SUCCESS_STATUS = "ALERT_SUCCESS_STATUS";
 export const FAILURE_MESSAGE = "FAILURE_MESSAGE";
+export const CHECK_IN_TIME = "CHECK_IN_TIME";
+export const CHECK_OUT_TIME = "CHECK_OUT_TIME";
