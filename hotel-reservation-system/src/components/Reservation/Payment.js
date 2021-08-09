@@ -1,4 +1,4 @@
-import { React } from "react";
+import { React, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 import ReservationPaymentTable from "./ReservationPaymentTable";
@@ -28,8 +28,22 @@ export default function Payment({
   checkInDate,
   checkOutDate,
   isEditOrder,
+  checkInTime,
+  checkOutTime,
+  orderId,
+  handleCloseUpdateOrderDialog,
+  limitDays,
+  isCheckOutTimeShifted,
 }) {
   const classes = useStyles();
+
+  const [currentCheckInDate, setCurrentCheckInDate] = useState(checkInDate);
+  const [currentCheckOutDate, setCurrentCheckOutDate] = useState(checkOutDate);
+
+  function shiftCheckOutDate(value) {
+    setCurrentCheckOutDate(value);
+    console.log("payment shift");
+  }
 
   return (
     <Grid
@@ -43,17 +57,24 @@ export default function Payment({
         <ReservationPaymentTable
           selectedServices={selectedServices}
           room={room}
-          checkInDate={checkInDate}
-          checkOutDate={checkOutDate}
+          checkInDate={currentCheckInDate}
+          checkOutDate={currentCheckOutDate}
         ></ReservationPaymentTable>
       </Grid>
       <Grid item lg={6}>
         <OrderConfirmation
           selectedServices={selectedServices}
           room={room}
-          checkInDate={checkInDate}
-          checkOutDate={checkOutDate}
+          checkInDate={currentCheckInDate}
+          checkOutDate={currentCheckOutDate}
           isEditOrder={isEditOrder}
+          shiftCheckOutDate={shiftCheckOutDate}
+          orderCheckInTime={checkInTime}
+          orderCheckOutTime={checkOutTime}
+          orderId={orderId}
+          handleCloseUpdateOrderDialog={handleCloseUpdateOrderDialog}
+          limitDays={limitDays}
+          isCheckOutTimeShifted={isCheckOutTimeShifted}
         ></OrderConfirmation>
       </Grid>
     </Grid>

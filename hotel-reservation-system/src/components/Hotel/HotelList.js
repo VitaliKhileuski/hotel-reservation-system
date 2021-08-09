@@ -20,8 +20,6 @@ export default function HotelList({
   const dispatch = useDispatch();
   function toRoomsPage(hotel) {
     const hotelId = hotel.id;
-    dispatch({ type: CHECK_IN_TIME, checkInTime: hotel.checkInTime });
-    dispatch({ type: CHECK_OUT_TIME, checkOutTime: hotel.checkOutTime });
     history.push({
       pathname: ROOMS_PATH,
       state: {

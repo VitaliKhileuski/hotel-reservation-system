@@ -21,7 +21,7 @@ export default function ReservationPaymentTable({
   checkInDate,
   checkOutDate,
 }) {
-  console.log(selectedServices);
+  console.log(checkOutDate);
   const classes = useStyles();
   const numberOfDays = Math.round(
     Math.abs(checkInDate - checkOutDate) / (1000 * 3600 * 24)

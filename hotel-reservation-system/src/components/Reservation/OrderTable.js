@@ -92,6 +92,8 @@ function Row({ order, handleClickDeleteIcon, handleClickUpdateOrder }) {
         <TableCell align="right">
           {new Date(order.endDate).toLocaleDateString("en-GB")}
         </TableCell>
+        <TableCell align="right">{order.checkInTime}</TableCell>
+        <TableCell align="right">{order.checkOutTime}</TableCell>
         <TableCell align="right">{order.numberOfDays}</TableCell>
         <TableCell align="right">{ccyFormat(order.fullPrice)}</TableCell>
         <TableCell>
@@ -116,7 +118,7 @@ function Row({ order, handleClickDeleteIcon, handleClickUpdateOrder }) {
         ""
       ) : (
         <TableRow>
-          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8}>
+          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={10}>
             <Collapse in={open} timeout="auto" unmountOnExit>
               <Box margin={1}>
                 <Typography variant="h6" gutterBottom component="div">
@@ -165,7 +167,7 @@ function Row({ order, handleClickDeleteIcon, handleClickUpdateOrder }) {
       )}
 
       <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8}>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={10}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box margin={1}>
               <Typography variant="h6" gutterBottom component="div">
@@ -215,7 +217,7 @@ function Row({ order, handleClickDeleteIcon, handleClickUpdateOrder }) {
       </TableRow>
       {role !== USER ? (
         <TableRow>
-          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8}>
+          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={10}>
             <Collapse in={open} timeout="auto" unmountOnExit>
               <Box margin={1}>
                 <Typography variant="h6" gutterBottom component="div">
@@ -285,6 +287,7 @@ export default function OrderTable() {
   const [currentSortField, setCurrentSortField] = useState("");
   const [openUpdateOrder, setOpenUpdateOrder] = useState(false);
   const [currentAscending, setCurrentAscending] = useState("asc");
+  const [currentLimitDays, setCurrentLimitDays] = useState();
   const [orderId, setOrderId] = useState("");
   const [currentOrder, setCurrentOrder] = useState();
   const token = localStorage.getItem("token");
@@ -296,16 +299,22 @@ export default function OrderTable() {
       checkInDate={new Date(currentOrder.startDate)}
       checkOutDate={new Date(currentOrder.endDate)}
       isEditOrder={true}
+      checkInTime={currentOrder.checkInTime}
+      checkOutTime={currentOrder.checkOutTime}
+      orderId={currentOrder.id}
+      handleCloseUpdateOrderDialog={handleCloseUpdateOrderDialog}
+      limitDays={currentOrder.room.hotel.limitDays}
+      isCheckOutTimeShifted={currentOrder.isCheckOutTimeShifted}
     ></Payment>
   ) : (
     ""
   );
 
   useEffect(() => {
-    if (deleteDialogOpen === false && filterflag) {
+    if (deleteDialogOpen === false && filterflag && !openUpdateOrder) {
       loadOrders();
     }
-  }, [rowsPerPage, page, deleteDialogOpen]);
+  }, [rowsPerPage, page, deleteDialogOpen, openUpdateOrder]);
 
   const loadOrders = async (
     country,
@@ -347,6 +356,7 @@ export default function OrderTable() {
     })
       .then((response) => response.data)
       .then((data) => {
+        console.log(data.items);
         setOrders(data.items);
         setMaxNumberOfOrders(data.numberOfItems);
       })
@@ -455,13 +465,13 @@ export default function OrderTable() {
           <TableHead>
             <TableRow>
               <TableCell />
-              <TableCell align="right" style={{ minWidth: 170 }}>
+              <TableCell align="right" style={{ minWidth: 130 }}>
                 Order number
               </TableCell>
-              <TableCell align="right" style={{ minWidth: 170 }}>
+              <TableCell align="right" style={{ minWidth: 30 }}>
                 Room
               </TableCell>
-              <TableCell align="right" style={{ minWidth: 170 }}>
+              <TableCell align="right" style={{ minWidth: 100 }}>
                 <TableSortLabel
                   active={currentSortField === "DateOrdered"}
                   direction={currentAscending}
@@ -470,25 +480,43 @@ export default function OrderTable() {
                   Order date
                 </TableSortLabel>
               </TableCell>
-              <TableCell align="right" style={{ minWidth: 170 }}>
+              <TableCell align="right" style={{ minWidth: 100 }}>
                 <TableSortLabel
                   active={currentSortField === "StartDate"}
                   direction={currentAscending}
                   onClick={() => orderBy("StartDate")}
                 >
-                  Check in date
+                  Check-in date
                 </TableSortLabel>
               </TableCell>
-              <TableCell align="right" style={{ minWidth: 170 }}>
+              <TableCell align="right" style={{ minWidth: 100 }}>
                 <TableSortLabel
                   active={currentSortField === "EndDate"}
                   direction={currentAscending}
                   onClick={() => orderBy("EndDate")}
                 >
-                  Check out date
+                  Check-out date
                 </TableSortLabel>
               </TableCell>
-              <TableCell align="right" style={{ minWidth: 170 }}>
+              <TableCell align="right" style={{ minWidth: 100 }}>
+                <TableSortLabel
+                  active={currentSortField === "CheckInTime"}
+                  direction={currentAscending}
+                  onClick={() => orderBy("CheckInTime")}
+                >
+                  Check-in time
+                </TableSortLabel>
+              </TableCell>
+              <TableCell align="right" style={{ minWidth: 100 }}>
+                <TableSortLabel
+                  active={currentSortField === "CheckOutTime"}
+                  direction={currentAscending}
+                  onClick={() => orderBy("CheckOutTime")}
+                >
+                  Check-out time
+                </TableSortLabel>
+              </TableCell>
+              <TableCell align="right" style={{ minWidth: 100 }}>
                 <TableSortLabel
                   active={currentSortField === "NumberOfDays"}
                   direction={currentAscending}
@@ -497,7 +525,7 @@ export default function OrderTable() {
                   Number of days
                 </TableSortLabel>
               </TableCell>
-              <TableCell align="right" style={{ minWidth: 170 }}>
+              <TableCell align="right" style={{ minWidth: 100 }}>
                 <TableSortLabel
                   active={currentSortField === "FullPrice"}
                   direction={currentAscending}

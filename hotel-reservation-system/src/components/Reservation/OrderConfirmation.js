@@ -1,4 +1,4 @@
-import { React, useState } from "react";
+import { React, useState, useEffect } from "react";
 import moment from "moment";
 import { makeStyles } from "@material-ui/core/styles";
 import { useHistory } from "react-router";
@@ -44,8 +44,20 @@ export default function OrderConfirmation({
   room,
   checkInDate,
   checkOutDate,
-  isOrderEdit,
+  shiftCheckOutDate,
+  isEditOrder,
+  orderCheckInTime,
+  orderCheckOutTime,
+  orderId,
+  handleCloseUpdateOrderDialog,
+  limitDays,
+  isCheckOutTimeShifted,
 }) {
+  useEffect(() => {
+    getLimitHours();
+  }, []);
+
+  console.log(limitDays);
   const dispatch = useDispatch();
   const [checked, setChecked] = useState(false);
   const history = useHistory();
@@ -55,13 +67,26 @@ export default function OrderConfirmation({
   const isLogged = useSelector((state) => state.isLogged);
   let userEmail = useSelector((state) => state.email);
   const token = localStorage.getItem("token");
-  const hotelCheckInTime = useSelector((state) => state.checkInTime);
-  const hotelCheckOutTime = useSelector((state) => state.checkOutTime);
+  const [hotelCheckInTime, setHotelCheckInTime] = useState();
+  const [hotelCheckOutTime, setHotelCheckOutTime] = useState();
+  const [currentCheckInDate, setCurrentCheckInDate] = useState(checkInDate);
+  const [currentCheckOutDate, setCurrentCheckOutDate] = useState(checkOutDate);
+  const [requestCheckInDate, setRequestCheckInDate] = useState(checkInDate);
+  const [requestCheckOutDate, setRequestCheckOutDate] = useState(checkOutDate);
+  const [currentCheckInTime, setCurrentCheckInTime] = useState(
+    isEditOrder ? orderCheckInTime : ""
+  );
+  const [currentCheckOutTime, setCurrentCheckOutTime] = useState(
+    isEditOrder ? orderCheckOutTime : ""
+  );
+  const [isShifted, setIsShifted] = useState(
+    !!isCheckOutTimeShifted ? isCheckOutTimeShifted : false
+  );
   const [checkInTime, setCheckInTime] = useState(
-    useSelector((state) => state.checkInTime)
+    isEditOrder ? orderCheckInTime : ""
   );
   const [checkOutTime, setCheckOutTime] = useState(
-    useSelector((state) => state.checkOutTime)
+    isEditOrder ? orderCheckOutTime : ""
   );
   const [isCheckInTimeIncorrect, setIsCheckInTimeIncorrect] = useState(false);
   const [isCheckOutTimeIncorrect, setIsCheckOutTimeIncorrect] = useState(false);
@@ -86,16 +111,22 @@ export default function OrderConfirmation({
     if (value < convertTimeSpan(hotelCheckInTime)) {
       setIsCheckInTimeIncorrect(true);
     }
-    setCheckInTime(value);
+    setCurrentCheckInTime(value);
   }
 
   function ValidateCheckOutTime(value) {
-    setIsCheckOutTimeIncorrect(false);
-    console.log(moment(checkOutDate, "DD-MM-YYYY").add(1, "days").toJSON());
-    if (value > convertTimeSpan(hotelCheckOutTime)) {
-      isAvaivableToShiftCheckOutTime();
+    if (isShifted) {
+      setCurrentCheckOutTime(value);
+      setCheckOutTime(value);
+    } else {
+      setCurrentCheckOutTime(value);
+      setIsCheckOutTimeIncorrect(false);
+      if (value > convertTimeSpan(hotelCheckOutTime)) {
+        isAvaivableToShiftCheckOutTime();
+      } else {
+        setCheckOutTime(value);
+      }
     }
-    setCheckOutTime(value);
   }
 
   function handleCloseShiftAlert() {
@@ -117,6 +148,11 @@ export default function OrderConfirmation({
     });
   }
 
+  function validateHours() {
+    setCheckInTime(currentCheckInTime);
+    ValidateCheckOutTime(currentCheckOutTime);
+  }
+
   function validateEmail(email) {
     const emailWithoutSpaces = email.trim();
     setEmailErrorLabel("");
@@ -129,11 +165,44 @@ export default function OrderConfirmation({
       setEmailErrorLabel("email is required");
     }
   }
+
+  const getLimitHours = async () => {
+    await API.get("/rooms/" + room.id + "/getLimitHours")
+      .then((response) => response.data)
+      .then((data) => {
+        setHotelCheckInTime(data.checkInTime);
+        setHotelCheckOutTime(data.checkOutTime);
+
+        if (!isEditOrder) {
+          setCheckInTime(data.checkInTime);
+          setCurrentCheckInTime(data.checkInTime);
+          setCheckOutTime(data.checkOutTime);
+          setCurrentCheckOutTime(data.checkOutTime);
+        }
+      });
+  };
+
+  const isAvaivableToBook = async (checkIn, checkOut) => {
+    await API.get("/rooms/" + room.id + "/isEmpty", {
+      params: {
+        checkInDate: checkIn.toJSON(),
+        checkOutDate: checkOut.toJSON(),
+      },
+    })
+      .then((response) => response.data)
+      .then((data) => {
+        if (data) {
+        } else {
+        }
+      })
+      .catch((error) => console.log(error.response.data.message));
+  };
+
   const isAvaivableToShiftCheckOutTime = async () => {
     await API.get("/rooms/" + room.id + "/isPossibleToShiftCheckOutTime", {
       params: {
         checkOutDate: moment(checkOutDate, "DD-MM-YYYY")
-          .add(2, "days")
+          .add(1, "days")
           .toJSON(),
       },
     })
@@ -150,9 +219,15 @@ export default function OrderConfirmation({
         CallAlert(dispatch, false, "", "room already booked on this dates");
       });
   };
-  function shiftCheckOutDate() {
+  function ShiftCheckOutDate() {
+    const newCheckOutDate = new Date(
+      moment(checkOutDate, "DD-MM-YYYY").add(1, "days")
+    );
+    setCurrentCheckOutDate(newCheckOutDate);
+    shiftCheckOutDate(newCheckOutDate);
+    setCheckOutTime(currentCheckOutTime);
+    setIsShifted(true);
     handleCloseShiftAlert();
-    console.log("shift");
   }
 
   const createOrderRequest = async (request) => {
@@ -163,6 +238,29 @@ export default function OrderConfirmation({
       })
       .catch((error) => {
         CallAlert(dispatch, false, "", "room already booked on this dates");
+      });
+  };
+
+  const updateOrder = async () => {
+    const request = {
+      CheckInTime: checkInTime,
+      CheckOutTime: checkOutTime,
+    };
+    await API.put("/orders/" + orderId + "/updateOrder", request, {
+      headers: { Authorization: "Bearer " + token },
+    })
+      .then((response) => response.data)
+      .then((data) => {
+        handleCloseUpdateOrderDialog();
+        CallAlert(dispatch, true, "order updated successfully");
+      })
+      .catch((error) => {
+        CallAlert(
+          dispatch,
+          false,
+          "",
+          "something went wrong.Please, try again"
+        );
       });
   };
 
@@ -190,10 +288,13 @@ export default function OrderConfirmation({
   async function сreateOrder() {
     if (checked && emailErrorLabel === "") {
       let requestForOrder = {
-        StartDate: checkInDate,
-        EndDate: checkOutDate,
+        StartDate: currentCheckInDate,
+        EndDate: currentCheckOutDate,
         ServiceQuantities: selectedServices,
         UserEmail: userEmail,
+        CheckInTime: checkInTime,
+        CheckOutTime: checkOutTime,
+        IsCheckOutTimeShifted: isShifted,
       };
       if (userEmail === "" || userEmail === undefined) {
         userEmail = email;
@@ -218,12 +319,12 @@ export default function OrderConfirmation({
         >
           <Grid item>
             <Grid container spacing={6}>
-              <Grid item sm={6}>
+              <Grid item sm={4}>
                 <TextField
                   id="time"
                   label="check-in"
                   type="time"
-                  value={checkInTime}
+                  value={currentCheckInTime}
                   //className={classes.textField}
                   onChange={(e) => {
                     ValidateCheckInTime(e.target.value);
@@ -239,12 +340,12 @@ export default function OrderConfirmation({
                   }}
                 />
               </Grid>
-              <Grid item sm={6}>
+              <Grid item sm={4}>
                 <TextField
                   id="time"
                   label="check-out"
                   type="time"
-                  value={checkOutTime}
+                  value={currentCheckOutTime}
                   error={isCheckOutTimeIncorrect}
                   helperText={
                     isCheckOutTimeIncorrect
@@ -256,39 +357,91 @@ export default function OrderConfirmation({
                     shrink: true,
                   }}
                   onChange={(e) => {
-                    ValidateCheckOutTime(e.target.value);
+                    setCurrentCheckOutTime(e.target.value);
                   }}
                 />
               </Grid>
+              <Grid item sm={4}>
+                <Button
+                  disabled={isCheckInTimeIncorrect}
+                  color="primary"
+                  style={{ marginTop: 10 }}
+                  size="small"
+                  onClick={validateHours}
+                  variant="contained"
+                >
+                  Save hours
+                </Button>
+              </Grid>
             </Grid>
           </Grid>
-          {isOrderEdit ? (
-            <Grid item xs={12}>
-              <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                <Typography variant="h6">Select a new check in date</Typography>
-                <KeyboardDatePicker
-                  disableToolbar
-                  disablePast
-                  variant="inline"
-                  inputVariant="outlined"
-                  format="MM/dd/yyyy"
-                  //value={checkIn}
-                  onChange={() => console.log("change")}
-                  KeyboardButtonProps={{
-                    "aria-label": "change date",
-                  }}
-                />
-              </MuiPickersUtilsProvider>
+          {isEditOrder &&
+          !!limitDays &&
+          moment().add(limitDays, "days") < checkInDate ? (
+            <Grid item>
+              <Grid container spacing={6}>
+                <Grid item sm={4}>
+                  <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                    <Typography variant="h6">new check-in date</Typography>
+                    <KeyboardDatePicker
+                      disableToolbar
+                      disablePast
+                      variant="inline"
+                      inputVariant="outlined"
+                      format="MM/dd/yyyy"
+                      value={currentCheckInDate}
+                      onChange={setCurrentCheckInDate}
+                      KeyboardButtonProps={{
+                        "aria-label": "change date",
+                      }}
+                    />
+                  </MuiPickersUtilsProvider>
+                </Grid>
+                <Grid item sm={4}>
+                  <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                    <Typography variant="h6">new check-out date</Typography>
+                    <KeyboardDatePicker
+                      disableToolbar
+                      disablePast
+                      variant="inline"
+                      inputVariant="outlined"
+                      format="MM/dd/yyyy"
+                      value={currentCheckOutDate}
+                      onChange={(date) => setCurrentCheckOutDate(date)}
+                      KeyboardButtonProps={{
+                        "aria-label": "change date",
+                      }}
+                    />
+                  </MuiPickersUtilsProvider>
+                </Grid>
+                <Grid item sm={4}>
+                  <Button
+                    style={{ marginTop: 40 }}
+                    variant="contained"
+                    color="primary"
+                  >
+                    Save new dates
+                  </Button>
+                </Grid>
+              </Grid>
             </Grid>
           ) : (
             ""
           )}
           <Grid item xs={12}>
+            <Typography>check-in hour : {checkInTime}</Typography>
             <Typography>
-              check in date: {checkInDate.toLocaleDateString("en-GB")}
+              check-in date: {requestCheckInDate.toLocaleDateString("en-GB")}
             </Typography>
             <Typography>
-              check in date: {checkOutDate.toLocaleDateString("en-GB")}
+              check-out date: {requestCheckOutDate.toLocaleDateString("en-GB")}
+            </Typography>
+            <Typography>
+              check-out hour :
+              {moment(requestCheckOutDate)
+                .subtract(1, "days")
+                .format("DD/MM/YYYY")}{" "}
+              {checkOutTime}
             </Typography>
           </Grid>
           {isLogged === false ? (
@@ -321,7 +474,7 @@ export default function OrderConfirmation({
           </Grid>
           <Button
             variant="contained"
-            onClick={сreateOrder}
+            onClick={isEditOrder ? updateOrder : сreateOrder}
             color="primary"
             disabled={
               !checked ||
@@ -330,7 +483,7 @@ export default function OrderConfirmation({
               checkInTime < hotelCheckInTime
             }
           >
-            Order
+            {isEditOrder ? "Update order" : "Order"}
           </Button>
         </Grid>
       </Paper>
@@ -343,7 +496,7 @@ export default function OrderConfirmation({
         open={shiftAlertOpen}
         handleClose={handleCloseShiftAlert}
         checkOutTime={hotelCheckOutTime}
-        shiftCheckOutDate={shiftCheckOutDate}
+        shiftCheckOutDate={ShiftCheckOutDate}
       ></ShiftCheckOutTimeAlert>
     </>
   );

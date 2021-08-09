@@ -39,10 +39,6 @@ export default function authentication(state = initialState, action) {
       return { ...state, alertSuccessStatus: action.alertSuccessStatus };
     case FAILURE_MESSAGE:
       return { ...state, failureMessage: action.failureMessage };
-    case CHECK_IN_TIME:
-      return { ...state, checkInTime: action.checkInTime };
-    case CHECK_OUT_TIME:
-      return { ...state, checkOutTime: action.checkOutTime };
     default:
       return state;
   }

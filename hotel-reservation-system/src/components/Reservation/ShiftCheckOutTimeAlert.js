@@ -34,7 +34,7 @@ export default function ShiftCheckOutTimeAlert({
               Choose another time
             </Button>
             <Button onClick={shiftCheckOutDate} color="primary" autoFocus>
-              Add 1 day yo your check-out date
+              Add 1 day to your check-out date
             </Button>
           </DialogActions>
         </Dialog>
