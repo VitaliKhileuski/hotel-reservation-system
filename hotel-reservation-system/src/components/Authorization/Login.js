@@ -38,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
 export default function Login() {
   const dispatch = useDispatch();
   const classes = useStyles();
-  const isLogged = useSelector((state) => state.isLogged);
+  const isLogged = useSelector((state) => state.tokenData.isLogged);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailErrorLabel, setEmailErrorLabel] = useState("");

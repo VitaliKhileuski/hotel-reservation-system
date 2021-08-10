@@ -1,14 +1,9 @@
 import { React } from "react";
 import { useHistory } from "react-router";
-import { useDispatch } from "react-redux";
 import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
 import { ROOMS_PATH } from "../../constants/RoutingPaths";
 import BaseCard from "./../shared/BaseCard";
-import {
-  CHECK_IN_TIME,
-  CHECK_OUT_TIME,
-} from "../../storage/actions/actionTypes";
 
 export default function HotelList({
   toRoomsPage,
@@ -17,7 +12,6 @@ export default function HotelList({
   checkOutDate,
 }) {
   const history = useHistory();
-  const dispatch = useDispatch();
   function toRoomsPage(hotel) {
     const hotelId = hotel.id;
     history.push({

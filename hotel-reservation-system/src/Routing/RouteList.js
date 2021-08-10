@@ -16,7 +16,7 @@ import UserProfile from "./../components/User/UserProfile";
 import UserTable from "../components/User/UserTable";
 import AuthRoute from "./../Routing/AuthRoute";
 import RoomPage from "./../components/Room/RoomPage";
-import { ADMIN, HOTEL_ADMIN } from "./../config/Roles";
+import { ADMIN, HOTEL_ADMIN } from "../constants/Roles";
 import {
   HOME_PATH,
   LOGIN_PATH,

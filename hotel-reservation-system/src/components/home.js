@@ -8,7 +8,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Pagination from "@material-ui/lab/Pagination";
 import { useDispatch, useSelector } from "react-redux";
 import API from "../api";
-import { CHECK_IN_DATE, CHECK_OUT_DATE } from "../storage/actions/actionTypes";
+import { DATES } from "../storage/actions/actionTypes";
 import HotelList from "./Hotel/HotelList";
 import DateFilter from "./Filters/DateFilter";
 import AsyncAutocomplete from "./../components/shared/AsyncAutocomplete";
@@ -42,15 +42,15 @@ export default function Home() {
   const [hotelName, setHotelName] = useState("");
   const [isValidDates, setIsValidDates] = useState(true);
   const [checkInDate, setCheckInDate] = useState(
-    useSelector((state) => state.checkInDate)
+    useSelector((state) => state.dates.checkInDate)
   );
   const [checkOutDate, setCheckOutDate] = useState(
-    useSelector((state) => state.checkOutDate)
+    useSelector((state) => state.dates.checkOutDate)
   );
   const [page, setPage] = useState(1);
   const [maxPage, setMaxPage] = useState(1);
   const pageSize = 8;
-  const userId = useSelector((state) => state.userId);
+  const userId = useSelector((state) => state.tokenData.userId);
   const dispatch = useDispatch();
   const token = localStorage.getItem("token");
   const [filterFlag, setFilterFlag] = useState(true);
@@ -115,8 +115,11 @@ export default function Home() {
   }
 
   async function SearchFilteredHotels(pageNumber) {
-    dispatch({ type: CHECK_IN_DATE, checkInDate: checkInDate });
-    dispatch({ type: CHECK_OUT_DATE, checkOutDate: checkOutDate });
+    dispatch({
+      type: DATES,
+      checkInDate: checkInDate,
+      checkOutDate: checkOutDate,
+    });
     let requestPageNumber = !!pageNumber ? pageNumber : page;
     const getFilteredHotels = async () => {
       await API.get("/hotels/page", {

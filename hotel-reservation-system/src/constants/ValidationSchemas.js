@@ -18,6 +18,18 @@ export const REGISTER_VALIDATION_SCHEMA = Yup.object().shape({
     .oneOf([Yup.ref("password"), null], "Passwords must match")
     .required("Required"),
 });
+export const FAST_REGISTER_VALIDATIOM_SCHEMA = Yup.object().shape({
+  password: Yup.string()
+    .min(8, "Minimum characters should be 8")
+    .required("password is required")
+    .matches(
+      PASSWORD_REGEX,
+      "password should contains numbers and latin letters"
+    ),
+  passwordConfirm: Yup.string()
+    .oneOf([Yup.ref("password"), null], "Passwords must match")
+    .required("Required"),
+});
 
 export const HOTEL_VALIDATION_SCHEMA = Yup.object().shape({
   name: Yup.string().required("name is required").trim(),

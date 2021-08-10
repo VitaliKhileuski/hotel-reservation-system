@@ -53,7 +53,7 @@ export default function RoomTable({ hotelId }) {
   const [currentSortField, setCurrentSortField] = useState("");
   const [currentAscending, setCurrentAscending] = useState("");
   const [currentRoomNumber, setCurrentRoomNumber] = useState("");
-  const userId = useSelector((state) => state.userId);
+  const userId = useSelector((state) => state.tokenData.userId);
   const [filterFlag, setFilterFlag] = useState(true);
 
   function callImageDialog(room) {

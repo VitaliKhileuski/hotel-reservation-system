@@ -1,11 +1,3 @@
-export const IS_LOGGED = "IS_LOGGED";
-export const ROLE = "ROLE";
-export const NAME = "NAME";
-export const EMAIL = "EMAIL";
-export const USER_ID = 0;
-export const CHECK_IN_DATE = "CHECK_IN_DATE";
-export const CHECK_OUT_DATE = "CHECK_OUT_DATE";
-export const OPEN_ALERT = "OPEN_ALERT";
-export const MESSAGE = "MESSAGE";
-export const ALERT_SUCCESS_STATUS = "ALERT_SUCCESS_STATUS";
-export const FAILURE_MESSAGE = "FAILURE_MESSAGE";
+export const TOKEN_DATA = "TOKEN_DATA";
+export const ALERT_INFO = "ALERT_INFO";
+export const DATES = "DATES";

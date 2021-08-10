@@ -3,7 +3,7 @@ import { useHistory } from "react-router";
 import { BrowserRouter as Router } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import createAuthRefreshInterceptor from "axios-auth-refresh";
-import { OPEN_ALERT } from "./storage/actions/actionTypes";
+import { ALERT_INFO } from "./storage/actions/actionTypes";
 import { FillStorage, Logout } from "./components/Authorization/TokenData";
 import BaseAlert from "./components/shared/BaseAlert";
 import RouteList from "./Routing/RouteList";
@@ -13,11 +13,12 @@ import API from "./api";
 export default function App() {
   const dispatch = useDispatch();
   const history = useHistory();
-  const email = useSelector((state) => state.email);
 
   function handleCloseAlert() {
-    dispatch({ type: OPEN_ALERT, openAlert: false });
+    dispatch({ type: ALERT_INFO, openAlert: false });
   }
+
+  useSelector((state) => console.log(state));
 
   const refreshAuthLogic = async (failedRequest) =>
     await API.put("/account/refreshTokenVerification", {
@@ -66,10 +67,7 @@ export default function App() {
         <RouteList></RouteList>
         <BaseAlert
           handleClose={handleCloseAlert}
-          open={useSelector((state) => state.openAlert)}
-          failureMessage={useSelector((state) => state.failureMessage)}
-          message={useSelector((state) => state.message)}
-          success={useSelector((state) => state.alertSuccessStatus)}
+          alertInfo={useSelector((state) => state.alertInfo)}
         ></BaseAlert>
       </div>
     </Router>

@@ -1,10 +1,12 @@
 import { React, useState, useEffect } from "react";
 import Grid from "@material-ui/core/Grid";
 import Autocomplete from "@material-ui/lab/Autocomplete";
+import { useSelector } from "react-redux";
 import TextField from "@material-ui/core/TextField";
 import { makeStyles } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import API from "./../../api";
+import { USER } from "./../../constants/Roles";
 import AsyncAutocomplete from "../shared/AsyncAutocomplete";
 
 const useStyles = makeStyles((theme) => ({
@@ -29,6 +31,7 @@ export default function OrderFilter({ getValuesFromFilter }) {
   const [orderNumber, setOrderNumber] = useState("");
   const [city, setCity] = useState("");
   const token = localStorage.getItem("token");
+  const role = useSelector((state) => state.tokenData.role);
 
   useEffect(() => {
     loadCountries();
@@ -121,12 +124,16 @@ export default function OrderFilter({ getValuesFromFilter }) {
           )}
         />
       </Grid>
-      <Grid item>
-        <AsyncAutocomplete
-          request={loadCustomersSurnames}
-          label="find by surname"
-        ></AsyncAutocomplete>
-      </Grid>
+      {role !== USER ? (
+        <Grid item>
+          <AsyncAutocomplete
+            request={loadCustomersSurnames}
+            label="find by surname"
+          ></AsyncAutocomplete>
+        </Grid>
+      ) : (
+        ""
+      )}
       <Grid item>
         <TextField
           label="Find by order number"

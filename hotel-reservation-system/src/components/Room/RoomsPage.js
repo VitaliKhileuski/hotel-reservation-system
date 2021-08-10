@@ -26,7 +26,7 @@ export default function RoomsPage(props) {
   const [numberOfPages, setNumberOfPages] = useState(0);
   const pageSize = 8;
   const classes = useStyles();
-  const userId = useSelector((state) => state.userId);
+  const userId = useSelector((state) => state.tokenData.userId);
   const token = localStorage.getItem("token");
 
   useEffect(() => {

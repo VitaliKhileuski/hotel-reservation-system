@@ -4,14 +4,16 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 import TextField from "@material-ui/core/TextField";
 import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
+import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { Formik, Form, ErrorMessage, Field } from "formik";
+import { useDispatch, useSelector } from "react-redux";
 import api from "./../../api/";
-import { useDispatch } from "react-redux";
-import { TOKEN_DATA } from "../../storage/actions/actionTypes.js";
-import { UPDATE_USER_VALIDATION_SCHEMA } from "../../constants/ValidationSchemas";
+import { FAST_REGISTER_VALIDATIOM_SCHEMA } from "../../constants/ValidationSchemas";
+import CallAlert from "../../Notifications/NotificationHandler";
 import { EMAIL_REGEX } from "../../constants/Regex";
+import { FillStorage, FillLocalStorage } from "./TokenData";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -33,102 +35,76 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function UpdateUserForm({ changeFlag, handleClose, user }) {
-  const dispatch = useDispatch();
+export default function FastRegister({ handleClose }) {
   const classes = useStyles();
+  const dispatch = useDispatch();
   const [emailErrorLabel, setEmailErrorLabel] = useState("");
-  const [email, setEmail] = useState(user.email);
-  const token = localStorage.getItem("token");
+  const [email, setEmail] = useState("");
+  const role = useSelector((state) => state.tokenData.role);
 
   const initialValues = {
-    lastName: !!user ? user.surname : "",
-    firstName: !!user ? user.name : "",
-    email: !!user ? user.email : "",
-    phone: !!user ? user.phoneNumber : "",
+    email: "",
+    password: "",
+    passwordConfirm: "",
   };
-
   const onSubmit = (values) => {
     const request = {
       Email: email,
-      Name: values.firstName,
-      SurName: values.lastName,
-      PhoneNumber: values.phone,
+      Password: values.password,
     };
     api
-      .put("/users/" + user.id, request, {
-        headers: { Authorization: "Bearer " + token },
-      })
+      .post("/account/register", request)
       .then((response) => response.data)
       .then((data) => {
-        localStorage.setItem("token", data.token);
-        dispatch({
-          type: TOKEN_DATA,
-          email: request.Email,
-          name: request.Name,
-        });
-        changeFlag();
+        FillStorage(data[0], dispatch);
+        FillLocalStorage(data[0], data[1]);
         handleClose();
+        CallAlert(
+          dispatch,
+          true,
+          "you successfully registered, now you can order this room"
+        );
       })
       .catch((error) => {
         if (!!error.response) {
           setEmailErrorLabel(error.response.data.Message);
-          console.log(error.response.data.Message);
-          console.log(error.response.data);
         }
       });
   };
   function ValidateEmail(email) {
+    setEmail(email);
     setEmailErrorLabel("");
+    if (email === "") {
+      setEmailErrorLabel("email is reqired");
+      return false;
+    }
     const flag = EMAIL_REGEX.test(email);
     if (!flag) {
       setEmailErrorLabel("invalid email");
-    }
-    if (email === "") {
-      setEmailErrorLabel("email is reqired");
+      return false;
     }
     setEmail(email);
+    return true;
   }
+
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
+        <Typography component="h1" variant="h5">
+          Fast Register
+        </Typography>
         <Formik
           initialValues={initialValues}
-          onSubmit={onSubmit}
-          validationSchema={UPDATE_USER_VALIDATION_SCHEMA}
+          onSubmit={(values) => {
+            if (ValidateEmail(email.trim()) && emailErrorLabel === "")
+              onSubmit(values);
+          }}
+          validationSchema={FAST_REGISTER_VALIDATIOM_SCHEMA}
         >
           {(props) => (
-            <Form className={classes.form}>
+            <Form className={classes.form} noValidate>
               <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
-                  <Field
-                    as={TextField}
-                    variant="outlined"
-                    autoComplete="lname"
-                    name="firstName"
-                    required
-                    error={props.errors.firstName && props.touched.firstName}
-                    helperText={<ErrorMessage name="firstName" />}
-                    fullWidth
-                    id="firstName"
-                    label="First Name"
-                    autoFocus
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <Field
-                    as={TextField}
-                    variant="outlined"
-                    required
-                    fullWidth
-                    id="lastName"
-                    label="Last Name"
-                    name="lastName"
-                    error={props.errors.lastName && props.touched.lastName}
-                    helperText={<ErrorMessage name="lastName" />}
-                    autoComplete="lname"
-                  />
-                </Grid>
                 <Grid item xs={12}>
                   <Field
                     as={TextField}
@@ -151,13 +127,34 @@ export default function UpdateUserForm({ changeFlag, handleClose, user }) {
                 <Grid item xs={12}>
                   <Field
                     as={TextField}
-                    fullWidth
-                    required
-                    label="Phone Number"
                     variant="outlined"
-                    name="phone"
-                    error={props.errors.phone && props.touched.phone}
-                    helperText={<ErrorMessage name="phone" />}
+                    required
+                    fullWidth
+                    name="password"
+                    label="Password"
+                    error={props.errors.password && props.touched.password}
+                    helperText={<ErrorMessage name="password" />}
+                    type="password"
+                    id="password"
+                    autoComplete="current-password"
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <Field
+                    as={TextField}
+                    variant="outlined"
+                    required
+                    fullWidth
+                    name="passwordConfirm"
+                    label="confirm your password"
+                    error={
+                      props.errors.passwordConfirm &&
+                      props.touched.passwordConfirm
+                    }
+                    helperText={<ErrorMessage name="passwordConfirm" />}
+                    type="password"
+                    id="passwordConfirm"
+                    autoComplete="current-password"
                   />
                 </Grid>
               </Grid>
@@ -168,8 +165,9 @@ export default function UpdateUserForm({ changeFlag, handleClose, user }) {
                 color="primary"
                 className={classes.submit}
               >
-                Save
+                Sign up
               </Button>
+              <Grid container justify="flex-end"></Grid>
             </Form>
           )}
         </Formik>

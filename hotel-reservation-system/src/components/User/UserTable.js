@@ -21,8 +21,7 @@ import BaseDialog from "../shared/BaseDialog";
 import BaseDeleteDialog from "../shared/BaseDeleteDialog";
 import Register from "./../Authorization/Register";
 import UsersFilter from "../Filters/UserFilter";
-import BaseAlert from "../shared/BaseAlert";
-import { ADMIN } from "./../../config/Roles";
+import { ADMIN } from "../../constants/Roles";
 
 const useStyles = makeStyles({
   root: {

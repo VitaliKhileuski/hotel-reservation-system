@@ -10,10 +10,7 @@ import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import API from "../../api";
 import RoomIsOccupiedAlert from "../Reservation/RoomIsOccupiedAlert";
-import {
-  CHECK_IN_DATE,
-  CHECK_OUT_DATE,
-} from "./../../storage/actions/actionTypes";
+import { DATES } from "./../../storage/actions/actionTypes";
 
 export default function DateFilter({
   roomId,
@@ -47,7 +44,7 @@ export default function DateFilter({
   };
 
   const handleDateCheckInChange = (date) => {
-    dispatch({ type: CHECK_IN_DATE, checkInDate: date });
+    dispatch({ type: DATES, checkInDate: date });
     setCheckIn(date);
     changeDates(date, checkOut);
     if (date < checkOut) {
@@ -60,7 +57,7 @@ export default function DateFilter({
     }
   };
   const handleDateCheckOutChange = (date) => {
-    dispatch({ type: CHECK_OUT_DATE, checkOutDate: date });
+    dispatch({ type: DATES, checkOutDate: date });
     setCheckOut(date);
     changeDates(checkIn, date);
     if (date > checkIn) {

@@ -14,7 +14,7 @@ import { useDispatch } from "react-redux";
 import API from "./../../api/";
 import { HOTEL_VALIDATION_SCHEMA } from "../../constants/ValidationSchemas";
 import { NUMBER_REGEX } from "./../../constants/Regex";
-import { ADMIN } from "../../config/Roles";
+import { ADMIN } from "../../constants/Roles";
 import CallAlert from "../../Notifications/NotificationHandler";
 
 const useStyles = makeStyles((theme) => ({
@@ -55,7 +55,7 @@ export default function AddHotelForm({ hotel, handleClose, updateMainInfo }) {
   const [checkOutTime, setCheckOutTime] = useState(
     !!hotel ? hotel.checkOutTime : "12:00"
   );
-  const role = useSelector((state) => state.role);
+  const role = useSelector((state) => state.tokenData.role);
   const initialValues = {
     name: !!hotel ? hotel.name : "",
     country: !!hotel ? hotel.location.country : "",

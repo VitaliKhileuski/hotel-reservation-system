@@ -13,9 +13,9 @@ import { useDispatch, useSelector } from "react-redux";
 import api from "./../../api/";
 import { REGISTER_VALIDATION_SCHEMA } from "../../constants/ValidationSchemas";
 import CallAlert from "../../Notifications/NotificationHandler";
-import { ADMIN } from "./../../config/Roles";
+import { ADMIN } from "../../constants/Roles";
 import { EMAIL_REGEX } from "../../constants/Regex";
-import { FillStorage } from "./TokenData";
+import { FillStorage, FillLocalStorage } from "./TokenData";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -38,12 +38,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Register({ handleClose }) {
-  const isLogged = useSelector((state) => state.isLogged);
+  const isLogged = useSelector((state) => state.tokenData.isLogged);
   const classes = useStyles();
   const dispatch = useDispatch();
   const [emailErrorLabel, setEmailErrorLabel] = useState("");
   const [email, setEmail] = useState("");
-  const role = useSelector((state) => state.role);
+  const role = useSelector((state) => state.tokenData.role);
 
   const initialValues = {
     lastName: "",
@@ -66,7 +66,8 @@ export default function Register({ handleClose }) {
       .then((response) => {
         if (role !== ADMIN) {
           if (!!response && !!response.data) {
-            FillStorage(response.data[0], response.data[1], dispatch);
+            FillStorage(response.data[0], dispatch);
+            FillLocalStorage(response.data[0], response.data[1]);
           }
         } else {
           handleClose();
@@ -91,7 +92,6 @@ export default function Register({ handleClose }) {
       setEmailErrorLabel("invalid email");
       return false;
     }
-    setEmail(email);
     return true;
   }
 

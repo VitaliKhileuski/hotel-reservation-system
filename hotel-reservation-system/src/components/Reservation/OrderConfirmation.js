@@ -15,12 +15,10 @@ import {
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Grid from "@material-ui/core/Grid";
 import { useSelector, useDispatch } from "react-redux";
-import { EMAIL } from "./../../storage/actions/actionTypes";
 import API from "./../../api";
 import CallAlert from "../../Notifications/NotificationHandler";
 import BaseDialog from "../shared/BaseDialog";
-import { FillStorage, FillLocalStorage } from "../Authorization/TokenData";
-import { EMAIL_REGEX } from "../../constants/Regex";
+import FastRegister from "./../Authorization/FastRegister";
 import { HOME_PATH } from "../../constants/RoutingPaths";
 import ShiftCheckOutTimeAlert from "./ShiftCheckOutTimeAlert";
 import RoomIsOccupiedAlert from "./RoomIsOccupiedAlert";
@@ -63,11 +61,9 @@ export default function OrderConfirmation({
   const dispatch = useDispatch();
   const [checked, setChecked] = useState(false);
   const history = useHistory();
-  const [email, setEmail] = useState();
-  const [emailErrorLabel, setEmailErrorLabel] = useState("");
   const classes = useStyles();
-  const isLogged = useSelector((state) => state.isLogged);
-  let userEmail = useSelector((state) => state.email);
+  const isLogged = useSelector((state) => state.tokenData.isLogged);
+  let userEmail = useSelector((state) => state.tokenData.email);
   const token = localStorage.getItem("token");
   const [hotelCheckInTime, setHotelCheckInTime] = useState();
   const [hotelCheckOutTime, setHotelCheckOutTime] = useState();
@@ -94,19 +90,16 @@ export default function OrderConfirmation({
   const [isCheckOutTimeIncorrect, setIsCheckOutTimeIncorrect] = useState(false);
   const [shiftAlertOpen, setShiftAlertOpen] = useState(false);
   const [roomIsOccupiedAlertOpen, setRoomIsOccupiedAlertOpen] = useState(false);
-
+  const [fastRegisterDialogOpen, setFastRegisterDialogOpen] = useState(false);
   const [messageDialogOpen, SetMessageDialogOpen] = useState(false);
-  const messageForGuest = (
-    <Typography style={{ margin: 50 }}>
-      Order successfully created.we have registered you so that you can track
-      your order. Your email and password will be send to your email. You can
-      change your profile details in the my profile tab
-    </Typography>
-  );
+
   const messageForUser = (
     <Typography style={{ margin: 50 }}>
       Order successfully created.You can track it in my Orders tab.
     </Typography>
+  );
+  const fastRegister = (
+    <FastRegister handleClose={handleCloseFastRegisterDialog}></FastRegister>
   );
 
   function ValidateCheckInTime(value) {
@@ -142,9 +135,6 @@ export default function OrderConfirmation({
   }
 
   function handleCloseMessageDialog() {
-    if (!!email) {
-      dispatch({ type: EMAIL, email: email });
-    }
     SetMessageDialogOpen(false);
     history.push({
       pathname: HOME_PATH,
@@ -155,19 +145,6 @@ export default function OrderConfirmation({
     setCheckInTime(currentCheckInTime);
     console.log(currentCheckOutTime);
     ValidateCheckOutTime(currentCheckOutTime);
-  }
-
-  function validateEmail(email) {
-    const emailWithoutSpaces = email.trim();
-    setEmailErrorLabel("");
-    setEmail(emailWithoutSpaces);
-    const flag = EMAIL_REGEX.test(emailWithoutSpaces);
-    if (!flag) {
-      setEmailErrorLabel("invalid email");
-    }
-    if (emailWithoutSpaces === "") {
-      setEmailErrorLabel("email is required");
-    }
   }
 
   const getLimitHours = async () => {
@@ -276,29 +253,8 @@ export default function OrderConfirmation({
       });
   };
 
-  const createUser = async (requestForOrder) => {
-    console.log("create user");
-    let request = {
-      Email: email,
-    };
-    await API.post("/account/register", request)
-      .then((response) => {
-        if (!!response && !!response.data) {
-          FillLocalStorage(response.data[0], response.data[1]);
-          FillStorage(response.data[0], dispatch);
-          createOrderRequest(requestForOrder);
-        }
-      })
-      .catch((error) => {
-        if (!!error.response) {
-          setEmailErrorLabel(error.response.data.Message);
-          console.log(error.response.data.Message);
-        }
-      });
-  };
-
   async function сreateOrder() {
-    if (checked && emailErrorLabel === "") {
+    if (checked) {
       let requestForOrder = {
         StartDate: currentCheckInDate,
         EndDate: currentCheckOutDate,
@@ -308,18 +264,16 @@ export default function OrderConfirmation({
         CheckOutTime: checkOutTime,
         IsCheckOutTimeShifted: isShifted,
       };
-      if (userEmail === "" || userEmail === undefined) {
-        userEmail = email;
-        requestForOrder.UserEmail = email;
-        await createUser(requestForOrder);
-      } else {
-        createOrderRequest(requestForOrder);
-      }
+
+      createOrderRequest(requestForOrder);
     }
   }
 
   function handleCloseRoomIsOccupiedAlert() {
     setRoomIsOccupiedAlertOpen(false);
+  }
+  function handleCloseFastRegisterDialog() {
+    setFastRegisterDialogOpen(false);
   }
 
   return (
@@ -470,15 +424,28 @@ export default function OrderConfirmation({
           </Grid>
           {isLogged === false ? (
             <Grid item xs={12}>
-              <TextField
-                label="write your email"
-                required
-                value={email}
-                onChange={(e) => validateEmail(e.target.value)}
-                error={emailErrorLabel !== ""}
-                helperText={emailErrorLabel}
-                autoComplete="email"
-              ></TextField>
+              <Grid
+                container
+                spacing={1}
+                direction="column"
+                justifyContent="center"
+                alignItems="center"
+              >
+                <Grid item>
+                  <Typography variant="h6">
+                    You should register before booking a room
+                  </Typography>
+                </Grid>
+                <Grid item>
+                  <Button
+                    color="primary"
+                    variant="contained"
+                    onClick={() => setFastRegisterDialogOpen(true)}
+                  >
+                    Fast Register
+                  </Button>
+                </Grid>
+              </Grid>
             </Grid>
           ) : (
             ""
@@ -500,12 +467,7 @@ export default function OrderConfirmation({
             variant="contained"
             onClick={isEditOrder ? updateOrder : сreateOrder}
             color="primary"
-            disabled={
-              !checked ||
-              emailErrorLabel !== "" ||
-              email === "" ||
-              checkInTime < hotelCheckInTime
-            }
+            disabled={!isLogged || !checked || checkInTime < hotelCheckInTime}
           >
             {isEditOrder ? "Update order" : "Order"}
           </Button>
@@ -514,7 +476,12 @@ export default function OrderConfirmation({
       <BaseDialog
         open={messageDialogOpen}
         handleClose={handleCloseMessageDialog}
-        form={!!token ? messageForUser : messageForGuest}
+        form={messageForUser}
+      ></BaseDialog>
+      <BaseDialog
+        open={fastRegisterDialogOpen}
+        handleClose={handleCloseFastRegisterDialog}
+        form={fastRegister}
       ></BaseDialog>
       <ShiftCheckOutTimeAlert
         open={shiftAlertOpen}

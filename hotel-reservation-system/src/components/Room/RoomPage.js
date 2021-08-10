@@ -6,7 +6,6 @@ import { useHistory } from "react-router";
 import { useSelector, useDispatch } from "react-redux";
 import API from "./../../api";
 import MainReservationDialog from "../Reservation/MainReservationDialog";
-import OrderConfirmation from "./../Reservation/OrderConfirmation";
 import CallAlert from "../../Notifications/NotificationHandler";
 import RoomDetails from "./RoomDetails";
 
@@ -32,8 +31,8 @@ export default function RoomPage(props) {
   const [checkOutDate, setCheckOutDate] = useState(
     props.location.state.checkOutDate
   );
-  const islogged = useSelector((state) => state.isLogged);
-  const userId = useSelector((state) => state.userId);
+  const islogged = useSelector((state) => state.tokenData.isLogged);
+  const userId = useSelector((state) => state.tokenData.userId);
   const token = localStorage.getItem("token");
 
   function callReservationDialog() {
@@ -42,10 +41,6 @@ export default function RoomPage(props) {
       blockRoom();
     }
     setReservationDialogOpen(true);
-  }
-
-  function handleCloseUpdateOrderDialog() {
-    setOpenUpdateOrder(false);
   }
 
   const isRoomBlocked = async () => {
@@ -75,7 +70,7 @@ export default function RoomPage(props) {
     })
       .then((response) => response.data)
       .then((data) => {})
-      .catch((error) => console.log(error.response.data.message));
+      .catch((error) => console.log(error));
   };
 
   function handleCloseReservationDialog() {

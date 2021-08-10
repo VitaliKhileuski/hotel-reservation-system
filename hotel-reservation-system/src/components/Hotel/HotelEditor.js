@@ -11,7 +11,7 @@ import API from "./../../api";
 import RoomTable from "./../Room/RoomTable";
 import BaseImageDialog from "./../shared/BaseImageDialog";
 import ServiceTable from "../Service/ServiceTable";
-import { ADMIN } from "./../../config/Roles";
+import { ADMIN } from "../../constants/Roles";
 import AddHotelForm from "./AddHotelForm";
 
 function TabPanel(props) {
@@ -65,17 +65,12 @@ export default function HotelEditor(props) {
   const [hotel, setHotel] = useState(
     !!props.location.state ? props.location.state.hotel : ""
   );
-  const [updateAlertOpen, setUpdateAlertOpen] = useState(false);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
-  const role = useSelector((state) => state.role);
+  const role = useSelector((state) => state.tokenData.role);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
-
-  function callUpdateAlert() {
-    setUpdateAlertOpen(true);
-  }
 
   function toRoomSection() {
     setValue(1);
@@ -126,7 +121,6 @@ export default function HotelEditor(props) {
               <AddHotelForm
                 toRoomSection={toRoomSection}
                 hotel={hotel}
-                callUpdateAlert={callUpdateAlert}
                 updateMainInfo={updateMainInfo}
               ></AddHotelForm>
             </Grid>

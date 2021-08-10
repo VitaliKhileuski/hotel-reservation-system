@@ -30,7 +30,7 @@ import CallAlert from "../../Notifications/NotificationHandler";
 import UsersFilter from "../Filters/UserFilter";
 import HotelFilter from "../Filters/HotelFilter";
 import { getRole } from "./../Authorization/TokenData";
-import { ADMIN, HOTEL_ADMIN } from "../../config/Roles";
+import { ADMIN, HOTEL_ADMIN } from "../../constants/Roles";
 import AddHotelForm from "./AddHotelForm";
 import HotelAdminDialog from "./HotelAdminDialog";
 
@@ -79,8 +79,7 @@ export default function HotelTable() {
   const [hotelAdminSurname, setHotelAdminSurname] = useState("");
   const [currentSortField, setCurrentSortField] = useState("");
   const [currentAscending, setCurrentAscending] = useState("asc");
-  const isLogged = useSelector((state) => state.isLogged);
-  const adminId = useSelector((state) => state.userId);
+  const adminId = useSelector((state) => state.tokenData.userId);
   const [filterFlag, setFilterFlag] = useState(true);
 
   const form = <AddHotelForm handleClose={handleClose}></AddHotelForm>;

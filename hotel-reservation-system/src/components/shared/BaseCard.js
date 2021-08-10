@@ -1,4 +1,4 @@
-import { React, useState } from "react";
+import { React } from "react";
 import { useSelector } from "react-redux";
 import Carousel from "react-material-ui-carousel";
 import { makeStyles } from "@material-ui/core";
@@ -31,8 +31,6 @@ export default function BaseCard({
 }) {
   const classes = useStyles();
   const history = useHistory();
-  const islogged = useSelector((state) => state.isLogged);
-  const token = localStorage.getItem("token");
 
   function openRoomDetails() {
     history.push({

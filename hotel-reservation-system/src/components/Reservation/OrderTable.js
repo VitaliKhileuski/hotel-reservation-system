@@ -28,7 +28,7 @@ import Payment from "./Payment";
 import RoomDetails from "../Room/RoomDetails";
 import BaseDeleteDialog from "../shared/BaseDeleteDialog";
 import CallAlert from "../../Notifications/NotificationHandler";
-import { USER } from "./../../config/Roles";
+import { USER } from "../../constants/Roles";
 
 const useRowStyles = makeStyles({
   root: {
@@ -50,7 +50,7 @@ function Row({ order, handleClickDeleteIcon, handleClickUpdateOrder }) {
   const [roomDetailsOpen, setRoomDetailsOpen] = useState(false);
   const [room, setRoom] = useState();
   const component = <RoomDetails room={room}></RoomDetails>;
-  const role = useSelector((state) => state.role);
+  const role = useSelector((state) => state.tokenData.role);
 
   function openRoomDetails(room) {
     setRoom(room);
