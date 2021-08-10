@@ -46,6 +46,7 @@ export default function MainReservationDialog({
   const roomDetailsСomponent = <RoomDetails room={room}></RoomDetails>;
   const choiseOfServicesComponent = (
     <ServiceChoice
+      hotelId={room.hotelId}
       oldSelectedServices={selectedServices}
       getSelectedServices={getSelectedServices}
     ></ServiceChoice>

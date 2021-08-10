@@ -70,7 +70,7 @@ export default function RoomPage(props) {
   }
 
   const blockRoom = async () => {
-    await API.put("/rooms/" + room.id + "/block", {
+    await API.put("/rooms/" + room.id + "/block", null, {
       headers: { Authorization: "Bearer " + token },
     })
       .then((response) => response.data)

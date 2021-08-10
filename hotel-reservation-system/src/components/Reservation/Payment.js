@@ -42,7 +42,9 @@ export default function Payment({
 
   function shiftCheckOutDate(value) {
     setCurrentCheckOutDate(value);
-    console.log("payment shift");
+  }
+  function shiftCheckInDate(value) {
+    setCurrentCheckInDate(value);
   }
 
   return (
@@ -69,6 +71,7 @@ export default function Payment({
           checkOutDate={currentCheckOutDate}
           isEditOrder={isEditOrder}
           shiftCheckOutDate={shiftCheckOutDate}
+          shiftCheckInDate={shiftCheckInDate}
           orderCheckInTime={checkInTime}
           orderCheckOutTime={checkOutTime}
           orderId={orderId}

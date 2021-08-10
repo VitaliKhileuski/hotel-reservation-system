@@ -8,7 +8,11 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import { useHistory } from "react-router";
 import { HOME_PATH } from "./../../constants/RoutingPaths";
 
-export default function RoomIsOccupiedAlert({ open, handleClose }) {
+export default function RoomIsOccupiedAlert({
+  open,
+  handleClose,
+  onlyMessage,
+}) {
   {
     const history = useHistory();
     function searchOtherHotelsWithUserDates() {
@@ -30,20 +34,26 @@ export default function RoomIsOccupiedAlert({ open, handleClose }) {
           <DialogContent>
             <DialogContentText id="alert-dialog-description">
               Room on this date is already occupied.Please, choose another date
-              or we can search for other hotels for your new date.
+              {onlyMessage
+                ? "."
+                : "or we can search for other hotels for your new date."}
             </DialogContentText>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose} color="primary">
               Choose another date
             </Button>
-            <Button
-              onClick={searchOtherHotelsWithUserDates}
-              color="primary"
-              autoFocus
-            >
-              Search for other hotels
-            </Button>
+            {onlyMessage ? (
+              ""
+            ) : (
+              <Button
+                onClick={searchOtherHotelsWithUserDates}
+                color="primary"
+                autoFocus
+              >
+                Search for other hotels
+              </Button>
+            )}
           </DialogActions>
         </Dialog>
       </div>

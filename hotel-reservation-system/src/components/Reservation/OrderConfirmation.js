@@ -23,6 +23,7 @@ import { FillStorage, FillLocalStorage } from "../Authorization/TokenData";
 import { EMAIL_REGEX } from "../../constants/Regex";
 import { HOME_PATH } from "../../constants/RoutingPaths";
 import ShiftCheckOutTimeAlert from "./ShiftCheckOutTimeAlert";
+import RoomIsOccupiedAlert from "./RoomIsOccupiedAlert";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -45,6 +46,7 @@ export default function OrderConfirmation({
   checkInDate,
   checkOutDate,
   shiftCheckOutDate,
+  shiftCheckInDate,
   isEditOrder,
   orderCheckInTime,
   orderCheckOutTime,
@@ -53,8 +55,8 @@ export default function OrderConfirmation({
   limitDays,
   isCheckOutTimeShifted,
 }) {
-  useEffect(() => {
-    getLimitHours();
+  useEffect(async () => {
+    await getLimitHours();
   }, []);
 
   console.log(limitDays);
@@ -91,6 +93,7 @@ export default function OrderConfirmation({
   const [isCheckInTimeIncorrect, setIsCheckInTimeIncorrect] = useState(false);
   const [isCheckOutTimeIncorrect, setIsCheckOutTimeIncorrect] = useState(false);
   const [shiftAlertOpen, setShiftAlertOpen] = useState(false);
+  const [roomIsOccupiedAlertOpen, setRoomIsOccupiedAlertOpen] = useState(false);
 
   const [messageDialogOpen, SetMessageDialogOpen] = useState(false);
   const messageForGuest = (
@@ -121,7 +124,7 @@ export default function OrderConfirmation({
     } else {
       setCurrentCheckOutTime(value);
       setIsCheckOutTimeIncorrect(false);
-      if (value > convertTimeSpan(hotelCheckOutTime)) {
+      if (convertTimeSpan(value) > convertTimeSpan(hotelCheckOutTime)) {
         isAvaivableToShiftCheckOutTime();
       } else {
         setCheckOutTime(value);
@@ -150,6 +153,7 @@ export default function OrderConfirmation({
 
   function validateHours() {
     setCheckInTime(currentCheckInTime);
+    console.log(currentCheckOutTime);
     ValidateCheckOutTime(currentCheckOutTime);
   }
 
@@ -185,6 +189,7 @@ export default function OrderConfirmation({
   const isAvaivableToBook = async (checkIn, checkOut) => {
     await API.get("/rooms/" + room.id + "/isEmpty", {
       params: {
+        orderId: orderId,
         checkInDate: checkIn.toJSON(),
         checkOutDate: checkOut.toJSON(),
       },
@@ -192,7 +197,12 @@ export default function OrderConfirmation({
       .then((response) => response.data)
       .then((data) => {
         if (data) {
+          setRequestCheckInDate(currentCheckInDate);
+          setRequestCheckOutDate(currentCheckOutDate);
+          shiftCheckInDate(currentCheckInDate);
+          shiftCheckOutDate(currentCheckOutDate);
         } else {
+          setRoomIsOccupiedAlertOpen(true);
         }
       })
       .catch((error) => console.log(error.response.data.message));
@@ -245,6 +255,8 @@ export default function OrderConfirmation({
     const request = {
       CheckInTime: checkInTime,
       CheckOutTime: checkOutTime,
+      checkInDate: requestCheckInDate,
+      checkOutDate: requestCheckOutDate,
     };
     await API.put("/orders/" + orderId + "/updateOrder", request, {
       headers: { Authorization: "Bearer " + token },
@@ -306,6 +318,10 @@ export default function OrderConfirmation({
     }
   }
 
+  function handleCloseRoomIsOccupiedAlert() {
+    setRoomIsOccupiedAlertOpen(false);
+  }
+
   return (
     <>
       <Paper className={classes.paper}>
@@ -325,7 +341,6 @@ export default function OrderConfirmation({
                   label="check-in"
                   type="time"
                   value={currentCheckInTime}
-                  //className={classes.textField}
                   onChange={(e) => {
                     ValidateCheckInTime(e.target.value);
                   }}
@@ -403,6 +418,7 @@ export default function OrderConfirmation({
                     <KeyboardDatePicker
                       disableToolbar
                       disablePast
+                      minDate={moment(currentCheckInDate).add(1, "days")._d}
                       variant="inline"
                       inputVariant="outlined"
                       format="MM/dd/yyyy"
@@ -419,6 +435,10 @@ export default function OrderConfirmation({
                     style={{ marginTop: 40 }}
                     variant="contained"
                     color="primary"
+                    disabled={currentCheckOutDate < currentCheckInDate}
+                    onClick={() =>
+                      isAvaivableToBook(currentCheckInDate, currentCheckOutDate)
+                    }
                   >
                     Save new dates
                   </Button>
@@ -438,9 +458,13 @@ export default function OrderConfirmation({
             </Typography>
             <Typography>
               check-out hour :
-              {moment(requestCheckOutDate)
-                .subtract(1, "days")
-                .format("DD/MM/YYYY")}{" "}
+              {!!hotelCheckOutTime &&
+              isShifted &&
+              convertTimeSpan(checkOutTime) > convertTimeSpan(hotelCheckOutTime)
+                ? moment(requestCheckOutDate)
+                    .subtract(1, "days")
+                    .format("DD/MM/YYYY")
+                : ""}{" "}
               {checkOutTime}
             </Typography>
           </Grid>
@@ -498,6 +522,11 @@ export default function OrderConfirmation({
         checkOutTime={hotelCheckOutTime}
         shiftCheckOutDate={ShiftCheckOutDate}
       ></ShiftCheckOutTimeAlert>
+      <RoomIsOccupiedAlert
+        open={roomIsOccupiedAlertOpen}
+        handleClose={handleCloseRoomIsOccupiedAlert}
+        onlyMessage={true}
+      ></RoomIsOccupiedAlert>
     </>
   );
 }
