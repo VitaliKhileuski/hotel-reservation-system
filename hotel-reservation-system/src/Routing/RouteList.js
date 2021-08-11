@@ -16,34 +16,49 @@ import UserProfile from "./../components/User/UserProfile";
 import UserTable from "../components/User/UserTable";
 import AuthRoute from "./../Routing/AuthRoute";
 import RoomPage from "./../components/Room/RoomPage";
-import { ADMIN, HOTEL_ADMIN } from "./../config/Roles";
+import { ADMIN, HOTEL_ADMIN } from "../constants/Roles";
+import {
+  HOME_PATH,
+  LOGIN_PATH,
+  REGISTER_PATH,
+  ROOMS_PATH,
+  ROOM_DETAILS_PATH,
+  OWNED_HOTELS_PATH,
+  ORDERS_PATH,
+  USER_PROFILE_PATH,
+  HOTEL_EDITOR_PATH,
+  USERS_PATH,
+} from "./../constants/RoutingPaths";
 
 export default function RouterList() {
   return (
     <Switch>
-      <Route path="/home" component={Home} />
-      <Route path="/login" component={Login} />
-      <Route path="/register" component={Register} />
-      <Route path="/rooms" render={(props) => <RoomsPage {...props} />} />
-      <Route path="/roomDetails" render={(props) => <RoomPage {...props} />} />
+      <Route path={HOME_PATH} component={Home} />
+      <Route path={LOGIN_PATH} component={Login} />
+      <Route path={REGISTER_PATH} component={Register} />
+      <Route path={ROOMS_PATH} render={(props) => <RoomsPage {...props} />} />
+      <Route
+        path={ROOM_DETAILS_PATH}
+        render={(props) => <RoomPage {...props} />}
+      />
       <AuthRoute
-        path="/ownedHotels"
+        path={OWNED_HOTELS_PATH}
         Component={HotelTable}
         requiredRoles={[ADMIN, HOTEL_ADMIN]}
       ></AuthRoute>
-      <AuthRoute path="/orders" Component={OrderTable}></AuthRoute>
-      <AuthRoute path="/userProfile" Component={UserProfile}></AuthRoute>
+      <AuthRoute path={ORDERS_PATH} Component={OrderTable}></AuthRoute>
+      <AuthRoute path={USER_PROFILE_PATH} Component={UserProfile}></AuthRoute>
       <AuthRoute
-        path="/hotelEditor"
+        path={HOTEL_EDITOR_PATH}
         Component={HotelEditor}
         requiredRoles={[ADMIN, HOTEL_ADMIN]}
       ></AuthRoute>
       <AuthRoute
-        path="/users"
+        path={USERS_PATH}
         Component={UserTable}
         requiredRoles={[ADMIN]}
       ></AuthRoute>
-      <Redirect to="/home" />
+      <Redirect to={HOME_PATH} />
     </Switch>
   );
 }

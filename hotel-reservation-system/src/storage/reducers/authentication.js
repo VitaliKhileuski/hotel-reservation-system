@@ -1,30 +1,40 @@
 import initialState from "../initialState";
-import {
-  IS_LOGGED,
-  ROLE,
-  NAME,
-  EMAIL,
-  USER_ID,
-  CHECK_IN_DATE,
-  CHECK_OUT_DATE,
-} from "../actions/actionTypes.js";
+import { DATES, TOKEN_DATA, ALERT_INFO } from "../actions/actionTypes.js";
 
 export default function authentication(state = initialState, action) {
   switch (action.type) {
-    case IS_LOGGED:
-      return { ...state, isLogged: action.isLogged };
-    case ROLE:
-      return { ...state, role: action.role };
-    case NAME:
-      return { ...state, name: action.name };
-    case USER_ID:
-      return { ...state, userId: action.userId };
-    case EMAIL:
-      return { ...state, email: action.email };
-    case CHECK_IN_DATE:
-      return { ...state, checkInDate: action.checkInDate };
-    case CHECK_OUT_DATE:
-      return { ...state, checkOutDate: action.checkOutDate };
+    case TOKEN_DATA:
+      return {
+        ...state,
+        tokenData: {
+          ...state.tokenData,
+          isLogged: action.isLogged,
+          role: action.role,
+          name: action.name,
+          userId: action.userId,
+          email: action.email,
+        },
+      };
+    case ALERT_INFO:
+      return {
+        ...state,
+        alertInfo: {
+          ...state.alertInfo,
+          openAlert: action.openAlert,
+          message: action.message,
+          alertSuccessStatus: action.alertSuccessStatus,
+          failureMessage: action.failureMessage,
+        },
+      };
+    case DATES:
+      return {
+        ...state,
+        dates: {
+          ...state.dates,
+          checkInDate: action.checkInDate,
+          checkOutDate: action.checkOutDate,
+        },
+      };
     default:
       return state;
   }

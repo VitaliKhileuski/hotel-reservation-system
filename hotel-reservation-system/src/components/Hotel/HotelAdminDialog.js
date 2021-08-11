@@ -7,6 +7,7 @@ import Box from "@material-ui/core/Box";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import Autocomplete from "@material-ui/lab/Autocomplete";
+import CallAlert from "../../Notifications/NotificationHandler";
 import API from "./../../api/";
 
 const useStyles = makeStyles((theme) => ({
@@ -33,7 +34,6 @@ export default function HotelAdminDialog({
   hotelId,
   message,
   handleClose,
-  callAlert,
   assingFlag,
 }) {
   const classes = useStyles();
@@ -72,25 +72,33 @@ export default function HotelAdminDialog({
   }, []);
 
   const UpdateHotelAdmin = async () => {
-    await API.put("hotels/" + hotelId + "/" + admin.id + "/setHotelAdmin", {
-      headers: { Authorization: "Bearer " + token },
-    })
+    await API.put(
+      "hotels/" + hotelId + "/" + admin.id + "/setHotelAdmin",
+      null,
+      {
+        headers: { Authorization: "Bearer " + token },
+      }
+    )
       .then((response) => response.data)
       .then((data) => {
-        callAlert("hotel admin assigned successfully", true);
+        CallAlert(true, "hotel admin assigned successfully");
       })
-      .catch((error) => callAlert(false));
+      .catch((error) => CallAlert(false));
   };
 
   const DeleteHotelAdmin = async () => {
-    await API.put("hotels/" + hotelId + "/" + admin.id + "/deleteHotelAdmin", {
-      headers: { Authorization: "Bearer " + token },
-    })
+    await API.put(
+      "hotels/" + hotelId + "/" + admin.id + "/deleteHotelAdmin",
+      null,
+      {
+        headers: { Authorization: "Bearer " + token },
+      }
+    )
       .then((response) => response.data)
       .then((data) => {
-        callAlert("hotel admin deleted successfully", true);
+        CallAlert(true, "hotel admin deleted successfully");
       })
-      .catch((error) => callAlert(false));
+      .catch((error) => CallAlert(false));
   };
 
   function updateHotelAdmin() {

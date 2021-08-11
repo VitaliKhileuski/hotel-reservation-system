@@ -8,10 +8,10 @@ import { makeStyles } from "@material-ui/core/styles";
 import Pagination from "@material-ui/lab/Pagination";
 import { useDispatch, useSelector } from "react-redux";
 import API from "../api";
-import { CHECK_IN_DATE, CHECK_OUT_DATE } from "../storage/actions/actionTypes";
+import { DATES } from "../storage/actions/actionTypes";
 import HotelList from "./Hotel/HotelList";
 import DateFilter from "./Filters/DateFilter";
-
+import AsyncAutocomplete from "./../components/shared/AsyncAutocomplete";
 const useStyles = makeStyles((theme) => ({
   option: {
     fontSize: 15,
@@ -42,21 +42,21 @@ export default function Home() {
   const [hotelName, setHotelName] = useState("");
   const [isValidDates, setIsValidDates] = useState(true);
   const [checkInDate, setCheckInDate] = useState(
-    useSelector((state) => state.checkInDate)
+    useSelector((state) => state.dates.checkInDate)
   );
   const [checkOutDate, setCheckOutDate] = useState(
-    useSelector((state) => state.checkOutDate)
+    useSelector((state) => state.dates.checkOutDate)
   );
   const [page, setPage] = useState(1);
   const [maxPage, setMaxPage] = useState(1);
   const pageSize = 8;
-  const userId = useSelector((state) => state.userId);
+  const userId = useSelector((state) => state.tokenData.userId);
   const dispatch = useDispatch();
   const token = localStorage.getItem("token");
+  const [filterFlag, setFilterFlag] = useState(true);
 
   useEffect(() => {
     loadCountries();
-    loadHotelNames();
   }, []);
 
   const loadCountries = async () => {
@@ -68,11 +68,26 @@ export default function Home() {
       .catch((error) => console.log(error));
   };
 
-  const loadHotelNames = async () => {
-    await API.get("/hotels/hotelNames")
+  const loadHotelNames = async (
+    value,
+    setNewItems,
+    setCurrentLoading,
+    limit
+  ) => {
+    setCurrentLoading(true);
+    setHotelName(value);
+    await API.get("/hotels/hotelNames", {
+      params: {
+        hotelName: value,
+        limit: limit,
+      },
+    })
       .then((response) => response.data)
       .then((data) => {
-        if (!!data) setHotelNames(data);
+        if (!!data) {
+          setCurrentLoading(false);
+          setNewItems(data);
+        }
       })
       .catch((error) => console.log(error));
   };
@@ -93,10 +108,19 @@ export default function Home() {
     setCity("");
   }, [currentCountry]);
 
-  async function SearchFilteredHotels() {
-    dispatch({ type: CHECK_IN_DATE, checkInDate: checkInDate });
-    dispatch({ type: CHECK_OUT_DATE, checkOutDate: checkOutDate });
+  async function handleSearchButton() {
+    setFilterFlag(false);
+    setPage(1);
+    await SearchFilteredHotels(1);
+  }
 
+  async function SearchFilteredHotels(pageNumber) {
+    dispatch({
+      type: DATES,
+      checkInDate: checkInDate,
+      checkOutDate: checkOutDate,
+    });
+    let requestPageNumber = !!pageNumber ? pageNumber : page;
     const getFilteredHotels = async () => {
       await API.get("/hotels/page", {
         params: {
@@ -106,7 +130,7 @@ export default function Home() {
           Country: currentCountry,
           City: city,
           HotelName: hotelName,
-          PageNumber: page,
+          PageNumber: requestPageNumber,
           PageSize: pageSize,
         },
       })
@@ -116,6 +140,7 @@ export default function Home() {
           setMaxPage(data.numberOfPages);
         })
         .catch((error) => console.log(error));
+      setFilterFlag(true);
     };
     if (!!token && !!userId) {
       getFilteredHotels();
@@ -133,7 +158,9 @@ export default function Home() {
   }
 
   useEffect(() => {
-    SearchFilteredHotels();
+    if (filterFlag) {
+      SearchFilteredHotels();
+    }
   }, [page, userId]);
 
   const classes = useStyles();
@@ -196,16 +223,10 @@ export default function Home() {
         </Grid>
         <Grid>
           <Typography variant="h6">Find by name</Typography>
-          <Autocomplete
-            id="hotelNames"
-            options={hotelNames}
-            getOptionLabel={(option) => option}
-            onChange={(event, value) => setHotelName(value)}
-            style={{ width: 300 }}
-            renderInput={(params) => (
-              <TextField {...params} label="find by name" variant="outlined" />
-            )}
-          />
+          <AsyncAutocomplete
+            request={loadHotelNames}
+            label="find by hotel name"
+          ></AsyncAutocomplete>
         </Grid>
         <Grid
           container
@@ -218,7 +239,7 @@ export default function Home() {
             color="primary"
             size="large"
             disabled={!isValidDates}
-            onClick={SearchFilteredHotels}
+            onClick={handleSearchButton}
           >
             Search
           </Button>

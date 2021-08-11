@@ -5,23 +5,14 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
-import { useHistory } from "react-router";
-import { HOME_PATH } from "./../../constants/RoutingPaths";
 
-export default function RoomIsOccupiedAlert({
+export default function ShiftCheckOutTimeAlert({
   open,
   handleClose,
-  onlyMessage,
+  checkOutTime,
+  shiftCheckOutDate,
 }) {
   {
-    const history = useHistory();
-    function searchOtherHotelsWithUserDates() {
-      history.push({
-        pathname: HOME_PATH,
-        state: {},
-      });
-    }
-
     return (
       <div>
         <Dialog
@@ -33,27 +24,18 @@ export default function RoomIsOccupiedAlert({
           <DialogTitle id="alert-dialog-title">Room is occupied</DialogTitle>
           <DialogContent>
             <DialogContentText id="alert-dialog-description">
-              Room on this date is already occupied.Please, choose another date
-              {onlyMessage
-                ? "."
-                : "or we can search for other hotels for your new date."}
+              You can't leave from this hotel later then {checkOutTime}. But we
+              can offer you to add 1 day to your check-out day and recalculate
+              final price.
             </DialogContentText>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose} color="primary">
-              Choose another date
+              Choose another time
             </Button>
-            {onlyMessage ? (
-              ""
-            ) : (
-              <Button
-                onClick={searchOtherHotelsWithUserDates}
-                color="primary"
-                autoFocus
-              >
-                Search for other hotels
-              </Button>
-            )}
+            <Button onClick={shiftCheckOutDate} color="primary" autoFocus>
+              Add 1 day to your check-out date
+            </Button>
           </DialogActions>
         </Dialog>
       </div>

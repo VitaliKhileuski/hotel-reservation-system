@@ -11,16 +11,17 @@ import Button from "@material-ui/core/Button";
 import TableHead from "@material-ui/core/TableHead";
 import IconButton from "@material-ui/core/IconButton";
 import EditIcon from "@material-ui/icons/Edit";
+import Tooltip from "@material-ui/core/Tooltip";
 import { useSelector } from "react-redux";
 import DeleteIcon from "@material-ui/icons/Delete";
 import AddPhotoAlternateIcon from "@material-ui/icons/AddPhotoAlternate";
 import API from "../../api";
 import BaseDialog from "../shared/BaseDialog";
+import CallAlert from "../../Notifications/NotificationHandler";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
 import BaseDeleteDialog from "../shared/BaseDeleteDialog";
 import BaseImageDialog from "../shared/BaseImageDialog";
 import RoomFilter from "../Filters/RoomFilter";
-import BaseAlert from "../shared/BaseAlert";
 import AddRoomForm from "./AddRoomForm";
 
 const useStyles = makeStyles({
@@ -47,14 +48,12 @@ export default function RoomTable({ hotelId }) {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [roomId, setRoomId] = useState(0);
   const [room, setRoom] = useState();
-  const [alertOpen, setAlertOpen] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
-  const [alertSuccessStatus, setAlertSuccessStatus] = useState(true);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [currentSortField, setCurrentSortField] = useState("");
   const [currentAscending, setCurrentAscending] = useState("");
   const [currentRoomNumber, setCurrentRoomNumber] = useState("");
-  const userId = useSelector((state) => state.userId);
+  const userId = useSelector((state) => state.tokenData.userId);
+  const [filterFlag, setFilterFlag] = useState(true);
 
   function callImageDialog(room) {
     setRoomId(room.id);
@@ -71,16 +70,24 @@ export default function RoomTable({ hotelId }) {
       handleClose={handleClose}
       hotelId={hotelId}
       room={room}
-      callAlert={callAlert}
     ></AddRoomForm>
   );
 
   useEffect(() => {
-    loadRooms();
+    if (filterFlag) {
+      loadRooms();
+    }
   }, [rowsPerPage, page, openDialog, openDeleteDialog]);
 
-  const loadRooms = async (roomNumber, flag, sortField, ascending) => {
+  const loadRooms = async (
+    roomNumber,
+    flag,
+    pageNumber,
+    sortField,
+    ascending
+  ) => {
     let requestRoomNumber = roomNumber;
+    let requestPageNumber = !!pageNumber ? pageNumber : pageForRequest;
     if (flag === undefined) {
       requestRoomNumber = currentRoomNumber;
     }
@@ -89,10 +96,11 @@ export default function RoomTable({ hotelId }) {
       sortField = currentSortField;
     }
     let requestAscending = (ascending || currentAscending) === "asc";
-    await API.get("/rooms/" + hotelId + "/" + userId, {
+    await API.get("/rooms/" + hotelId, {
       params: {
+        UserId: userId,
         RoomNumber: requestRoomNumber,
-        PageNumber: pageForRequest,
+        PageNumber: requestPageNumber,
         PageSize: rowsPerPage,
         SortField: sortField,
         Ascending: requestAscending,
@@ -104,6 +112,7 @@ export default function RoomTable({ hotelId }) {
         setMaxNumberOfRooms(data.numberOfItems);
       })
       .catch((error) => console.log(error.response.data.message));
+    setFilterFlag(true);
   };
 
   function orderBy(sortField) {
@@ -116,7 +125,7 @@ export default function RoomTable({ hotelId }) {
       setCurrentAscending("desc");
       ascending = "desc";
     }
-    loadRooms(undefined, undefined, sortField, ascending);
+    loadRooms(undefined, undefined, undefined, sortField, ascending);
   }
 
   const handleChangePage = (event, newPage) => {
@@ -148,20 +157,6 @@ export default function RoomTable({ hotelId }) {
     setOpenDeleteDialog(false);
   }
 
-  const handleCloseAlert = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    setAlertOpen(false);
-  };
-
-  function callAlert(message, successStatus) {
-    setAlertMessage(message);
-    setAlertSuccessStatus(successStatus);
-    setAlertOpen(true);
-  }
-
   async function deleteRoom() {
     const DeleteRoom = async () => {
       await API.delete("/rooms/" + roomId, {
@@ -169,9 +164,9 @@ export default function RoomTable({ hotelId }) {
       })
         .then((response) => response.data)
         .then((data) => {
-          callAlert("room deleted successfully", true);
+          CallAlert(true, "room deleted successfully");
         })
-        .catch((error) => callAlert(false));
+        .catch((error) => CallAlert(false));
     };
 
     await DeleteRoom();
@@ -179,8 +174,11 @@ export default function RoomTable({ hotelId }) {
   }
 
   function getValuesFromFilter(roomNumber) {
+    setFilterFlag(false);
+    setPage(0);
+    SetPageForRequest(1);
     setCurrentRoomNumber(roomNumber);
-    loadRooms(roomNumber, true);
+    loadRooms(roomNumber, true, 1);
   }
 
   return (
@@ -233,24 +231,30 @@ export default function RoomTable({ hotelId }) {
                   <TableCell align="right">{room.bedsNumber}</TableCell>
                   <TableCell align="right">{room.paymentPerDay}</TableCell>
                   <TableCell>
-                    <IconButton
-                      color="inherit"
-                      onClick={() => OpenAddRoomDialog(room)}
-                    >
-                      <EditIcon></EditIcon>
-                    </IconButton>
-                    <IconButton
-                      color="inherit"
-                      onClick={() => callDeleteDialog(room.id)}
-                    >
-                      <DeleteIcon></DeleteIcon>
-                    </IconButton>
-                    <IconButton
-                      color="inherit"
-                      onClick={() => callImageDialog(room)}
-                    >
-                      <AddPhotoAlternateIcon></AddPhotoAlternateIcon>
-                    </IconButton>
+                    <Tooltip title="edit">
+                      <IconButton
+                        color="inherit"
+                        onClick={() => OpenAddRoomDialog(room)}
+                      >
+                        <EditIcon></EditIcon>
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="delete">
+                      <IconButton
+                        color="inherit"
+                        onClick={() => callDeleteDialog(room.id)}
+                      >
+                        <DeleteIcon></DeleteIcon>
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="add images to room">
+                      <IconButton
+                        color="inherit"
+                        onClick={() => callImageDialog(room)}
+                      >
+                        <AddPhotoAlternateIcon></AddPhotoAlternateIcon>
+                      </IconButton>
+                    </Tooltip>
                   </TableCell>
                 </TableRow>
               ))}
@@ -296,12 +300,6 @@ export default function RoomTable({ hotelId }) {
         imageUrls={!!room ? room.imageUrls : undefined}
         filesLimit={5}
       ></BaseImageDialog>
-      <BaseAlert
-        open={alertOpen}
-        handleClose={handleCloseAlert}
-        message={alertMessage}
-        success={alertSuccessStatus}
-      ></BaseAlert>
     </>
   );
 }

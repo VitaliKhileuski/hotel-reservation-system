@@ -11,7 +11,7 @@ import ChangePasswordForm from "./../User/ChangePasswordForm";
 import BaseDialog from "../shared/BaseDialog";
 
 export default function UserProfile() {
-  const userId = useSelector((state) => state.userId);
+  const userId = useSelector((state) => state.tokenData.userId);
   const [user, setUser] = useState();
   const token = localStorage.getItem("token");
   const [updateUserDialogOpen, setUpdateUserDialogOpen] = useState(false);

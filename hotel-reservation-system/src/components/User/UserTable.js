@@ -1,4 +1,5 @@
 import { React, useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import IconButton from "@material-ui/core/IconButton";
@@ -8,18 +9,19 @@ import TableCell from "@material-ui/core/TableCell";
 import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import Grid from "@material-ui/core/Grid";
+import Tooltip from "@material-ui/core/Tooltip";
 import TablePagination from "@material-ui/core/TablePagination";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
 import TableRow from "@material-ui/core/TableRow";
 import Button from "@material-ui/core/Button";
 import DeleteIcon from "@material-ui/icons/Delete";
 import API from "../../api";
+import CallAlert from "../../Notifications/NotificationHandler";
 import BaseDialog from "../shared/BaseDialog";
 import BaseDeleteDialog from "../shared/BaseDeleteDialog";
 import Register from "./../Authorization/Register";
 import UsersFilter from "../Filters/UserFilter";
-import BaseAlert from "../shared/BaseAlert";
-import { ADMIN } from "./../../config/Roles";
+import { ADMIN } from "../../constants/Roles";
 
 const useStyles = makeStyles({
   root: {
@@ -42,6 +44,7 @@ const useStyles = makeStyles({
 
 export default function UserTable() {
   const token = localStorage.getItem("token");
+  const dispatch = useDispatch();
   const [users, setUsers] = useState([]);
   const [maxNumberOfUsers, setMaxNumberOfUsers] = useState(0);
   const classes = useStyles();
@@ -51,29 +54,31 @@ export default function UserTable() {
   const [userId, setUserId] = useState();
   const [addUserDialogOpen, setAddUserDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [alertOpen, setAlertOpen] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
   const [userEmail, setUserEmail] = useState("");
   const [userSurname, setUserSurname] = useState("");
   const [currentSortField, setCurrentSortField] = useState("");
   const [currentAscending, setCurrentAscending] = useState("");
-  const [alertSuccessStatus, setAlertSuccessStatus] = useState(true);
-  const form = (
-    <Register
-      handleClose={handleCloseAddUserDialog}
-      callAlert={callAlert}
-    ></Register>
-  );
+  const [filterFlag, setFilterFlag] = useState(true);
+
+  const form = <Register handleClose={handleCloseAddUserDialog}></Register>;
 
   useEffect(() => {
-    if (deleteDialogOpen === false && addUserDialogOpen === false) {
+    if (!deleteDialogOpen && !addUserDialogOpen && filterFlag) {
       loadUsers();
     }
   }, [rowsPerPage, page, deleteDialogOpen, addUserDialogOpen]);
 
-  const loadUsers = async (email, surname, flag, sortField, ascending) => {
+  const loadUsers = async (
+    email,
+    surname,
+    flag,
+    pageNumber,
+    sortField,
+    ascending
+  ) => {
     let requestEmail = email;
     let requestSurname = surname;
+    let requestPageNumber = !!pageNumber ? pageNumber : pageForRequest;
     if (flag === undefined) {
       requestEmail = userEmail;
       requestSurname = userSurname;
@@ -86,7 +91,7 @@ export default function UserTable() {
       params: {
         Email: requestEmail,
         Surname: requestSurname,
-        PageNumber: pageForRequest,
+        PageNumber: requestPageNumber,
         PageSize: rowsPerPage,
         SortField: sortField,
         Ascending: requestAscending,
@@ -99,6 +104,7 @@ export default function UserTable() {
         setMaxNumberOfUsers(data.numberOfItems);
       })
       .catch((error) => console.log(error.response.data.message));
+    setFilterFlag(true);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -112,20 +118,6 @@ export default function UserTable() {
     SetPageForRequest(1);
   };
 
-  const handleCloseAlert = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    setAlertOpen(false);
-  };
-
-  function callAlert(message, successStatus) {
-    setAlertMessage(message);
-    setAlertSuccessStatus(successStatus);
-    setAlertOpen(true);
-  }
-
   async function deleteUser() {
     const DeleteUser = async () => {
       await API.delete("/users/" + userId, {
@@ -133,9 +125,9 @@ export default function UserTable() {
       })
         .then((response) => response.data)
         .then((data) => {
-          callAlert("user deleted successfully", true);
+          CallAlert(true, "user deleted successfully");
         })
-        .catch((error) => callAlert(false));
+        .catch((error) => CallAlert(false));
     };
     await DeleteUser();
     handleCloseDeleteDialog();
@@ -159,9 +151,13 @@ export default function UserTable() {
     setAddUserDialogOpen(false);
   }
   function getValuesFromFilter(email, surname) {
+    console.log(email);
+    setFilterFlag(false);
+    setPage(0);
+    SetPageForRequest(1);
     setUserEmail(email);
     setUserSurname(surname);
-    loadUsers(email, surname, true);
+    loadUsers(email, surname, true, 1);
   }
 
   function orderBy(sortField) {
@@ -174,7 +170,7 @@ export default function UserTable() {
       setCurrentAscending("desc");
       ascending = "desc";
     }
-    loadUsers(undefined, undefined, undefined, sortField, ascending);
+    loadUsers(undefined, undefined, undefined, undefined, sortField, ascending);
   }
 
   return (
@@ -251,12 +247,14 @@ export default function UserTable() {
                   <TableCell align="right">{user.phoneNumber}</TableCell>
                   <TableCell>
                     {user.role.name !== ADMIN ? (
-                      <IconButton
-                        color="inherit"
-                        onClick={() => deleteUserById(user.id)}
-                      >
-                        <DeleteIcon></DeleteIcon>
-                      </IconButton>
+                      <Tooltip title="delete">
+                        <IconButton
+                          color="inherit"
+                          onClick={() => deleteUserById(user.id)}
+                        >
+                          <DeleteIcon></DeleteIcon>
+                        </IconButton>
+                      </Tooltip>
                     ) : (
                       ""
                     )}
@@ -299,12 +297,6 @@ export default function UserTable() {
         form={form}
         handleClose={handleCloseAddUserDialog}
       ></BaseDialog>
-      <BaseAlert
-        message={alertMessage}
-        open={alertOpen}
-        success={alertSuccessStatus}
-        handleClose={handleCloseAlert}
-      ></BaseAlert>
     </>
   );
 }

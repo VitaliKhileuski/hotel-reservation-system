@@ -8,11 +8,10 @@ import Typography from "@material-ui/core/Typography";
 import { Box } from "@material-ui/core/";
 import Grid from "@material-ui/core/Grid";
 import API from "./../../api";
-import BaseAlert from "./../shared/BaseAlert";
 import RoomTable from "./../Room/RoomTable";
 import BaseImageDialog from "./../shared/BaseImageDialog";
 import ServiceTable from "../Service/ServiceTable";
-import { ADMIN } from "./../../config/Roles";
+import { ADMIN } from "../../constants/Roles";
 import AddHotelForm from "./AddHotelForm";
 
 function TabPanel(props) {
@@ -60,28 +59,17 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function HotelEditor(props) {
+  console.log(props);
   const classes = useStyles();
   const [value, setValue] = useState(0);
   const [hotel, setHotel] = useState(
     !!props.location.state ? props.location.state.hotel : ""
   );
-  const [updateAlertOpen, setUpdateAlertOpen] = useState(false);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
-  const role = useSelector((state) => state.role);
+  const role = useSelector((state) => state.tokenData.role);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
-  };
-
-  function callUpdateAlert() {
-    setUpdateAlertOpen(true);
-  }
-
-  const handleCloseUpdateAlert = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setUpdateAlertOpen(false);
   };
 
   function toRoomSection() {
@@ -133,7 +121,6 @@ export default function HotelEditor(props) {
               <AddHotelForm
                 toRoomSection={toRoomSection}
                 hotel={hotel}
-                callUpdateAlert={callUpdateAlert}
                 updateMainInfo={updateMainInfo}
               ></AddHotelForm>
             </Grid>
@@ -156,11 +143,6 @@ export default function HotelEditor(props) {
         updateMainInfo={updateMainInfo}
         imageUrls={hotel.imageUrls}
       ></BaseImageDialog>
-      <BaseAlert
-        open={updateAlertOpen}
-        handleClose={handleCloseUpdateAlert}
-        message={"hotel updated succesfully"}
-      ></BaseAlert>
     </div>
   );
 }

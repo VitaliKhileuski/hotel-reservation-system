@@ -6,20 +6,21 @@ function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
-export default function BaseAlert({
-  open,
-  handleClose,
-  message,
-  success,
-  failureMessage,
-}) {
-  const errorMessage = !!failureMessage
-    ? failureMessage
+export default function BaseAlert({ handleClose, alertInfo }) {
+  const errorMessage = !!alertInfo.failureMessage
+    ? alertInfo.failureMessage
     : "Something went wrong. Please, try again";
   return (
-    <Snackbar open={open} autoHideDuration={5000} onClose={handleClose}>
-      <Alert onClose={handleClose} severity={success ? "success" : "error"}>
-        {success ? message : errorMessage}
+    <Snackbar
+      open={alertInfo.openAlert}
+      autoHideDuration={5000}
+      onClose={handleClose}
+    >
+      <Alert
+        onClose={handleClose}
+        severity={alertInfo.success ? "success" : "error"}
+      >
+        {alertInfo.success ? alertInfo.message : errorMessage}
       </Alert>
     </Snackbar>
   );

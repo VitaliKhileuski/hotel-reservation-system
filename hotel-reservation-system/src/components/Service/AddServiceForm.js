@@ -8,6 +8,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { Formik, Form, ErrorMessage, Field } from "formik";
 import API from "../../api";
+import CallAlert from "../../Notifications/NotificationHandler";
 import { SERVICE_VALIDATION_SCHEMA } from "../../constants/ValidationSchemas";
 
 const useStyles = makeStyles((theme) => ({
@@ -31,12 +32,8 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function AddServiceForm({
-  hotelId,
-  service,
-  handleClose,
-  callAlert,
-}) {
+export default function AddServiceForm({ hotelId, service, handleClose }) {
+  console.log(hotelId);
   const classes = useStyles();
   const [serviceName, setServiceName] = useState(!!service ? service.name : "");
   const token = localStorage.getItem("token");
@@ -53,24 +50,28 @@ export default function AddServiceForm({
       Payment: values.payment,
     };
 
-    const CreateService = async () => {
-      await API.post("/services/" + hotelId, request, {
-        headers: { Authorization: "Bearer " + token },
-      })
-        .then((response) => response.data)
-        .then((data) => {
-          handleClose();
-          callAlert("service added successfully", true);
-        })
-        .catch((error) => {
-          setServiceNameErrorLabel(error.response.data.Message);
-        });
-    };
     if (!!service) {
+      console.log(service);
       await UpdateService(request);
     } else {
-      await CreateService();
+      console.log(hotelId);
+      await CreateService(request);
     }
+  };
+
+  const CreateService = async (request) => {
+    console.log(hotelId);
+    await API.post("/services/" + hotelId, request, {
+      headers: { Authorization: "Bearer " + token },
+    })
+      .then((response) => response.data)
+      .then((data) => {
+        handleClose();
+        CallAlert(true, "service added successfully");
+      })
+      .catch((error) => {
+        setServiceNameErrorLabel(error.response.data.Message);
+      });
   };
 
   const UpdateService = async (request) => {
@@ -80,7 +81,7 @@ export default function AddServiceForm({
       .then((response) => response.data)
       .then((data) => {
         handleClose();
-        callAlert("service updated successfully", true);
+        CallAlert(true, "service updated successfully");
       })
       .catch((error) => {
         console.log(error.response.data.Message);
@@ -89,12 +90,14 @@ export default function AddServiceForm({
   };
 
   function ValidateServiceName(serviceName) {
+    setServiceName(serviceName);
     setServiceNameErrorLabel("");
-
+    console.log(serviceName);
     if (serviceName === "") {
       setServiceNameErrorLabel("name is reqired");
+      return false;
     }
-    setServiceName(serviceName);
+    return true;
   }
 
   return (
@@ -104,11 +107,18 @@ export default function AddServiceForm({
         <div className={classes.paper}>
           <Formik
             initialValues={initialValues}
-            onSubmit={onSubmit}
+            onSubmit={(values) => {
+              if (
+                ValidateServiceName(serviceName.trim()) &&
+                serviceNameErrorLabel === ""
+              ) {
+                onSubmit(values);
+              }
+            }}
             validationSchema={SERVICE_VALIDATION_SCHEMA}
           >
             {(props) => (
-              <Form className={classes.form}>
+              <Form className={classes.form} noValidate>
                 <Grid container spacing={2}>
                   <Grid item xs={12}></Grid>
                   <Grid item xs={12}>

@@ -1,11 +1,12 @@
 import { React, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Redirect, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import IconButton from "@material-ui/core/IconButton";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
+import Tooltip from "@material-ui/core/Tooltip";
 import TableCell from "@material-ui/core/TableCell";
 import Button from "@material-ui/core/Button";
 import TableRow from "@material-ui/core/TableRow";
@@ -17,19 +18,21 @@ import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
 import PersonAddIcon from "@material-ui/icons/PersonAdd";
+import InfoIcon from "@material-ui/icons/Info";
 import PersonAddDisabledIcon from "@material-ui/icons/PersonAddDisabled";
 import AddPhotoAlternateIcon from "@material-ui/icons/AddPhotoAlternate";
 import API from "./../../api";
-import BaseAlert from "./../shared/BaseAlert";
+import { HOTEL_EDITOR_PATH } from "../../constants/RoutingPaths";
 import BaseDialog from "../shared/BaseDialog";
 import BaseDeleteDialog from "./../shared/BaseDeleteDialog";
 import BaseImageDialog from "../shared/BaseImageDialog";
-import AddHotelForm from "./AddHotelForm";
-import HotelAdminDialog from "./HotelAdminDialog";
+import CallAlert from "../../Notifications/NotificationHandler";
 import UsersFilter from "../Filters/UserFilter";
 import HotelFilter from "../Filters/HotelFilter";
 import { getRole } from "./../Authorization/TokenData";
-import { ADMIN, HOTEL_ADMIN } from "../../config/Roles";
+import { ADMIN, HOTEL_ADMIN } from "../../constants/Roles";
+import AddHotelForm from "./AddHotelForm";
+import HotelAdminDialog from "./HotelAdminDialog";
 
 const useStyles = makeStyles({
   root: {
@@ -69,45 +72,50 @@ export default function HotelTable() {
   const [flag, setFlag] = useState(false);
   const [message, setMessage] = useState("");
   const [assingFlag, setAssignFlag] = useState(false);
-  const [alertOpen, setAlertOpen] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
-  const [alertSuccessStatus, setAlertSuccessStatus] = useState(true);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [hotelName, setHotelName] = useState("");
   const [hotelAdminEmail, setHotelAdminEmail] = useState("");
   const [hotelAdminSurname, setHotelAdminSurname] = useState("");
   const [currentSortField, setCurrentSortField] = useState("");
   const [currentAscending, setCurrentAscending] = useState("asc");
-  const isLogged = useSelector((state) => state.isLogged);
-  const adminId = useSelector((state) => state.userId);
+  const adminId = useSelector((state) => state.tokenData.userId);
+  const [filterFlag, setFilterFlag] = useState(true);
 
-  const form = (
-    <AddHotelForm
-      handleClose={handleClose}
-      callAlert={callAlert}
-    ></AddHotelForm>
-  );
+  const form = <AddHotelForm handleClose={handleClose}></AddHotelForm>;
 
   const component = (
     <HotelAdminDialog
       hotelId={hotelId}
       message={message}
       handleClose={handleClose}
-      callAlert={callAlert}
       assingFlag={assingFlag}
     ></HotelAdminDialog>
   );
 
   useEffect(() => {
-    if (!openDeleteDialog && !open && !imageDialogOpen) {
+    if (
+      !openDeleteDialog &&
+      !open &&
+      !imageDialogOpen &&
+      filterFlag &&
+      !!adminId
+    ) {
       loadHotels();
     }
-  }, [rowsPerPage, page, open, openDeleteDialog, imageDialogOpen]);
+  }, [rowsPerPage, page, open, openDeleteDialog, imageDialogOpen, adminId]);
 
-  const loadHotels = async (email, surname, flag, sortField, ascending) => {
+  const loadHotels = async (
+    email,
+    surname,
+    flag,
+    pageNumber,
+    sortField,
+    ascending
+  ) => {
     const path = role === ADMIN ? "page" : "pagesForHotelAdmin";
     let requestEmail = email;
     let requestSurname = surname;
+    let requestPageNumber = !!pageNumber ? pageNumber : pageForRequest;
     if (flag === undefined) {
       requestEmail = hotelAdminEmail;
       requestSurname = hotelAdminSurname;
@@ -115,6 +123,7 @@ export default function HotelTable() {
     if (sortField === null || sortField === undefined) {
       sortField = currentSortField;
     }
+    console.log(adminId);
     let requestAscending = (ascending || currentAscending) === "asc";
     await API.get("/hotels/" + path, {
       params: {
@@ -122,7 +131,7 @@ export default function HotelTable() {
         HotelName: hotelName,
         Email: requestEmail,
         Surname: requestSurname,
-        PageNumber: pageForRequest,
+        PageNumber: requestPageNumber,
         PageSize: rowsPerPage,
         SortField: sortField,
         Ascending: requestAscending,
@@ -130,10 +139,12 @@ export default function HotelTable() {
     })
       .then((response) => response.data)
       .then((data) => {
+        console.log(data);
         setHotels(data.items);
         setMaxNumberOfHotels(data.numberOfItems);
       })
       .catch((error) => {});
+    setFilterFlag(true);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -168,11 +179,10 @@ export default function HotelTable() {
         .then((response) => response.data)
         .then((data) => {
           handleClose();
-          setAlertMessage("hotel deleted successfully", true);
-          setAlertOpen(true);
+          CallAlert(true, "hotel deleted successfully");
         })
         .catch((error) => {
-          callAlert(false);
+          CallAlert(false);
         });
     };
     await DeleteHotel();
@@ -186,17 +196,11 @@ export default function HotelTable() {
 
   function toHotelEditor(hotel) {
     history.push({
-      pathname: "/hotelEditor",
+      pathname: HOTEL_EDITOR_PATH,
       state: {
         hotel,
       },
     });
-  }
-
-  function callAlert(message, successStatus) {
-    setAlertMessage(message);
-    setAlertSuccessStatus(successStatus);
-    setAlertOpen(true);
   }
 
   function callImageDialog(hotel) {
@@ -207,13 +211,6 @@ export default function HotelTable() {
   function handleCloseImageDialog() {
     setImageDialogOpen(false);
   }
-
-  const handleCloseAlert = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setAlertOpen(false);
-  };
 
   function SetAdmin(hotelId) {
     setMessage("add admin");
@@ -228,9 +225,12 @@ export default function HotelTable() {
     setMessage("delete admin");
   }
   function getValuesFromFilter(email, surname) {
+    setFilterFlag(false);
+    setPage(0);
+    SetPageForRequest(1);
     setHotelAdminEmail(email);
     setHotelAdminSurname(surname);
-    loadHotels(email, surname, true);
+    loadHotels(email, surname, true, 1);
   }
   function getValueFromHotelFilter(hotelName) {
     setHotelName(hotelName);
@@ -245,7 +245,14 @@ export default function HotelTable() {
       setCurrentAscending("desc");
       ascending = "desc";
     }
-    loadHotels(undefined, undefined, undefined, sortField, ascending);
+    loadHotels(
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      sortField,
+      ascending
+    );
   }
   return (
     <>
@@ -284,7 +291,7 @@ export default function HotelTable() {
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>
-                <TableCell align="right" style={{ minWidth: 170 }}>
+                <TableCell align="right" style={{ minWidth: 150 }}>
                   <TableSortLabel
                     active={currentSortField === "Name"}
                     direction={currentAscending}
@@ -293,7 +300,7 @@ export default function HotelTable() {
                     Name
                   </TableSortLabel>
                 </TableCell>
-                <TableCell align="right" style={{ minWidth: 170 }}>
+                <TableCell align="right" style={{ minWidth: 150 }}>
                   <TableSortLabel
                     active={currentSortField === "Location.Country"}
                     direction={currentAscending}
@@ -302,7 +309,7 @@ export default function HotelTable() {
                     Country
                   </TableSortLabel>
                 </TableCell>
-                <TableCell align="right" style={{ minWidth: 170 }}>
+                <TableCell align="right" style={{ minWidth: 150 }}>
                   <TableSortLabel
                     active={currentSortField === "Location.City"}
                     direction={currentAscending}
@@ -311,7 +318,7 @@ export default function HotelTable() {
                     City
                   </TableSortLabel>
                 </TableCell>
-                <TableCell align="right" style={{ minWidth: 170 }}>
+                <TableCell align="right" style={{ minWidth: 150 }}>
                   <TableSortLabel
                     active={currentSortField === "Location.Street"}
                     direction={currentAscending}
@@ -320,13 +327,40 @@ export default function HotelTable() {
                     Street
                   </TableSortLabel>
                 </TableCell>
-                <TableCell align="right" style={{ minWidth: 170 }}>
+                <TableCell align="right" style={{ minWidth: 150 }}>
                   <TableSortLabel
                     active={currentSortField === "Location.BuildingNumber"}
                     direction={currentAscending}
                     onClick={() => orderBy("Location.BuildingNumber")}
                   >
                     Building number
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell align="right" style={{ minWidth: 150 }}>
+                  <TableSortLabel
+                    active={currentSortField === "LimitDays"}
+                    direction={currentAscending}
+                    onClick={() => orderBy("LimitDays")}
+                  >
+                    limit days
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell align="right" style={{ minWidth: 100 }}>
+                  <TableSortLabel
+                    active={currentSortField === "CheckInTime"}
+                    direction={currentAscending}
+                    onClick={() => orderBy("CheckInTime")}
+                  >
+                    Check-in time
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell align="right" style={{ minWidth: 100 }}>
+                  <TableSortLabel
+                    active={currentSortField === "CheckOutTime"}
+                    direction={currentAscending}
+                    onClick={() => orderBy("CheckOutTime")}
+                  >
+                    Check-out time
                   </TableSortLabel>
                 </TableCell>
                 <TableCell style={{ minWidth: 30 }} />
@@ -346,37 +380,58 @@ export default function HotelTable() {
                   <TableCell align="right">
                     {hotel.location.buildingNumber}
                   </TableCell>
+                  <TableCell align="right">
+                    {!!hotel.limitDays ? (
+                      hotel.limitDays
+                    ) : (
+                      <Tooltip title="customers of your hotel can't shift check-in and check-out dates. You can enable this abilitity at edit hotel page">
+                        <InfoIcon></InfoIcon>
+                      </Tooltip>
+                    )}
+                  </TableCell>
+                  <TableCell align="right">{hotel.checkInTime}</TableCell>
+                  <TableCell align="right">{hotel.checkOutTime}</TableCell>
                   <TableCell>
-                    <IconButton
-                      color="inherit"
-                      onClick={() => toHotelEditor(hotel)}
-                    >
-                      <EditIcon></EditIcon>
-                    </IconButton>
-                    <IconButton
-                      color="inherit"
-                      onClick={() => callAlertDialog(hotel.id)}
-                    >
-                      <DeleteIcon></DeleteIcon>
-                    </IconButton>
-                    <IconButton
-                      color="inherit"
-                      onClick={() => SetAdmin(hotel.id)}
-                    >
-                      <PersonAddIcon></PersonAddIcon>
-                    </IconButton>
-                    <IconButton
-                      color="inherit"
-                      onClick={() => DeleteAdmin(hotel.id)}
-                    >
-                      <PersonAddDisabledIcon></PersonAddDisabledIcon>
-                    </IconButton>
-                    <IconButton
-                      color="inherit"
-                      onClick={() => callImageDialog(hotel)}
-                    >
-                      <AddPhotoAlternateIcon></AddPhotoAlternateIcon>
-                    </IconButton>
+                    <Tooltip title="edit">
+                      <IconButton
+                        color="inherit"
+                        onClick={() => toHotelEditor(hotel)}
+                      >
+                        <EditIcon></EditIcon>
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="delete">
+                      <IconButton
+                        color="inherit"
+                        onClick={() => callAlertDialog(hotel.id)}
+                      >
+                        <DeleteIcon></DeleteIcon>
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="assign hotel admin">
+                      <IconButton
+                        color="inherit"
+                        onClick={() => SetAdmin(hotel.id)}
+                      >
+                        <PersonAddIcon></PersonAddIcon>
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="delete hotel admin">
+                      <IconButton
+                        color="inherit"
+                        onClick={() => DeleteAdmin(hotel.id)}
+                      >
+                        <PersonAddDisabledIcon></PersonAddDisabledIcon>
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="add images to hotel">
+                      <IconButton
+                        color="inherit"
+                        onClick={() => callImageDialog(hotel)}
+                      >
+                        <AddPhotoAlternateIcon></AddPhotoAlternateIcon>
+                      </IconButton>
+                    </Tooltip>
                   </TableCell>
                 </TableRow>
               ))}
@@ -430,12 +485,6 @@ export default function HotelTable() {
         title={"Are you sure to delete this hotel?"}
         message={"the hotel will be permanently deleted"}
       ></BaseDeleteDialog>
-      <BaseAlert
-        open={alertOpen}
-        handleClose={handleCloseAlert}
-        message={alertMessage}
-        success={alertSuccessStatus}
-      ></BaseAlert>
     </>
   );
 }

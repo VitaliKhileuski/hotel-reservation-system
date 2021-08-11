@@ -1,10 +1,13 @@
 import { React, useState, useEffect } from "react";
 import Grid from "@material-ui/core/Grid";
 import Autocomplete from "@material-ui/lab/Autocomplete";
-import { TextField } from "@material-ui/core";
+import { useSelector } from "react-redux";
+import TextField from "@material-ui/core/TextField";
 import { makeStyles } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import API from "./../../api";
+import { USER } from "./../../constants/Roles";
+import AsyncAutocomplete from "../shared/AsyncAutocomplete";
 
 const useStyles = makeStyles((theme) => ({
   grid: {
@@ -25,12 +28,13 @@ export default function OrderFilter({ getValuesFromFilter }) {
   const [currentCountry, setCurrentCountry] = useState(null);
   const [surnames, setSurnames] = useState([]);
   const [surname, setSurname] = useState("");
+  const [orderNumber, setOrderNumber] = useState("");
   const [city, setCity] = useState("");
   const token = localStorage.getItem("token");
+  const role = useSelector((state) => state.tokenData.role);
 
   useEffect(() => {
     loadCountries();
-    loadCustomersSurnames();
   }, []);
 
   const loadCountries = async () => {
@@ -42,13 +46,27 @@ export default function OrderFilter({ getValuesFromFilter }) {
       .catch((error) => console.log(error));
   };
 
-  const loadCustomersSurnames = async () => {
+  const loadCustomersSurnames = async (
+    value,
+    setNewItems,
+    setCurrentLoading,
+    limit
+  ) => {
+    setSurname(value);
+    setCurrentLoading(true);
     await API.get("/users/customersSurnames", {
+      params: {
+        surname: value,
+        limit: limit,
+      },
       headers: { Authorization: "Bearer " + token },
     })
       .then((response) => response.data)
       .then((data) => {
-        if (!!data) setSurnames(data);
+        if (!!data) {
+          setCurrentLoading(false);
+          setNewItems(data);
+        }
       })
       .catch((error) => console.log(error));
   };
@@ -106,19 +124,22 @@ export default function OrderFilter({ getValuesFromFilter }) {
           )}
         />
       </Grid>
+      {role !== USER ? (
+        <Grid item>
+          <AsyncAutocomplete
+            request={loadCustomersSurnames}
+            label="find by surname"
+          ></AsyncAutocomplete>
+        </Grid>
+      ) : (
+        ""
+      )}
       <Grid item>
-        <Autocomplete
-          id="surnames"
-          options={surnames}
-          onChange={(event, value) => {
-            setSurname(value);
-          }}
-          getOptionLabel={(option) => option}
-          style={{ width: 300 }}
-          renderInput={(params) => (
-            <TextField {...params} label="find by surname" variant="outlined" />
-          )}
-        ></Autocomplete>
+        <TextField
+          label="Find by order number"
+          variant="outlined"
+          onChange={(event) => setOrderNumber(event.target.value)}
+        ></TextField>
       </Grid>
       <Grid item>
         <Button
@@ -127,7 +148,9 @@ export default function OrderFilter({ getValuesFromFilter }) {
           color="primary"
           size="large"
           margin="normal"
-          onClick={() => getValuesFromFilter(currentCountry, city, surname)}
+          onClick={() =>
+            getValuesFromFilter(currentCountry, city, surname, orderNumber)
+          }
         >
           Search
         </Button>

@@ -15,17 +15,20 @@ import TablePagination from "@material-ui/core/TablePagination";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Typography from "@material-ui/core/Typography";
+import UpdateIcon from "@material-ui/icons/Update";
 import Paper from "@material-ui/core/Paper";
+import Tooltip from "@material-ui/core/Tooltip";
 import KeyboardArrowDownIcon from "@material-ui/icons/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
+import BaseDialog from "../shared/BaseDialog";
 import { useStyles } from "@material-ui/pickers/views/Calendar/SlideTransition";
 import API from "./../../api";
-import BaseDialog from "../shared/BaseDialog";
 import OrderFilter from "../Filters/OrderFilter";
+import Payment from "./Payment";
 import RoomDetails from "../Room/RoomDetails";
 import BaseDeleteDialog from "../shared/BaseDeleteDialog";
-import BaseAlert from "../shared/BaseAlert";
-import { USER } from "./../../config/Roles";
+import CallAlert from "../../Notifications/NotificationHandler";
+import { USER } from "../../constants/Roles";
 
 const useRowStyles = makeStyles({
   root: {
@@ -41,13 +44,13 @@ function ccyFormat(num) {
   return `${num.toFixed(2)}`;
 }
 
-function Row({ order, handleClickDeleteIcon }) {
+function Row({ order, handleClickDeleteIcon, handleClickUpdateOrder }) {
   const [open, setOpen] = useState(false);
   const classes = useRowStyles();
   const [roomDetailsOpen, setRoomDetailsOpen] = useState(false);
   const [room, setRoom] = useState();
   const component = <RoomDetails room={room}></RoomDetails>;
-  const role = useSelector((state) => state.role);
+  const role = useSelector((state) => state.tokenData.role);
 
   function openRoomDetails(room) {
     setRoom(room);
@@ -69,13 +72,16 @@ function Row({ order, handleClickDeleteIcon }) {
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCell>
+        <TableCell align="right">{order.number}</TableCell>
         <TableCell align="right">
-          <IconButton
-            color="inherit"
-            onClick={() => openRoomDetails(order.room)}
-          >
-            <ZoomInIcon></ZoomInIcon>
-          </IconButton>
+          <Tooltip title="look to room details">
+            <IconButton
+              color="inherit"
+              onClick={() => openRoomDetails(order.room)}
+            >
+              <ZoomInIcon></ZoomInIcon>
+            </IconButton>
+          </Tooltip>
         </TableCell>
         <TableCell align="right">
           {new Date(order.dateOrdered).toLocaleDateString("en-GB")}
@@ -86,21 +92,33 @@ function Row({ order, handleClickDeleteIcon }) {
         <TableCell align="right">
           {new Date(order.endDate).toLocaleDateString("en-GB")}
         </TableCell>
+        <TableCell align="right">{order.checkInTime}</TableCell>
+        <TableCell align="right">{order.checkOutTime}</TableCell>
         <TableCell align="right">{order.numberOfDays}</TableCell>
         <TableCell align="right">{ccyFormat(order.fullPrice)}</TableCell>
         <TableCell>
-          <IconButton color="inherit">
-            <DeleteIcon
-              onClick={() => handleClickDeleteIcon(order.id)}
-            ></DeleteIcon>
-          </IconButton>
+          <Tooltip title="update check In date">
+            <IconButton
+              color="inherit"
+              onClick={() => handleClickUpdateOrder(order)}
+            >
+              <UpdateIcon></UpdateIcon>
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="delete">
+            <IconButton color="inherit">
+              <DeleteIcon
+                onClick={() => handleClickDeleteIcon(order.id)}
+              ></DeleteIcon>
+            </IconButton>
+          </Tooltip>
         </TableCell>
       </TableRow>
       {order.services.length === 0 ? (
         ""
       ) : (
         <TableRow>
-          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
+          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={10}>
             <Collapse in={open} timeout="auto" unmountOnExit>
               <Box margin={1}>
                 <Typography variant="h6" gutterBottom component="div">
@@ -149,7 +167,7 @@ function Row({ order, handleClickDeleteIcon }) {
       )}
 
       <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={10}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box margin={1}>
               <Typography variant="h6" gutterBottom component="div">
@@ -199,7 +217,7 @@ function Row({ order, handleClickDeleteIcon }) {
       </TableRow>
       {role !== USER ? (
         <TableRow>
-          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
+          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={10}>
             <Collapse in={open} timeout="auto" unmountOnExit>
               <Box margin={1}>
                 <Typography variant="h6" gutterBottom component="div">
@@ -258,41 +276,64 @@ export default function OrderTable() {
   const [orders, setOrders] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [pageForRequest, SetPageForRequest] = useState(0);
+  const [pageForRequest, setPageForRequest] = useState(0);
   const [maxNumberOfOrders, setMaxNumberOfOrders] = useState(0);
-  const [alertOpen, setAlertOpen] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
   const [hotelCountry, setHotelCountry] = useState("");
   const [hotelCity, setHotelCity] = useState("");
   const [currentSurname, setCurrentSurname] = useState("");
-  const [alertSuccessStatus, setAlertSuccessStatus] = useState(true);
+  const [currentOrderNumber, setCurrentOrderNumber] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [currentSortField, setCurrentSortField] = useState("");
+  const [openUpdateOrder, setOpenUpdateOrder] = useState(false);
   const [currentAscending, setCurrentAscending] = useState("asc");
   const [orderId, setOrderId] = useState("");
+  const [currentOrder, setCurrentOrder] = useState();
   const token = localStorage.getItem("token");
+  const [filterflag, setFilterFlag] = useState(true);
+  const updateOrderForm = !!currentOrder ? (
+    <Payment
+      selectedServices={currentOrder.services}
+      room={currentOrder.room}
+      checkInDate={new Date(currentOrder.startDate)}
+      checkOutDate={new Date(currentOrder.endDate)}
+      isEditOrder={true}
+      checkInTime={currentOrder.checkInTime}
+      checkOutTime={currentOrder.checkOutTime}
+      orderId={currentOrder.id}
+      handleCloseUpdateOrderDialog={handleCloseUpdateOrderDialog}
+      limitDays={currentOrder.room.hotel.limitDays}
+      isCheckOutTimeShifted={currentOrder.isCheckOutTimeShifted}
+    ></Payment>
+  ) : (
+    ""
+  );
 
   useEffect(() => {
-    if (deleteDialogOpen === false) {
+    if (deleteDialogOpen === false && filterflag && !openUpdateOrder) {
       loadOrders();
     }
-  }, [rowsPerPage, page, deleteDialogOpen]);
+  }, [rowsPerPage, page, deleteDialogOpen, openUpdateOrder]);
 
   const loadOrders = async (
     country,
     city,
     surname,
+    orderNumber,
     flag,
+    pageNumber,
     sortField,
     ascending
   ) => {
     let requestCountry = country;
     let requestCity = city;
     let requestSurname = surname;
+    let requestOrderNumber = orderNumber;
+    let requestPageNumber = !!pageNumber ? pageNumber : pageForRequest;
     if (flag === undefined) {
       requestCountry = hotelCountry;
       requestCity = hotelCity;
       requestSurname = currentSurname;
+      requestOrderNumber = currentOrderNumber;
     }
     if (sortField === null || sortField === undefined) {
       sortField = currentSortField;
@@ -303,7 +344,8 @@ export default function OrderTable() {
         Country: requestCountry,
         City: requestCity,
         Surname: requestSurname,
-        PageNumber: pageForRequest,
+        Number: requestOrderNumber,
+        PageNumber: requestPageNumber,
         PageSize: rowsPerPage,
         SortField: sortField,
         Ascending: requestAscending,
@@ -312,11 +354,12 @@ export default function OrderTable() {
     })
       .then((response) => response.data)
       .then((data) => {
-        console.log(data);
+        console.log(data.items);
         setOrders(data.items);
         setMaxNumberOfOrders(data.numberOfItems);
       })
       .catch((error) => console.log(error.response.data.Message));
+    setFilterFlag(true);
   };
 
   async function deleteOrder() {
@@ -326,18 +369,12 @@ export default function OrderTable() {
       })
         .then((response) => response.data)
         .then((data) => {
-          callAlert("order deleted successfully", true);
+          CallAlert(true, "order deleted successfully");
         })
-        .catch((error) => callAlert(false));
+        .catch((error) => CallAlert(false));
     };
     DeleteOrder();
     handleCloseDeleteDialog();
-  }
-
-  function callAlert(message, successStatus) {
-    setAlertMessage(message);
-    setAlertSuccessStatus(successStatus);
-    setAlertOpen(true);
   }
 
   function handleCloseDeleteDialog() {
@@ -348,29 +385,27 @@ export default function OrderTable() {
     setOrderId(orderId);
     setDeleteDialogOpen(true);
   }
-  function getValuesFromFilter(country, city, surname) {
+  function getValuesFromFilter(country, city, surname, orderNumber) {
+    setFilterFlag(false);
+    setPage(0);
+    setPageForRequest(1);
+    const orderNumberNoSpaces = orderNumber.trim();
     setHotelCountry(country);
     setHotelCity(city);
     setCurrentSurname(surname);
-    loadOrders(country, city, surname, true);
+    setCurrentOrderNumber(orderNumberNoSpaces);
+    loadOrders(country, city, surname, orderNumberNoSpaces, true, 1);
   }
-
-  const handleCloseAlert = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setAlertOpen(false);
-  };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
-    SetPageForRequest(newPage + 1);
+    setPageForRequest(newPage + 1);
   };
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
-    SetPageForRequest(1);
+    setPageForRequest(1);
   };
 
   function orderBy(sortField) {
@@ -388,9 +423,35 @@ export default function OrderTable() {
       undefined,
       undefined,
       undefined,
+      undefined,
+      undefined,
       sortField,
       ascending
     );
+  }
+  function handleCloseUpdateOrderDialog() {
+    setOpenUpdateOrder(false);
+  }
+
+  function handleClickUpdateOrder(order) {
+    let currentOrder = Object.assign({}, order);
+    let newServices = [];
+    currentOrder.services.forEach((item) => {
+      let serviceId = item.service.id;
+      let payment = item.service.payment;
+      let quantity = item.quantity;
+      let name = item.service.name;
+      let newService = {
+        ServiceId: serviceId,
+        name: name,
+        payment: payment,
+        quantity: quantity,
+      };
+      newServices.push(newService);
+    });
+    currentOrder.services = newServices;
+    setCurrentOrder(currentOrder);
+    setOpenUpdateOrder(true);
   }
 
   const classes = useStyles();
@@ -402,10 +463,13 @@ export default function OrderTable() {
           <TableHead>
             <TableRow>
               <TableCell />
-              <TableCell align="right" style={{ minWidth: 170 }}>
+              <TableCell align="right" style={{ minWidth: 130 }}>
+                Order number
+              </TableCell>
+              <TableCell align="right" style={{ minWidth: 30 }}>
                 Room
               </TableCell>
-              <TableCell align="right" style={{ minWidth: 170 }}>
+              <TableCell align="right" style={{ minWidth: 100 }}>
                 <TableSortLabel
                   active={currentSortField === "DateOrdered"}
                   direction={currentAscending}
@@ -414,25 +478,43 @@ export default function OrderTable() {
                   Order date
                 </TableSortLabel>
               </TableCell>
-              <TableCell align="right" style={{ minWidth: 170 }}>
+              <TableCell align="right" style={{ minWidth: 100 }}>
                 <TableSortLabel
                   active={currentSortField === "StartDate"}
                   direction={currentAscending}
                   onClick={() => orderBy("StartDate")}
                 >
-                  Check in date
+                  Check-in date
                 </TableSortLabel>
               </TableCell>
-              <TableCell align="right" style={{ minWidth: 170 }}>
+              <TableCell align="right" style={{ minWidth: 100 }}>
                 <TableSortLabel
                   active={currentSortField === "EndDate"}
                   direction={currentAscending}
                   onClick={() => orderBy("EndDate")}
                 >
-                  Check out date
+                  Check-out date
                 </TableSortLabel>
               </TableCell>
-              <TableCell align="right" style={{ minWidth: 170 }}>
+              <TableCell align="right" style={{ minWidth: 100 }}>
+                <TableSortLabel
+                  active={currentSortField === "CheckInTime"}
+                  direction={currentAscending}
+                  onClick={() => orderBy("CheckInTime")}
+                >
+                  Check-in time
+                </TableSortLabel>
+              </TableCell>
+              <TableCell align="right" style={{ minWidth: 100 }}>
+                <TableSortLabel
+                  active={currentSortField === "CheckOutTime"}
+                  direction={currentAscending}
+                  onClick={() => orderBy("CheckOutTime")}
+                >
+                  Check-out time
+                </TableSortLabel>
+              </TableCell>
+              <TableCell align="right" style={{ minWidth: 100 }}>
                 <TableSortLabel
                   active={currentSortField === "NumberOfDays"}
                   direction={currentAscending}
@@ -441,7 +523,7 @@ export default function OrderTable() {
                   Number of days
                 </TableSortLabel>
               </TableCell>
-              <TableCell align="right" style={{ minWidth: 170 }}>
+              <TableCell align="right" style={{ minWidth: 100 }}>
                 <TableSortLabel
                   active={currentSortField === "FullPrice"}
                   direction={currentAscending}
@@ -459,6 +541,7 @@ export default function OrderTable() {
                 key={order.id}
                 order={order}
                 handleClickDeleteIcon={handleClickDeleteIcon}
+                handleClickUpdateOrder={handleClickUpdateOrder}
               />
             ))}
           </TableBody>
@@ -480,12 +563,13 @@ export default function OrderTable() {
         message="order will be canceled."
         deleteItem={deleteOrder}
       ></BaseDeleteDialog>
-      <BaseAlert
-        open={alertOpen}
-        handleClose={handleCloseAlert}
-        message={alertMessage}
-        success={alertSuccessStatus}
-      ></BaseAlert>
+      <BaseDialog
+        title="update check In Date"
+        open={openUpdateOrder}
+        handleClose={handleCloseUpdateOrderDialog}
+        form={updateOrderForm}
+        fullWidth={true}
+      ></BaseDialog>
     </>
   );
 }

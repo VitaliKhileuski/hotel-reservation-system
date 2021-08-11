@@ -19,6 +19,7 @@ const useStyles = makeStyles({
 });
 
 export default function ServiceChoice({
+  hotelId,
   oldSelectedServices,
   getSelectedServices,
 }) {
@@ -27,7 +28,7 @@ export default function ServiceChoice({
   const [selectedServices, setSelectedServices] = useState(oldSelectedServices);
   useEffect(() => {
     const loadServices = async () => {
-      await API.get("/services")
+      await API.get("/hotels/" + hotelId + "/getServices")
         .then((response) => response.data)
         .then((data) => {
           if (!!data) {

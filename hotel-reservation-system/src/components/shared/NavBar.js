@@ -14,8 +14,9 @@ import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
 import { useSelector } from "react-redux";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
-import { ADMIN, USER } from "./../../config/Roles";
+import { ADMIN, USER } from "../../constants/Roles";
 import { Logout } from "../Authorization/TokenData";
+import { HOME_PATH } from "./../../constants/RoutingPaths";
 import "./../../css/App.css";
 
 const useStyles = makeStyles((theme) => ({
@@ -24,6 +25,7 @@ const useStyles = makeStyles((theme) => ({
   },
   title: {
     flexGrow: 1,
+    cursor: "pointer",
   },
   navElement: {
     marginLeft: theme.spacing(1),
@@ -38,9 +40,9 @@ export default function NavBar() {
   const [open, setOpen] = useState(false);
   const anchorRef = useRef(null);
   const classes = useStyles();
-  const isLogged = useSelector((state) => state.isLogged);
-  const role = useSelector((state) => state.role);
-  const name = useSelector((state) => state.name);
+  const isLogged = useSelector((state) => state.tokenData.isLogged);
+  const role = useSelector((state) => state.tokenData.role);
+  const name = useSelector((state) => state.tokenData.name);
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen);
   };
@@ -60,7 +62,7 @@ export default function NavBar() {
   }
   function toHomePage() {
     history.push({
-      pathname: "/home",
+      pathname: HOME_PATH,
     });
   }
 
@@ -69,6 +71,7 @@ export default function NavBar() {
       <AppBar position="static">
         <Toolbar>
           <Typography
+            as={Button}
             onClick={toHomePage}
             align="left"
             variant="h6"

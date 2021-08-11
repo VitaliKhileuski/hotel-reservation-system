@@ -11,12 +11,13 @@ import TablePagination from "@material-ui/core/TablePagination";
 import TableRow from "@material-ui/core/TableRow";
 import Button from "@material-ui/core/Button";
 import EditIcon from "@material-ui/icons/Edit";
+import Tooltip from "@material-ui/core/Tooltip";
 import DeleteIcon from "@material-ui/icons/Delete";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
 import AddIcon from "@material-ui/icons/Add";
 import RemoveIcon from "@material-ui/icons/Remove";
 import API from "../../api";
-import BaseAlert from "../shared/BaseAlert";
+import CallAlert from "../../Notifications/NotificationHandler";
 import BaseDialog from "../shared/BaseDialog";
 import BaseDeleteDialog from "../shared/BaseDeleteDialog";
 import AddServiceForm from "./AddServiceForm";
@@ -46,18 +47,14 @@ export default function ServiceTable({ hotelId, serviceList }) {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [serviceId, setServiceId] = useState(0);
   const [service, setService] = useState();
-  const [alertOpen, setAlertOpen] = useState(false);
   const [currentSortField, setCurrentSortField] = useState("");
   const [currentAscending, setCurrentAscending] = useState("");
-  const [alertMessage, setAlertMessage] = useState("");
-  const [alertSuccessStatus, setAlertSuccessStatus] = useState(true);
 
   const form = (
     <AddServiceForm
       handleClose={handleClose}
       hotelId={hotelId}
       service={service}
-      callAlert={callAlert}
     ></AddServiceForm>
   );
 
@@ -120,6 +117,7 @@ export default function ServiceTable({ hotelId, serviceList }) {
   };
 
   function OpenAddServiceDialog(service) {
+    console.log(service);
     setService(service);
     setOpenDialog(true);
   }
@@ -158,18 +156,6 @@ export default function ServiceTable({ hotelId, serviceList }) {
       setService(newService);
     }
   }
-  function callAlert(message, successStatus) {
-    setAlertMessage(message);
-    setAlertSuccessStatus(successStatus);
-    setAlertOpen(true);
-  }
-
-  const handleCloseAlert = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setAlertOpen(false);
-  };
 
   function slice(services) {
     if (!!hotelId) {
@@ -181,6 +167,9 @@ export default function ServiceTable({ hotelId, serviceList }) {
       );
     }
   }
+  function ccyFormat(num) {
+    return `${num.toFixed(2)}`;
+  }
 
   async function deleteService() {
     const DeleteService = async () => {
@@ -189,9 +178,9 @@ export default function ServiceTable({ hotelId, serviceList }) {
       })
         .then((response) => response.data)
         .then((data) => {
-          callAlert("service deleted successfully", true);
+          CallAlert(true, "service deleted successfully");
         })
-        .catch((error) => callAlert(false));
+        .catch((error) => CallAlert(false));
     };
 
     await DeleteService();
@@ -205,71 +194,96 @@ export default function ServiceTable({ hotelId, serviceList }) {
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>
-                <TableCell align="right" style={{ minWidth: 170 }}>
-                  <TableSortLabel
-                    active={currentSortField === "Name" ? true : false}
-                    direction={currentAscending}
-                    onClick={() => orderBy("Name")}
-                  >
-                    Name
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell align="right" style={{ minWidth: 100 }}>
-                  <TableSortLabel
-                    active={currentSortField === "Payment" ? true : false}
-                    direction={currentAscending}
-                    onClick={() => orderBy("Payment")}
-                  >
-                    Payment
-                  </TableSortLabel>
-                </TableCell>
                 {!!hotelId ? (
-                  ""
+                  <>
+                    <TableCell align="right" style={{ minWidth: 170 }}>
+                      <TableSortLabel
+                        active={currentSortField === "Name" ? true : false}
+                        direction={currentAscending}
+                        onClick={() => orderBy("Name")}
+                      >
+                        Name
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell align="right" style={{ minWidth: 100 }}>
+                      <TableSortLabel
+                        active={currentSortField === "Payment" ? true : false}
+                        direction={currentAscending}
+                        onClick={() => orderBy("Payment")}
+                      >
+                        Payment
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell></TableCell>
+                  </>
                 ) : (
-                  <TableCell align="right" style={{ minWidth: 50 }}>
-                    Quantity
-                  </TableCell>
+                  <>
+                    <TableCell align="right" style={{ minWidth: 50 }}>
+                      Name
+                    </TableCell>
+                    <TableCell align="right" style={{ minWidth: 170 }}>
+                      Payment
+                    </TableCell>
+                    <TableCell align="right" style={{ minWidth: 50 }}>
+                      Quantity
+                    </TableCell>
+                    <TableCell />
+                    <TableCell align="center" style={{ minWidth: 50 }}>
+                      Total sum
+                    </TableCell>
+                  </>
                 )}
-                <TableCell />
-                <TableCell />
               </TableRow>
             </TableHead>
             <TableBody>
               {slice(services).map((service) => (
                 <TableRow key={service.id}>
                   <TableCell align="right">{service.name}</TableCell>
-                  <TableCell align="right">{service.payment}</TableCell>
+                  <TableCell align="right">
+                    {ccyFormat(service.payment)}
+                  </TableCell>
                   {!!hotelId ? (
                     <TableCell>
-                      <IconButton
-                        color="inherit"
-                        onClick={() => OpenAddServiceDialog(service)}
-                      >
-                        <EditIcon></EditIcon>
-                      </IconButton>
-                      <IconButton
-                        color="inherit"
-                        onClick={() => callDeleteDialog(service.id)}
-                      >
-                        <DeleteIcon></DeleteIcon>
-                      </IconButton>
+                      <Tooltip title="edit">
+                        <IconButton
+                          color="inherit"
+                          onClick={() => OpenAddServiceDialog(service)}
+                        >
+                          <EditIcon></EditIcon>
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="delete">
+                        <IconButton
+                          color="inherit"
+                          onClick={() => callDeleteDialog(service.id)}
+                        >
+                          <DeleteIcon></DeleteIcon>
+                        </IconButton>
+                      </Tooltip>
                     </TableCell>
                   ) : (
                     <>
                       <TableCell align="right">{service.quantity}</TableCell>
                       <TableCell>
-                        <IconButton
-                          onClick={() => increaseQuantity(service)}
-                          color="inherit"
-                        >
-                          <AddIcon></AddIcon>
-                        </IconButton>
-                        <IconButton
-                          onClick={() => reduceQuantity(service)}
-                          color="inherit"
-                        >
-                          <RemoveIcon></RemoveIcon>
-                        </IconButton>
+                        <Tooltip title="add">
+                          <IconButton
+                            onClick={() => increaseQuantity(service)}
+                            color="inherit"
+                          >
+                            <AddIcon></AddIcon>
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="substract">
+                          <IconButton
+                            onClick={() => reduceQuantity(service)}
+                            color="inherit"
+                          >
+                            <RemoveIcon></RemoveIcon>
+                          </IconButton>
+                        </Tooltip>
+                      </TableCell>
+                      <TableCell align="center">
+                        {ccyFormat(service.quantity * service.payment)}
                       </TableCell>
                     </>
                   )}
@@ -296,7 +310,7 @@ export default function ServiceTable({ hotelId, serviceList }) {
             size="large"
             margin="normal"
             className={classes.createRoomButton}
-            onClick={OpenAddServiceDialog}
+            onClick={() => OpenAddServiceDialog()}
           >
             Create Service
           </Button>
@@ -312,12 +326,6 @@ export default function ServiceTable({ hotelId, serviceList }) {
             title={"Are you sure to delete this service?"}
             message={"service will be permanently deleted"}
           ></BaseDeleteDialog>
-          <BaseAlert
-            open={alertOpen}
-            handleClose={handleCloseAlert}
-            message={alertMessage}
-            success={alertSuccessStatus}
-          ></BaseAlert>
         </>
       ) : (
         ""

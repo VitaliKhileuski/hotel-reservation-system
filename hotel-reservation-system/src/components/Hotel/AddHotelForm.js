@@ -2,13 +2,19 @@ import { React, useState } from "react";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import TextField from "@material-ui/core/TextField";
+import Checkbox from "@material-ui/core/Checkbox";
 import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
+import { useSelector } from "react-redux";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { Formik, Form, ErrorMessage, Field } from "formik";
 import API from "./../../api/";
 import { HOTEL_VALIDATION_SCHEMA } from "../../constants/ValidationSchemas";
+import { NUMBER_REGEX } from "./../../constants/Regex";
+import { ADMIN } from "../../constants/Roles";
+import CallAlert from "../../Notifications/NotificationHandler";
 
 const useStyles = makeStyles((theme) => ({
   root: {},
@@ -31,20 +37,23 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function AddHotelForm({
-  hotel,
-  handleClose,
-  callAlert,
-  callUpdateAlert,
-  updateMainInfo,
-}) {
+export default function AddHotelForm({ hotel, handleClose, updateMainInfo }) {
   const classes = useStyles();
   const token = localStorage.getItem("token");
   const [buildingNumberLabelError, setBuildingNumberLabelError] = useState("");
   const [buildingNumber, setBuildingNumber] = useState(
     !!hotel ? hotel.location.buildingNumber : ""
   );
-
+  const [checked, setChecked] = useState(!!hotel ? !!hotel.limitDays : false);
+  const [limitDays, setLimitDays] = useState(!!hotel ? hotel.limitDays : "");
+  const [limitDaysLabelError, setLimitDaysLabelError] = useState("");
+  const [checkInTime, setCheckInTime] = useState(
+    !!hotel ? hotel.checkInTime : "14:00"
+  );
+  const [checkOutTime, setCheckOutTime] = useState(
+    !!hotel ? hotel.checkOutTime : "12:00"
+  );
+  const role = useSelector((state) => state.tokenData.role);
   const initialValues = {
     name: !!hotel ? hotel.name : "",
     country: !!hotel ? hotel.location.country : "",
@@ -54,6 +63,8 @@ export default function AddHotelForm({
   };
 
   const onSubmit = async (values) => {
+    console.log(checkOutTime);
+    console.log(checkInTime);
     const request = {
       Name: values.name.trim(),
       Location: {
@@ -62,7 +73,11 @@ export default function AddHotelForm({
         Street: values.street.trim(),
         buildingNumber: buildingNumber.trim(),
       },
+      LimitDays: limitDays,
+      CheckInTime: checkInTime,
+      CheckOutTime: checkOutTime,
     };
+
     const CreateHotel = async () => {
       await API.post("/hotels/", request, {
         headers: { Authorization: "Bearer " + token },
@@ -70,10 +85,9 @@ export default function AddHotelForm({
         .then((response) => response.data)
         .then((data) => {
           handleClose();
-          callAlert("hotel added succesfully", true);
+          CallAlert(true, "Hotel added succesfully");
         })
         .catch((error) => {
-          console.log(error.response.data.Message);
           setBuildingNumberLabelError(error.response.data.Message);
         });
     };
@@ -90,11 +104,10 @@ export default function AddHotelForm({
     })
       .then((response) => response.data)
       .then((data) => {
-        callUpdateAlert();
+        CallAlert(true, "Hotel updated succcessfully");
         updateMainInfo();
       })
       .catch((error) => {
-        console.log(error.response.data.message);
         setBuildingNumberLabelError(error.response.data.Message);
       });
   };
@@ -109,6 +122,30 @@ export default function AddHotelForm({
     setBuildingNumber(buildingNumber);
   }
 
+  function setCheckedValue(value) {
+    setChecked(value);
+    if (!value) {
+      setLimitDaysLabelError("");
+      setLimitDays("");
+    }
+  }
+
+  function ValidateLimitDays(limitDays) {
+    setLimitDays(limitDays);
+    setLimitDaysLabelError("");
+
+    if (limitDays === "") {
+      setLimitDaysLabelError("limit days is reqired");
+      return false;
+    }
+    const flag = NUMBER_REGEX.test(limitDays);
+    if (!flag) {
+      setLimitDaysLabelError("you should write a number");
+      return false;
+    }
+    return true;
+  }
+
   return (
     <>
       <Container component="main" maxWidth="xs" className={classes.root}>
@@ -116,11 +153,19 @@ export default function AddHotelForm({
         <div className={classes.paper}>
           <Formik
             initialValues={initialValues}
-            onSubmit={onSubmit}
+            onSubmit={(values) => {
+              if (
+                role === ADMIN ||
+                (checked && ValidateLimitDays(limitDays)) ||
+                !checked
+              ) {
+                onSubmit(values);
+              }
+            }}
             validationSchema={HOTEL_VALIDATION_SCHEMA}
           >
             {(props) => (
-              <Form className={classes.form}>
+              <Form className={classes.form} noValidate>
                 <Grid container spacing={2}>
                   <Grid item xs={12}>
                     <Field
@@ -187,6 +232,63 @@ export default function AddHotelForm({
                       onChange={(e) => ValidateLocation(e.target.value)}
                       error={buildingNumberLabelError !== ""}
                       helperText={buildingNumberLabelError}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          onChange={(e) => setCheckedValue(e.target.checked)}
+                          checked={checked}
+                          name="checkedB"
+                          color="primary"
+                        />
+                      }
+                      label="User can shift order dates"
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Field
+                      as={TextField}
+                      variant="outlined"
+                      name="limitDays"
+                      disabled={!checked}
+                      required
+                      value={limitDays}
+                      onChange={(e) => ValidateLimitDays(e.target.value)}
+                      error={limitDaysLabelError !== ""}
+                      helperText={limitDaysLabelError}
+                      fullWidth
+                      id="limitDays"
+                      label="amount of days until order can still be updated"
+                    />
+                  </Grid>
+                  <Grid item sm={6}>
+                    <TextField
+                      id="time"
+                      label="check-in"
+                      type="time"
+                      value={checkInTime}
+                      defaultValue="14:00"
+                      className={classes.textField}
+                      onChange={(e) => setCheckInTime(e.target.value)}
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                    />
+                  </Grid>
+                  <Grid item sm={6}>
+                    <TextField
+                      id="time"
+                      label="check-out"
+                      type="time"
+                      defaultValue="12:00"
+                      value={checkOutTime}
+                      className={classes.textField}
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                      onChange={(e) => setCheckOutTime(e.target.value)}
                     />
                   </Grid>
                 </Grid>

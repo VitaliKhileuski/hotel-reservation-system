@@ -9,7 +9,7 @@ import Container from "@material-ui/core/Container";
 import { Formik, Form, ErrorMessage, Field } from "formik";
 import api from "./../../api/";
 import { useDispatch } from "react-redux";
-import { NAME, EMAIL } from "../../storage/actions/actionTypes.js";
+import { TOKEN_DATA } from "../../storage/actions/actionTypes.js";
 import { UPDATE_USER_VALIDATION_SCHEMA } from "../../constants/ValidationSchemas";
 import { EMAIL_REGEX } from "../../constants/Regex";
 
@@ -61,8 +61,11 @@ export default function UpdateUserForm({ changeFlag, handleClose, user }) {
       .then((response) => response.data)
       .then((data) => {
         localStorage.setItem("token", data.token);
-        dispatch({ type: EMAIL, email: request.Email });
-        dispatch({ type: NAME, name: request.Name });
+        dispatch({
+          type: TOKEN_DATA,
+          email: request.Email,
+          name: request.Name,
+        });
         changeFlag();
         handleClose();
       })

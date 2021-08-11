@@ -1,4 +1,4 @@
-import { React, useState } from "react";
+import { React } from "react";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import TextField from "@material-ui/core/TextField";
@@ -8,6 +8,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { Formik, Form, ErrorMessage, Field } from "formik";
 import API from "../../api";
+import CallAlert from "../../Notifications/NotificationHandler";
 import { ROOM_VALIDATION_SCHEMA } from "../../constants/ValidationSchemas";
 
 const useStyles = makeStyles((theme) => ({
@@ -31,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function AddRoomForm({ hotelId, room, handleClose, callAlert }) {
+export default function AddRoomForm({ hotelId, room, handleClose }) {
   const classes = useStyles();
   const token = localStorage.getItem("token");
   const initialValues = {
@@ -53,9 +54,9 @@ export default function AddRoomForm({ hotelId, room, handleClose, callAlert }) {
       })
         .then((response) => response.data)
         .then((data) => {
-          callAlert("room added successfully", true);
+          CallAlert(true, "room added successfully");
         })
-        .catch((error) => callAlert(false));
+        .catch((error) => CallAlert(false));
     };
     if (!!room) {
       console.log(room);
@@ -73,9 +74,9 @@ export default function AddRoomForm({ hotelId, room, handleClose, callAlert }) {
     })
       .then((response) => response.data)
       .then((data) => {
-        callAlert("room updated successfully", true);
+        CallAlert(true, "room updated successfully");
       })
-      .catch((error) => callAlert(false));
+      .catch((error) => CallAlert(false));
   };
 
   return (
@@ -89,7 +90,7 @@ export default function AddRoomForm({ hotelId, room, handleClose, callAlert }) {
             validationSchema={ROOM_VALIDATION_SCHEMA}
           >
             {(props) => (
-              <Form className={classes.form}>
+              <Form className={classes.form} noValidate>
                 <Grid container spacing={2}>
                   <Grid item xs={12}></Grid>
                   <Grid item xs={12}>

@@ -1,19 +1,17 @@
-import {
-  IS_LOGGED,
-  NAME,
-  ROLE,
-  USER_ID,
-  EMAIL,
-} from "../../storage/actions/actionTypes.js";
+import { TOKEN_DATA } from "../../storage/actions/actionTypes.js";
+import { HOME_PATH } from "../../constants/RoutingPaths";
+import store from './../../storage/storage'
 
-export function FillStorage(token, dispatch) {
+export function FillStorage(token) {
   const jwt = JSON.parse(atob(token.split(".")[1]));
-  dispatch({ type: IS_LOGGED, isLogged: true });
-  dispatch({ type: ROLE, role: jwt.role });
-  dispatch({ type: USER_ID, userId: jwt.id });
-  dispatch({ type: ROLE, role: jwt.role });
-  dispatch({ type: EMAIL, email: jwt.email });
-  dispatch({ type: NAME, name: jwt.firstname });
+  store.dispatch({
+    type: TOKEN_DATA,
+    isLogged: true,
+    role: jwt.role,
+    userId: jwt.id,
+    email: jwt.email,
+    name: jwt.firstname,
+  });
 }
 
 export function FillLocalStorage(token, refreshToken) {
@@ -24,15 +22,18 @@ export function FillLocalStorage(token, refreshToken) {
 export function Logout(dispatch, history) {
   localStorage.removeItem("refreshToken");
   localStorage.removeItem("token");
-  dispatch({ type: IS_LOGGED, isLogged: false });
-  dispatch({ type: USER_ID, userId: "" });
-  dispatch({ type: ROLE, role: "" });
-  dispatch({ type: EMAIL, email: "" });
-  dispatch({ type: NAME, name: "" });
+  dispatch({
+    type: TOKEN_DATA,
+    isLogged: false,
+    role: "",
+    userId: "",
+    email: "",
+    name: "",
+  });
 
   if (!!history) {
     history.push({
-      pathname: "/home",
+      pathname: HOME_PATH,
     });
   }
 }
