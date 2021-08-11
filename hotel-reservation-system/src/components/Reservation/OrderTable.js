@@ -27,7 +27,7 @@ import OrderFilter from "../Filters/OrderFilter";
 import Payment from "./Payment";
 import RoomDetails from "../Room/RoomDetails";
 import BaseDeleteDialog from "../shared/BaseDeleteDialog";
-import CallAlert from "../../Notifications/NotificationHandler";
+import callAlert from "../../Notifications/NotificationHandler";
 import { USER } from "../../constants/Roles";
 
 const useRowStyles = makeStyles({
@@ -315,14 +315,14 @@ export default function OrderTable() {
   }, [rowsPerPage, page, deleteDialogOpen, openUpdateOrder]);
 
   const loadOrders = async (
+    sortField,
+    ascending,
     country,
     city,
     surname,
     orderNumber,
     flag,
     pageNumber,
-    sortField,
-    ascending
   ) => {
     let requestCountry = country;
     let requestCity = city;
@@ -369,9 +369,9 @@ export default function OrderTable() {
       })
         .then((response) => response.data)
         .then((data) => {
-          CallAlert(true, "order deleted successfully");
+          callAlert(true, "order deleted successfully");
         })
-        .catch((error) => CallAlert(false));
+        .catch((error) => callAlert(false));
     };
     DeleteOrder();
     handleCloseDeleteDialog();
@@ -419,12 +419,6 @@ export default function OrderTable() {
       ascending = "desc";
     }
     loadOrders(
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
       sortField,
       ascending
     );

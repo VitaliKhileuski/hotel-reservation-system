@@ -7,7 +7,7 @@ import Box from "@material-ui/core/Box";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import Autocomplete from "@material-ui/lab/Autocomplete";
-import CallAlert from "../../Notifications/NotificationHandler";
+import callAlert from "../../Notifications/NotificationHandler";
 import API from "./../../api/";
 
 const useStyles = makeStyles((theme) => ({
@@ -81,9 +81,9 @@ export default function HotelAdminDialog({
     )
       .then((response) => response.data)
       .then((data) => {
-        CallAlert(true, "hotel admin assigned successfully");
+        callAlert(true, "hotel admin assigned successfully");
       })
-      .catch((error) => CallAlert(false));
+      .catch((error) => callAlert(false));
   };
 
   const DeleteHotelAdmin = async () => {
@@ -96,9 +96,9 @@ export default function HotelAdminDialog({
     )
       .then((response) => response.data)
       .then((data) => {
-        CallAlert(true, "hotel admin deleted successfully");
+        callAlert(true, "hotel admin deleted successfully");
       })
-      .catch((error) => CallAlert(false));
+      .catch((error) => callAlert(false));
   };
 
   function updateHotelAdmin() {

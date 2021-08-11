@@ -8,7 +8,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { Formik, Form, ErrorMessage, Field } from "formik";
 import API from "../../api";
-import CallAlert from "../../Notifications/NotificationHandler";
+import callAlert from "../../Notifications/NotificationHandler";
 import { ROOM_VALIDATION_SCHEMA } from "../../constants/ValidationSchemas";
 
 const useStyles = makeStyles((theme) => ({
@@ -54,9 +54,9 @@ export default function AddRoomForm({ hotelId, room, handleClose }) {
       })
         .then((response) => response.data)
         .then((data) => {
-          CallAlert(true, "room added successfully");
+          callAlert(true, "room added successfully");
         })
-        .catch((error) => CallAlert(false));
+        .catch((error) => callAlert(false));
     };
     if (!!room) {
       console.log(room);
@@ -74,9 +74,9 @@ export default function AddRoomForm({ hotelId, room, handleClose }) {
     })
       .then((response) => response.data)
       .then((data) => {
-        CallAlert(true, "room updated successfully");
+        callAlert(true, "room updated successfully");
       })
-      .catch((error) => CallAlert(false));
+      .catch((error) => callAlert(false));
   };
 
   return (

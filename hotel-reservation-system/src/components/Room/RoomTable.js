@@ -17,7 +17,7 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import AddPhotoAlternateIcon from "@material-ui/icons/AddPhotoAlternate";
 import API from "../../api";
 import BaseDialog from "../shared/BaseDialog";
-import CallAlert from "../../Notifications/NotificationHandler";
+import callAlert from "../../Notifications/NotificationHandler";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
 import BaseDeleteDialog from "../shared/BaseDeleteDialog";
 import BaseImageDialog from "../shared/BaseImageDialog";
@@ -80,11 +80,12 @@ export default function RoomTable({ hotelId }) {
   }, [rowsPerPage, page, openDialog, openDeleteDialog]);
 
   const loadRooms = async (
+    sortField,
+    ascending,
     roomNumber,
     flag,
     pageNumber,
-    sortField,
-    ascending
+    
   ) => {
     let requestRoomNumber = roomNumber;
     let requestPageNumber = !!pageNumber ? pageNumber : pageForRequest;
@@ -125,7 +126,7 @@ export default function RoomTable({ hotelId }) {
       setCurrentAscending("desc");
       ascending = "desc";
     }
-    loadRooms(undefined, undefined, undefined, sortField, ascending);
+    loadRooms(sortField, ascending);
   }
 
   const handleChangePage = (event, newPage) => {
@@ -164,9 +165,9 @@ export default function RoomTable({ hotelId }) {
       })
         .then((response) => response.data)
         .then((data) => {
-          CallAlert(true, "room deleted successfully");
+          callAlert(true, "room deleted successfully");
         })
-        .catch((error) => CallAlert(false));
+        .catch((error) => callAlert(false));
     };
 
     await DeleteRoom();
@@ -178,7 +179,7 @@ export default function RoomTable({ hotelId }) {
     setPage(0);
     SetPageForRequest(1);
     setCurrentRoomNumber(roomNumber);
-    loadRooms(roomNumber, true, 1);
+    loadRooms(undefined,"asc",roomNumber, true, 1);
   }
 
   return (

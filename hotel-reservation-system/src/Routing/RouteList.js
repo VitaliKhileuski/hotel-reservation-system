@@ -7,7 +7,7 @@ import {
 } from "react-router-dom";
 import Login from "./../components/Authorization/Login";
 import Register from "./../components/Authorization/Register";
-import Home from "./../components/Home";
+import HotelsPage from "./../components/Hotel/HotelsPage";
 import HotelTable from "./../components/Hotel/HotelTable";
 import HotelEditor from "./../components/Hotel/HotelEditor";
 import RoomsPage from "./../components/Room/RoomsPage";
@@ -33,7 +33,7 @@ import {
 export default function RouterList() {
   return (
     <Switch>
-      <Route path={HOME_PATH} component={Home} />
+      <Route path={HOME_PATH} component={HotelsPage} />
       <Route path={LOGIN_PATH} component={Login} />
       <Route path={REGISTER_PATH} component={Register} />
       <Route path={ROOMS_PATH} render={(props) => <RoomsPage {...props} />} />

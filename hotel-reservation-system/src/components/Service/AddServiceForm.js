@@ -8,7 +8,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { Formik, Form, ErrorMessage, Field } from "formik";
 import API from "../../api";
-import CallAlert from "../../Notifications/NotificationHandler";
+import callAlert from "../../Notifications/NotificationHandler";
 import { SERVICE_VALIDATION_SCHEMA } from "../../constants/ValidationSchemas";
 
 const useStyles = makeStyles((theme) => ({
@@ -45,17 +45,22 @@ export default function AddServiceForm({ hotelId, service, handleClose }) {
   };
 
   const onSubmit = async (values) => {
-    const request = {
-      Name: serviceName,
-      Payment: values.payment,
-    };
-
-    if (!!service) {
-      console.log(service);
-      await UpdateService(request);
-    } else {
-      console.log(hotelId);
-      await CreateService(request);
+    if (
+      ValidateServiceName(serviceName.trim()) &&
+      serviceNameErrorLabel === ""
+    ){
+      const request = {
+        Name: serviceName,
+        Payment: values.payment,
+      };
+  
+      if (!!service) {
+        console.log(service);
+        await UpdateService(request);
+      } else {
+        console.log(hotelId);
+        await CreateService(request);
+      }
     }
   };
 
@@ -67,7 +72,7 @@ export default function AddServiceForm({ hotelId, service, handleClose }) {
       .then((response) => response.data)
       .then((data) => {
         handleClose();
-        CallAlert(true, "service added successfully");
+        callAlert(true, "service added successfully");
       })
       .catch((error) => {
         setServiceNameErrorLabel(error.response.data.Message);
@@ -81,7 +86,7 @@ export default function AddServiceForm({ hotelId, service, handleClose }) {
       .then((response) => response.data)
       .then((data) => {
         handleClose();
-        CallAlert(true, "service updated successfully");
+        callAlert(true, "service updated successfully");
       })
       .catch((error) => {
         console.log(error.response.data.Message);
@@ -107,14 +112,7 @@ export default function AddServiceForm({ hotelId, service, handleClose }) {
         <div className={classes.paper}>
           <Formik
             initialValues={initialValues}
-            onSubmit={(values) => {
-              if (
-                ValidateServiceName(serviceName.trim()) &&
-                serviceNameErrorLabel === ""
-              ) {
-                onSubmit(values);
-              }
-            }}
+            onSubmit={onSubmit}
             validationSchema={SERVICE_VALIDATION_SCHEMA}
           >
             {(props) => (

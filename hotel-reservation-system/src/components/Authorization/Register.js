@@ -12,10 +12,10 @@ import { Formik, Form, ErrorMessage, Field } from "formik";
 import { useDispatch, useSelector } from "react-redux";
 import api from "./../../api/";
 import { REGISTER_VALIDATION_SCHEMA } from "../../constants/ValidationSchemas";
-import CallAlert from "../../Notifications/NotificationHandler";
+import callAlert from "../../Notifications/NotificationHandler";
 import { ADMIN } from "../../constants/Roles";
 import { EMAIL_REGEX } from "../../constants/Regex";
-import { FillStorage, FillLocalStorage } from "./TokenData";
+import { fillStorage, fillLocalStorage } from "./TokenData";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -40,7 +40,6 @@ const useStyles = makeStyles((theme) => ({
 export default function Register({ handleClose }) {
   const isLogged = useSelector((state) => state.tokenData.isLogged);
   const classes = useStyles();
-  const dispatch = useDispatch();
   const [emailErrorLabel, setEmailErrorLabel] = useState("");
   const [email, setEmail] = useState("");
   const role = useSelector((state) => state.tokenData.role);
@@ -54,31 +53,34 @@ export default function Register({ handleClose }) {
     passwordConfirm: "",
   };
   const onSubmit = (values) => {
-    const request = {
-      Email: email,
-      Name: values.firstName,
-      SurName: values.lastName,
-      PhoneNumber: values.phone,
-      Password: values.password,
-    };
-    api
-      .post("/account/register", request)
-      .then((response) => {
-        if (role !== ADMIN) {
-          if (!!response && !!response.data) {
-            FillStorage(response.data[0]);
-            FillLocalStorage(response.data[0], response.data[1]);
-          }
-        } else {
-          handleClose();
-          CallAlert(true, "user was added successfully");
-        }
-      })
-      .catch((error) => {
-        if (!!error.response) {
-          setEmailErrorLabel(error.response.data.Message);
-        }
-      });
+    ValidateEmail(email);
+            if (ValidateEmail(email.trim()) && emailErrorLabel === ""){
+              const request = {
+                Email: email,
+                Name: values.firstName,
+                SurName: values.lastName,
+                PhoneNumber: values.phone,
+                Password: values.password,
+              };
+              api
+                .post("/account/register", request)
+                .then((response) => {
+                  if (role !== ADMIN) {
+                    if (!!response && !!response.data) {
+                      fillStorage(response.data[0]);
+                      fillLocalStorage(response.data[0], response.data[1]);
+                    }
+                  } else {
+                    handleClose();
+                    callAlert(true, "user was added successfully");
+                  }
+                })
+                .catch((error) => {
+                  if (!!error.response) {
+                    setEmailErrorLabel(error.response.data.Message);
+                  }
+                });
+            }
   };
   function ValidateEmail(email) {
     setEmail(email);
@@ -111,11 +113,7 @@ export default function Register({ handleClose }) {
         )}
         <Formik
           initialValues={initialValues}
-          onSubmit={(values) => {
-            ValidateEmail(email);
-            if (ValidateEmail(email.trim()) && emailErrorLabel === "")
-              onSubmit(values);
-          }}
+          onSubmit={onSubmit}
           validationSchema={REGISTER_VALIDATION_SCHEMA}
         >
           {(props) => (

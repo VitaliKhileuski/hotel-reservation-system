@@ -4,7 +4,7 @@ import { BrowserRouter as Router } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import createAuthRefreshInterceptor from "axios-auth-refresh";
 import { ALERT_INFO } from "./storage/actions/actionTypes";
-import { FillStorage, Logout } from "./components/Authorization/TokenData";
+import { fillStorage, logout } from "./components/Authorization/TokenData";
 import BaseAlert from "./components/shared/BaseAlert";
 import RouteList from "./Routing/RouteList";
 import NavBar from "./components/shared/NavBar";
@@ -15,10 +15,8 @@ export default function App() {
   const history = useHistory();
 
   function handleCloseAlert() {
-    dispatch({ type: ALERT_INFO, openAlert: false });
+    dispatch({ type: ALERT_INFO, openAlert: false, alertSuccessStatus : true });
   }
-
-  useSelector((state) => console.log(state));
 
   const refreshAuthLogic = async (failedRequest) =>
     await API.put("/account/refreshTokenVerification", {
@@ -29,11 +27,11 @@ export default function App() {
         localStorage.setItem("refreshToken", tokenRefreshResponse.data[1]);
         failedRequest.response.config.headers["Authorization"] =
           "Bearer " + tokenRefreshResponse.data[0];
-        FillStorage(tokenRefreshResponse.data[0]);
+        fillStorage(tokenRefreshResponse.data[0]);
         return Promise.resolve();
       })
       .catch((error) => {
-        Logout(dispatch, history);
+        logout(history);
       });
 
   createAuthRefreshInterceptor(API, refreshAuthLogic);
@@ -41,7 +39,7 @@ export default function App() {
   async function tokenVerification() {
     if (localStorage.getItem("token") !== null) {
       const token = localStorage.getItem("token");
-      FillStorage(token);
+      fillStorage(token);
       let result;
       try {
         result = await API.get("/account/tokenVerification", {
@@ -52,7 +50,7 @@ export default function App() {
         });
       } catch (e) {}
     } else {
-      Logout(dispatch, history);
+      logout(history);
     }
   }
 

@@ -15,7 +15,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { useSelector } from "react-redux";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import { ADMIN, USER } from "../../constants/Roles";
-import { Logout } from "../Authorization/TokenData";
+import { logout } from "../Authorization/TokenData";
 import { HOME_PATH } from "./../../constants/RoutingPaths";
 import "./../../css/App.css";
 
@@ -141,7 +141,7 @@ export default function NavBar() {
                           <MenuItem
                             onClick={(e) => {
                               handleClose(e);
-                              Logout(dispatch, history);
+                              logout(history);
                             }}
                           >
                             Logout

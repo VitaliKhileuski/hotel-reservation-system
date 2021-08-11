@@ -26,7 +26,7 @@ import { HOTEL_EDITOR_PATH } from "../../constants/RoutingPaths";
 import BaseDialog from "../shared/BaseDialog";
 import BaseDeleteDialog from "./../shared/BaseDeleteDialog";
 import BaseImageDialog from "../shared/BaseImageDialog";
-import CallAlert from "../../Notifications/NotificationHandler";
+import callAlert from "../../Notifications/NotificationHandler";
 import UsersFilter from "../Filters/UserFilter";
 import HotelFilter from "../Filters/HotelFilter";
 import { getRole } from "./../Authorization/TokenData";
@@ -105,12 +105,12 @@ export default function HotelTable() {
   }, [rowsPerPage, page, open, openDeleteDialog, imageDialogOpen, adminId]);
 
   const loadHotels = async (
+    sortField,
+    ascending,
     email,
     surname,
     flag,
-    pageNumber,
-    sortField,
-    ascending
+    pageNumber
   ) => {
     const path = role === ADMIN ? "page" : "pagesForHotelAdmin";
     let requestEmail = email;
@@ -179,10 +179,10 @@ export default function HotelTable() {
         .then((response) => response.data)
         .then((data) => {
           handleClose();
-          CallAlert(true, "hotel deleted successfully");
+          callAlert(true, "hotel deleted successfully");
         })
         .catch((error) => {
-          CallAlert(false);
+          callAlert(false);
         });
     };
     await DeleteHotel();
@@ -230,7 +230,7 @@ export default function HotelTable() {
     SetPageForRequest(1);
     setHotelAdminEmail(email);
     setHotelAdminSurname(surname);
-    loadHotels(email, surname, true, 1);
+    loadHotels(undefined,"asc",email, surname, true, 1);
   }
   function getValueFromHotelFilter(hotelName) {
     setHotelName(hotelName);
@@ -246,10 +246,6 @@ export default function HotelTable() {
       ascending = "desc";
     }
     loadHotels(
-      undefined,
-      undefined,
-      undefined,
-      undefined,
       sortField,
       ascending
     );

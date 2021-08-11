@@ -16,7 +16,7 @@ import TableRow from "@material-ui/core/TableRow";
 import Button from "@material-ui/core/Button";
 import DeleteIcon from "@material-ui/icons/Delete";
 import API from "../../api";
-import CallAlert from "../../Notifications/NotificationHandler";
+import callAlert from "../../Notifications/NotificationHandler";
 import BaseDialog from "../shared/BaseDialog";
 import BaseDeleteDialog from "../shared/BaseDeleteDialog";
 import Register from "./../Authorization/Register";
@@ -69,12 +69,12 @@ export default function UserTable() {
   }, [rowsPerPage, page, deleteDialogOpen, addUserDialogOpen]);
 
   const loadUsers = async (
+    sortField,
+    ascending,
     email,
     surname,
     flag,
-    pageNumber,
-    sortField,
-    ascending
+    pageNumber
   ) => {
     let requestEmail = email;
     let requestSurname = surname;
@@ -125,9 +125,9 @@ export default function UserTable() {
       })
         .then((response) => response.data)
         .then((data) => {
-          CallAlert(true, "user deleted successfully");
+          callAlert(true, "user deleted successfully");
         })
-        .catch((error) => CallAlert(false));
+        .catch((error) => callAlert(false));
     };
     await DeleteUser();
     handleCloseDeleteDialog();
@@ -157,7 +157,7 @@ export default function UserTable() {
     SetPageForRequest(1);
     setUserEmail(email);
     setUserSurname(surname);
-    loadUsers(email, surname, true, 1);
+    loadUsers(undefined, "asc", email, surname, true, 1);
   }
 
   function orderBy(sortField) {
@@ -170,7 +170,7 @@ export default function UserTable() {
       setCurrentAscending("desc");
       ascending = "desc";
     }
-    loadUsers(undefined, undefined, undefined, undefined, sortField, ascending);
+    loadUsers(sortField, ascending);
   }
 
   return (

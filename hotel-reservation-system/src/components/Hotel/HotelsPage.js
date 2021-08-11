@@ -7,11 +7,11 @@ import Autocomplete from "@material-ui/lab/Autocomplete";
 import { makeStyles } from "@material-ui/core/styles";
 import Pagination from "@material-ui/lab/Pagination";
 import { useDispatch, useSelector } from "react-redux";
-import API from "../api";
-import { DATES } from "../storage/actions/actionTypes";
-import HotelList from "./Hotel/HotelList";
-import DateFilter from "./Filters/DateFilter";
-import AsyncAutocomplete from "./../components/shared/AsyncAutocomplete";
+import API from "./../../api";
+import { DATES } from "./../../storage/actions/actionTypes";
+import HotelList from "./HotelList";
+import DateFilter from "./../Filters/DateFilter";
+import AsyncAutocomplete from "./../shared/AsyncAutocomplete";
 const useStyles = makeStyles((theme) => ({
   option: {
     fontSize: 15,
@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Home() {
+export default function HotelsPage() {
   const [city, setCity] = useState("");
   const [countries, setCountries] = useState([]);
   const [cities, setCities] = useState([]);

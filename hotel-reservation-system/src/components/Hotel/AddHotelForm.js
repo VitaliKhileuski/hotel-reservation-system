@@ -14,7 +14,7 @@ import API from "./../../api/";
 import { HOTEL_VALIDATION_SCHEMA } from "../../constants/ValidationSchemas";
 import { NUMBER_REGEX } from "./../../constants/Regex";
 import { ADMIN } from "../../constants/Roles";
-import CallAlert from "../../Notifications/NotificationHandler";
+import callAlert from "../../Notifications/NotificationHandler";
 
 const useStyles = makeStyles((theme) => ({
   root: {},
@@ -63,38 +63,42 @@ export default function AddHotelForm({ hotel, handleClose, updateMainInfo }) {
   };
 
   const onSubmit = async (values) => {
-    console.log(checkOutTime);
-    console.log(checkInTime);
-    const request = {
-      Name: values.name.trim(),
-      Location: {
-        Country: values.country.trim(),
-        City: values.city.trim(),
-        Street: values.street.trim(),
-        buildingNumber: buildingNumber.trim(),
-      },
-      LimitDays: limitDays,
-      CheckInTime: checkInTime,
-      CheckOutTime: checkOutTime,
-    };
-
-    const CreateHotel = async () => {
-      await API.post("/hotels/", request, {
-        headers: { Authorization: "Bearer " + token },
-      })
-        .then((response) => response.data)
-        .then((data) => {
-          handleClose();
-          CallAlert(true, "Hotel added succesfully");
+    if (
+      role === ADMIN ||
+      (checked && ValidateLimitDays(limitDays)) ||
+      !checked
+    ){
+      const request = {
+        Name: values.name.trim(),
+        Location: {
+          Country: values.country.trim(),
+          City: values.city.trim(),
+          Street: values.street.trim(),
+          buildingNumber: buildingNumber.trim(),
+        },
+        LimitDays: limitDays,
+        CheckInTime: checkInTime,
+        CheckOutTime: checkOutTime,
+      };
+  
+      const CreateHotel = async () => {
+        await API.post("/hotels/", request, {
+          headers: { Authorization: "Bearer " + token },
         })
-        .catch((error) => {
-          setBuildingNumberLabelError(error.response.data.Message);
-        });
-    };
-    if (!!hotel) {
-      await UpdateHotel(request);
-    } else {
-      await CreateHotel();
+          .then((response) => response.data)
+          .then((data) => {
+            handleClose();
+            callAlert(true, "Hotel added succesfully");
+          })
+          .catch((error) => {
+            setBuildingNumberLabelError(error.response.data.Message);
+          });
+      };
+      if (!!hotel) {
+        await UpdateHotel(request);
+      } else {
+        await CreateHotel();
+      }
     }
   };
 
@@ -104,7 +108,7 @@ export default function AddHotelForm({ hotel, handleClose, updateMainInfo }) {
     })
       .then((response) => response.data)
       .then((data) => {
-        CallAlert(true, "Hotel updated succcessfully");
+        callAlert(true, "Hotel updated succcessfully");
         updateMainInfo();
       })
       .catch((error) => {
@@ -153,15 +157,7 @@ export default function AddHotelForm({ hotel, handleClose, updateMainInfo }) {
         <div className={classes.paper}>
           <Formik
             initialValues={initialValues}
-            onSubmit={(values) => {
-              if (
-                role === ADMIN ||
-                (checked && ValidateLimitDays(limitDays)) ||
-                !checked
-              ) {
-                onSubmit(values);
-              }
-            }}
+            onSubmit={onSubmit}
             validationSchema={HOTEL_VALIDATION_SCHEMA}
           >
             {(props) => (

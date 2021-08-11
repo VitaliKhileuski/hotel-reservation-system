@@ -7,6 +7,7 @@ function Alert(props) {
 }
 
 export default function BaseAlert({ handleClose, alertInfo }) {
+  console.log(alertInfo);
   const errorMessage = !!alertInfo.failureMessage
     ? alertInfo.failureMessage
     : "Something went wrong. Please, try again";
@@ -18,9 +19,9 @@ export default function BaseAlert({ handleClose, alertInfo }) {
     >
       <Alert
         onClose={handleClose}
-        severity={alertInfo.success ? "success" : "error"}
+        severity={alertInfo.alertSuccessStatus ? "success" : "error"}
       >
-        {alertInfo.success ? alertInfo.message : errorMessage}
+        {alertInfo.alertSuccessStatus ? alertInfo.message : errorMessage}
       </Alert>
     </Snackbar>
   );

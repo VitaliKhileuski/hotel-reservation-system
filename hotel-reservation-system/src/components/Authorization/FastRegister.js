@@ -11,9 +11,9 @@ import { Formik, Form, ErrorMessage, Field } from "formik";
 import { useSelector } from "react-redux";
 import api from "./../../api/";
 import { FAST_REGISTER_VALIDATIOM_SCHEMA } from "../../constants/ValidationSchemas";
-import CallAlert from "../../Notifications/NotificationHandler";
+import callAlert from "../../Notifications/NotificationHandler";
 import { EMAIL_REGEX } from "../../constants/Regex";
-import { FillStorage, FillLocalStorage } from "./TokenData";
+import { fillStorage, fillLocalStorage } from "./TokenData";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -47,27 +47,29 @@ export default function FastRegister({ handleClose }) {
     passwordConfirm: "",
   };
   const onSubmit = (values) => {
-    const request = {
-      Email: email,
-      Password: values.password,
-    };
-    api
-      .post("/account/register", request)
-      .then((response) => response.data)
-      .then((data) => {
-        FillStorage(data[0]);
-        FillLocalStorage(data[0], data[1]);
-        handleClose();
-        CallAlert(
-          true,
-          "you successfully registered, now you can order this room"
-        );
-      })
-      .catch((error) => {
-        if (!!error.response) {
-          setEmailErrorLabel(error.response.data.Message);
-        }
-      });
+    if (ValidateEmail(email.trim()) && emailErrorLabel === ""){
+      const request = {
+        Email: email,
+        Password: values.password,
+      };
+      api
+        .post("/account/register", request)
+        .then((response) => response.data)
+        .then((data) => {
+          fillStorage(data[0]);
+          fillLocalStorage(data[0], data[1]);
+          handleClose();
+          callAlert(
+            true,
+            "you successfully registered, now you can order this room"
+          );
+        })
+        .catch((error) => {
+          if (!!error.response) {
+            setEmailErrorLabel(error.response.data.Message);
+          }
+        });
+    }
   };
   function ValidateEmail(email) {
     setEmail(email);
@@ -94,10 +96,7 @@ export default function FastRegister({ handleClose }) {
         </Typography>
         <Formik
           initialValues={initialValues}
-          onSubmit={(values) => {
-            if (ValidateEmail(email.trim()) && emailErrorLabel === "")
-              onSubmit(values);
-          }}
+          onSubmit={onSubmit}
           validationSchema={FAST_REGISTER_VALIDATIOM_SCHEMA}
         >
           {(props) => (

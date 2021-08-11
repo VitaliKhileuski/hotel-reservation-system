@@ -17,7 +17,7 @@ import TableSortLabel from "@material-ui/core/TableSortLabel";
 import AddIcon from "@material-ui/icons/Add";
 import RemoveIcon from "@material-ui/icons/Remove";
 import API from "../../api";
-import CallAlert from "../../Notifications/NotificationHandler";
+import callAlert from "../../Notifications/NotificationHandler";
 import BaseDialog from "../shared/BaseDialog";
 import BaseDeleteDialog from "../shared/BaseDeleteDialog";
 import AddServiceForm from "./AddServiceForm";
@@ -178,9 +178,9 @@ export default function ServiceTable({ hotelId, serviceList }) {
       })
         .then((response) => response.data)
         .then((data) => {
-          CallAlert(true, "service deleted successfully");
+          callAlert(true, "service deleted successfully");
         })
-        .catch((error) => CallAlert(false));
+        .catch((error) => callAlert(false));
     };
 
     await DeleteService();
@@ -198,7 +198,7 @@ export default function ServiceTable({ hotelId, serviceList }) {
                   <>
                     <TableCell align="right" style={{ minWidth: 170 }}>
                       <TableSortLabel
-                        active={currentSortField === "Name" ? true : false}
+                        active={currentSortField === "Name"}
                         direction={currentAscending}
                         onClick={() => orderBy("Name")}
                       >
@@ -207,7 +207,7 @@ export default function ServiceTable({ hotelId, serviceList }) {
                     </TableCell>
                     <TableCell align="right" style={{ minWidth: 100 }}>
                       <TableSortLabel
-                        active={currentSortField === "Payment" ? true : false}
+                        active={currentSortField === "Payment"}
                         direction={currentAscending}
                         onClick={() => orderBy("Payment")}
                       >

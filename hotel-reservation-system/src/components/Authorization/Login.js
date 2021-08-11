@@ -13,7 +13,7 @@ import { Formik, Form, Field } from "formik";
 import { useSelector } from "react-redux";
 import API from "./../../api";
 import { EMAIL_REGEX, PASSWORD_REGEX } from "../../constants/Regex";
-import { FillStorage, FillLocalStorage } from "./TokenData";
+import { fillStorage, fillLocalStorage } from "./TokenData";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -84,8 +84,8 @@ export default function Login() {
     API.post("/account/login", request)
       .then((response) => {
         if (!!response && !!response.data) {
-          FillLocalStorage(response.data[0], response.data[1]);
-          FillStorage(response.data[0]);
+          fillLocalStorage(response.data[0], response.data[1]);
+          fillStorage(response.data[0]);
         }
       })
       .catch((error) => {

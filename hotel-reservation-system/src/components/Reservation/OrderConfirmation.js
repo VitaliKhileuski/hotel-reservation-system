@@ -16,7 +16,7 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Grid from "@material-ui/core/Grid";
 import { useSelector } from "react-redux";
 import API from "./../../api";
-import CallAlert from "../../Notifications/NotificationHandler";
+import callAlert from "../../Notifications/NotificationHandler";
 import BaseDialog from "../shared/BaseDialog";
 import FastRegister from "./../Authorization/FastRegister";
 import { HOME_PATH } from "../../constants/RoutingPaths";
@@ -201,7 +201,7 @@ export default function OrderConfirmation({
         }
       })
       .catch((error) => {
-        CallAlert(false, "", "room already booked on this dates");
+        callAlert(false, "", "room already booked on this dates");
       });
   };
   function ShiftCheckOutDate() {
@@ -222,7 +222,7 @@ export default function OrderConfirmation({
         SetMessageDialogOpen(true);
       })
       .catch((error) => {
-        CallAlert(false, "", "room already booked on this dates");
+        callAlert(false, "", "room already booked on this dates");
       });
   };
 
@@ -239,10 +239,10 @@ export default function OrderConfirmation({
       .then((response) => response.data)
       .then((data) => {
         handleCloseUpdateOrderDialog();
-        CallAlert(true, "order updated successfully");
+        callAlert(true, "order updated successfully");
       })
       .catch((error) => {
-        CallAlert(false, "", "something went wrong.Please, try again");
+        callAlert(false, "", "something went wrong.Please, try again");
       });
   };
 

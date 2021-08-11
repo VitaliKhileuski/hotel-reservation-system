@@ -2,7 +2,7 @@ import { TOKEN_DATA } from "../../storage/actions/actionTypes.js";
 import { HOME_PATH } from "../../constants/RoutingPaths";
 import store from "./../../storage/storage";
 
-export function FillStorage(token) {
+export function fillStorage(token) {
   const jwt = JSON.parse(atob(token.split(".")[1]));
   store.dispatch({
     type: TOKEN_DATA,
@@ -14,15 +14,15 @@ export function FillStorage(token) {
   });
 }
 
-export function FillLocalStorage(token, refreshToken) {
+export function fillLocalStorage(token, refreshToken) {
   localStorage.setItem("token", token);
   localStorage.setItem("refreshToken", refreshToken);
 }
 
-export function Logout(dispatch, history) {
+export function logout(history) {
   localStorage.removeItem("refreshToken");
   localStorage.removeItem("token");
-  dispatch({
+  store.dispatch({
     type: TOKEN_DATA,
     isLogged: false,
     role: "",
