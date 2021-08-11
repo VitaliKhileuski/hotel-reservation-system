@@ -125,9 +125,9 @@ export default function UserTable() {
       })
         .then((response) => response.data)
         .then((data) => {
-          CallAlert(dispatch, true, "user deleted successfully");
+          CallAlert(true, "user deleted successfully");
         })
-        .catch((error) => CallAlert(dispatch, false));
+        .catch((error) => CallAlert(false));
     };
     await DeleteUser();
     handleCloseDeleteDialog();

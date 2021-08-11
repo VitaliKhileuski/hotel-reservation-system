@@ -1,9 +1,10 @@
 import { TOKEN_DATA } from "../../storage/actions/actionTypes.js";
 import { HOME_PATH } from "../../constants/RoutingPaths";
+import store from './../../storage/storage'
 
-export function FillStorage(token, dispatch) {
+export function FillStorage(token) {
   const jwt = JSON.parse(atob(token.split(".")[1]));
-  dispatch({
+  store.dispatch({
     type: TOKEN_DATA,
     isLogged: true,
     role: jwt.role,

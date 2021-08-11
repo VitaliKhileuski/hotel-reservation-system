@@ -3,7 +3,7 @@ import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
 import { makeStyles } from "@material-ui/core/styles";
 import { useHistory } from "react-router";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import API from "./../../api";
 import MainReservationDialog from "../Reservation/MainReservationDialog";
 import CallAlert from "../../Notifications/NotificationHandler";
@@ -21,7 +21,6 @@ const useStyles = makeStyles((theme) => ({
 export default function RoomPage(props) {
   const history = useHistory();
   const classes = useStyles();
-  const dispatch = useDispatch();
   const [room, setRoom] = useState(props.history.location.state.room);
   const [openUpdateOrder, setOpenUpdateOrder] = useState(false);
   const [reservationDialogOpen, setReservationDialogOpen] = useState(false);
@@ -50,7 +49,7 @@ export default function RoomPage(props) {
       .then((response) => response.data)
       .then((data) => {
         if (data) {
-          CallAlert(dispatch, false, "", "room is blocked");
+          CallAlert(false, "", "room is blocked");
         } else {
           callReservationDialog();
         }

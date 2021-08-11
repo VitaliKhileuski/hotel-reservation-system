@@ -1,5 +1,5 @@
 import { React, useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
@@ -57,7 +57,6 @@ const useStyles = makeStyles({
 
 export default function HotelTable() {
   const history = useHistory();
-  const dispatch = useDispatch();
   const token = localStorage.getItem("token");
   const role = getRole(token);
   const [hotel, setHotel] = useState();
@@ -180,10 +179,10 @@ export default function HotelTable() {
         .then((response) => response.data)
         .then((data) => {
           handleClose();
-          CallAlert(dispatch, true, "hotel deleted successfully");
+          CallAlert(true, "hotel deleted successfully");
         })
         .catch((error) => {
-          CallAlert(dispatch, false);
+          CallAlert(false);
         });
     };
     await DeleteHotel();

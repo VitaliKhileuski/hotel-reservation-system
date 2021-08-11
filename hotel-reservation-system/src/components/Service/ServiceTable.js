@@ -16,7 +16,6 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
 import AddIcon from "@material-ui/icons/Add";
 import RemoveIcon from "@material-ui/icons/Remove";
-import { useDispatch } from "react-redux";
 import API from "../../api";
 import CallAlert from "../../Notifications/NotificationHandler";
 import BaseDialog from "../shared/BaseDialog";
@@ -37,7 +36,6 @@ const useStyles = makeStyles({
 });
 
 export default function ServiceTable({ hotelId, serviceList }) {
-  const dispatch = useDispatch();
   const token = localStorage.getItem("token");
   const [services, setServices] = useState([]);
   const [maxNumberOfServices, setMaxNumberOfServices] = useState(0);
@@ -180,9 +178,9 @@ export default function ServiceTable({ hotelId, serviceList }) {
       })
         .then((response) => response.data)
         .then((data) => {
-          CallAlert(dispatch, true, "service deleted successfully");
+          CallAlert(true, "service deleted successfully");
         })
-        .catch((error) => CallAlert(dispatch, false));
+        .catch((error) => CallAlert(false));
     };
 
     await DeleteService();

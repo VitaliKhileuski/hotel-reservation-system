@@ -10,7 +10,6 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { Formik, Form, ErrorMessage, Field } from "formik";
-import { useDispatch } from "react-redux";
 import API from "./../../api/";
 import { HOTEL_VALIDATION_SCHEMA } from "../../constants/ValidationSchemas";
 import { NUMBER_REGEX } from "./../../constants/Regex";
@@ -40,7 +39,6 @@ const useStyles = makeStyles((theme) => ({
 
 export default function AddHotelForm({ hotel, handleClose, updateMainInfo }) {
   const classes = useStyles();
-  const dispatch = useDispatch();
   const token = localStorage.getItem("token");
   const [buildingNumberLabelError, setBuildingNumberLabelError] = useState("");
   const [buildingNumber, setBuildingNumber] = useState(
@@ -87,7 +85,7 @@ export default function AddHotelForm({ hotel, handleClose, updateMainInfo }) {
         .then((response) => response.data)
         .then((data) => {
           handleClose();
-          CallAlert(dispatch, true, "Hotel added succesfully");
+          CallAlert(true, "Hotel added succesfully");
         })
         .catch((error) => {
           setBuildingNumberLabelError(error.response.data.Message);
@@ -106,7 +104,7 @@ export default function AddHotelForm({ hotel, handleClose, updateMainInfo }) {
     })
       .then((response) => response.data)
       .then((data) => {
-        CallAlert(dispatch, true, "Hotel updated succcessfully");
+        CallAlert(true, "Hotel updated succcessfully");
         updateMainInfo();
       })
       .catch((error) => {

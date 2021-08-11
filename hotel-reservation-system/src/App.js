@@ -29,7 +29,7 @@ export default function App() {
         localStorage.setItem("refreshToken", tokenRefreshResponse.data[1]);
         failedRequest.response.config.headers["Authorization"] =
           "Bearer " + tokenRefreshResponse.data[0];
-        FillStorage(tokenRefreshResponse.data[0], dispatch);
+        FillStorage(tokenRefreshResponse.data[0]);
         return Promise.resolve();
       })
       .catch((error) => {
@@ -41,7 +41,7 @@ export default function App() {
   async function tokenVerification() {
     if (localStorage.getItem("token") !== null) {
       const token = localStorage.getItem("token");
-      FillStorage(token, dispatch);
+      FillStorage(token);
       let result;
       try {
         result = await API.get("/account/tokenVerification", {

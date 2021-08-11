@@ -66,12 +66,12 @@ export default function Register({ handleClose }) {
       .then((response) => {
         if (role !== ADMIN) {
           if (!!response && !!response.data) {
-            FillStorage(response.data[0], dispatch);
+            FillStorage(response.data[0]);
             FillLocalStorage(response.data[0], response.data[1]);
           }
         } else {
           handleClose();
-          CallAlert(dispatch, true, "user was added successfully");
+          CallAlert(true, "user was added successfully");
         }
       })
       .catch((error) => {

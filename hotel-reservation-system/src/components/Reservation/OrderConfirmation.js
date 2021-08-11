@@ -14,7 +14,7 @@ import {
 } from "@material-ui/pickers";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Grid from "@material-ui/core/Grid";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import API from "./../../api";
 import CallAlert from "../../Notifications/NotificationHandler";
 import BaseDialog from "../shared/BaseDialog";
@@ -57,8 +57,6 @@ export default function OrderConfirmation({
     await getLimitHours();
   }, []);
 
-  console.log(limitDays);
-  const dispatch = useDispatch();
   const [checked, setChecked] = useState(false);
   const history = useHistory();
   const classes = useStyles();
@@ -203,7 +201,7 @@ export default function OrderConfirmation({
         }
       })
       .catch((error) => {
-        CallAlert(dispatch, false, "", "room already booked on this dates");
+        CallAlert(false, "", "room already booked on this dates");
       });
   };
   function ShiftCheckOutDate() {
@@ -224,7 +222,7 @@ export default function OrderConfirmation({
         SetMessageDialogOpen(true);
       })
       .catch((error) => {
-        CallAlert(dispatch, false, "", "room already booked on this dates");
+        CallAlert(false, "", "room already booked on this dates");
       });
   };
 
@@ -241,11 +239,10 @@ export default function OrderConfirmation({
       .then((response) => response.data)
       .then((data) => {
         handleCloseUpdateOrderDialog();
-        CallAlert(dispatch, true, "order updated successfully");
+        CallAlert(true, "order updated successfully");
       })
       .catch((error) => {
         CallAlert(
-          dispatch,
           false,
           "",
           "something went wrong.Please, try again"

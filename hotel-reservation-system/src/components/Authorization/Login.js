@@ -10,7 +10,7 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { Formik, Form, Field } from "formik";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import API from "./../../api";
 import { EMAIL_REGEX, PASSWORD_REGEX } from "../../constants/Regex";
 import { FillStorage, FillLocalStorage } from "./TokenData";
@@ -36,7 +36,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Login() {
-  const dispatch = useDispatch();
   const classes = useStyles();
   const isLogged = useSelector((state) => state.tokenData.isLogged);
   const [email, setEmail] = useState("");
@@ -86,7 +85,7 @@ export default function Login() {
       .then((response) => {
         if (!!response && !!response.data) {
           FillLocalStorage(response.data[0], response.data[1]);
-          FillStorage(response.data[0], dispatch);
+          FillStorage(response.data[0]);
         }
       })
       .catch((error) => {

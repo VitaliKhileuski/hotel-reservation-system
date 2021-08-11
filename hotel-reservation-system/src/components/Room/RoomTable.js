@@ -12,7 +12,7 @@ import TableHead from "@material-ui/core/TableHead";
 import IconButton from "@material-ui/core/IconButton";
 import EditIcon from "@material-ui/icons/Edit";
 import Tooltip from "@material-ui/core/Tooltip";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import DeleteIcon from "@material-ui/icons/Delete";
 import AddPhotoAlternateIcon from "@material-ui/icons/AddPhotoAlternate";
 import API from "../../api";
@@ -37,7 +37,6 @@ const useStyles = makeStyles({
 });
 
 export default function RoomTable({ hotelId }) {
-  const dispatch = useDispatch();
   const token = localStorage.getItem("token");
   const [rooms, setRooms] = useState([]);
   const [maxNumberOfRooms, setMaxNumberOfRooms] = useState(0);
@@ -165,9 +164,9 @@ export default function RoomTable({ hotelId }) {
       })
         .then((response) => response.data)
         .then((data) => {
-          CallAlert(dispatch, true, "room deleted successfully");
+          CallAlert(true, "room deleted successfully");
         })
-        .catch((error) => CallAlert(dispatch, false));
+        .catch((error) => CallAlert(false));
     };
 
     await DeleteRoom();

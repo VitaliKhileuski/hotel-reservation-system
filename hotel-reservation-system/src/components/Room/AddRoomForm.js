@@ -6,7 +6,6 @@ import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
-import { useDispatch } from "react-redux";
 import { Formik, Form, ErrorMessage, Field } from "formik";
 import API from "../../api";
 import CallAlert from "../../Notifications/NotificationHandler";
@@ -35,7 +34,6 @@ const useStyles = makeStyles((theme) => ({
 
 export default function AddRoomForm({ hotelId, room, handleClose }) {
   const classes = useStyles();
-  const dispatch = useDispatch();
   const token = localStorage.getItem("token");
   const initialValues = {
     roomNumber: !!room ? room.roomNumber : "",
@@ -56,9 +54,9 @@ export default function AddRoomForm({ hotelId, room, handleClose }) {
       })
         .then((response) => response.data)
         .then((data) => {
-          CallAlert(dispatch, true, "room added successfully");
+          CallAlert(true, "room added successfully");
         })
-        .catch((error) => CallAlert(dispatch, false));
+        .catch((error) => CallAlert(false));
     };
     if (!!room) {
       console.log(room);
@@ -76,9 +74,9 @@ export default function AddRoomForm({ hotelId, room, handleClose }) {
     })
       .then((response) => response.data)
       .then((data) => {
-        CallAlert(dispatch, true, "room updated successfully");
+        CallAlert(true, "room updated successfully");
       })
-      .catch((error) => CallAlert(dispatch, false));
+      .catch((error) => CallAlert(false));
   };
 
   return (

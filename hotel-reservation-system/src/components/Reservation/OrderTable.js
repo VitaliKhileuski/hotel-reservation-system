@@ -4,7 +4,7 @@ import Box from "@material-ui/core/Box";
 import Collapse from "@material-ui/core/Collapse";
 import IconButton from "@material-ui/core/IconButton";
 import Table from "@material-ui/core/Table";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import DeleteIcon from "@material-ui/icons/Delete";
@@ -273,7 +273,6 @@ function Row({ order, handleClickDeleteIcon, handleClickUpdateOrder }) {
 }
 
 export default function OrderTable() {
-  const dispatch = useDispatch();
   const [orders, setOrders] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -287,7 +286,6 @@ export default function OrderTable() {
   const [currentSortField, setCurrentSortField] = useState("");
   const [openUpdateOrder, setOpenUpdateOrder] = useState(false);
   const [currentAscending, setCurrentAscending] = useState("asc");
-  const [currentLimitDays, setCurrentLimitDays] = useState();
   const [orderId, setOrderId] = useState("");
   const [currentOrder, setCurrentOrder] = useState();
   const token = localStorage.getItem("token");
@@ -371,9 +369,9 @@ export default function OrderTable() {
       })
         .then((response) => response.data)
         .then((data) => {
-          CallAlert(dispatch, true, "order deleted successfully");
+          CallAlert(true, "order deleted successfully");
         })
-        .catch((error) => CallAlert(dispatch, false));
+        .catch((error) => CallAlert(false));
     };
     DeleteOrder();
     handleCloseDeleteDialog();
