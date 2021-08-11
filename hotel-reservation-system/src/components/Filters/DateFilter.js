@@ -23,6 +23,7 @@ export default function DateFilter({
   const [checkIn, setCheckIn] = useState(checkInDate);
   const [checkOut, setCheckOut] = useState(checkOutDate);
   const [roomIsOccupiedAlertOpen, setRoomIsOccupiedAlertOpen] = useState(false);
+  dispatch({ type: DATES, checkInDate: checkIn, checkOutDate: checkOut });
 
   const checkPlace = async (checkIn, checkOut) => {
     await API.get("/rooms/" + roomId + "/isEmpty", {
