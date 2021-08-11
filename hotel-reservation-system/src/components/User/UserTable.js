@@ -56,6 +56,7 @@ export default function UserTable() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const [userSurname, setUserSurname] = useState("");
+  const [updateTable,setUpdateTable] = useState(true);
   const [currentSortField, setCurrentSortField] = useState("");
   const [currentAscending, setCurrentAscending] = useState("");
   const [filterFlag, setFilterFlag] = useState(true);
@@ -63,10 +64,10 @@ export default function UserTable() {
   const form = <Register handleClose={handleCloseAddUserDialog}></Register>;
 
   useEffect(() => {
-    if (!deleteDialogOpen && !addUserDialogOpen && filterFlag) {
+    if (updateTable && !addUserDialogOpen && filterFlag) {
       loadUsers();
     }
-  }, [rowsPerPage, page, deleteDialogOpen, addUserDialogOpen]);
+  }, [rowsPerPage, page, updateTable, addUserDialogOpen]);
 
   const loadUsers = async (
     sortField,
@@ -125,6 +126,7 @@ export default function UserTable() {
       })
         .then((response) => response.data)
         .then((data) => {
+          setUpdateTable(true);
           callAlert(true, "user deleted successfully");
         })
         .catch((error) => callAlert(false));
@@ -136,6 +138,7 @@ export default function UserTable() {
 
   function deleteUserById(userId) {
     setUserId(userId);
+    setUpdateTable(false);
     setDeleteDialogOpen(true);
   }
 

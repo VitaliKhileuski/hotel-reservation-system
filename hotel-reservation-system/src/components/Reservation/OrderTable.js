@@ -289,6 +289,7 @@ export default function OrderTable() {
   const [orderId, setOrderId] = useState("");
   const [currentOrder, setCurrentOrder] = useState();
   const token = localStorage.getItem("token");
+  const [updateTable,setUpdateTable] = useState(true);
   const [filterflag, setFilterFlag] = useState(true);
   const updateOrderForm = !!currentOrder ? (
     <Payment
@@ -309,10 +310,11 @@ export default function OrderTable() {
   );
 
   useEffect(() => {
-    if (deleteDialogOpen === false && filterflag && !openUpdateOrder) {
+    if (updateTable  && filterflag && !openUpdateOrder) {
       loadOrders();
     }
-  }, [rowsPerPage, page, deleteDialogOpen, openUpdateOrder]);
+  }, [rowsPerPage, page, openUpdateOrder,updateTable]);
+
 
   const loadOrders = async (
     sortField,
@@ -369,6 +371,7 @@ export default function OrderTable() {
       })
         .then((response) => response.data)
         .then((data) => {
+          setUpdateTable(true);
           callAlert(true, "order deleted successfully");
         })
         .catch((error) => callAlert(false));
@@ -382,6 +385,7 @@ export default function OrderTable() {
   }
 
   function handleClickDeleteIcon(orderId) {
+    setUpdateTable(false);
     setOrderId(orderId);
     setDeleteDialogOpen(true);
   }

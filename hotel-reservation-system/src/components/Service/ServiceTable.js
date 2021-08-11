@@ -47,6 +47,7 @@ export default function ServiceTable({ hotelId, serviceList }) {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [serviceId, setServiceId] = useState(0);
   const [service, setService] = useState();
+  const [updateTable,setUpdateTable] = useState(true);
   const [currentSortField, setCurrentSortField] = useState("");
   const [currentAscending, setCurrentAscending] = useState("");
 
@@ -65,10 +66,10 @@ export default function ServiceTable({ hotelId, serviceList }) {
   }, [serviceList, service]);
 
   useEffect(() => {
-    if (!!hotelId) {
+    if (updateTable && !!hotelId) {
       loadServices();
     }
-  }, [rowsPerPage, page, openDialog, openDeleteDialog]);
+  }, [rowsPerPage, page, openDialog,updateTable]);
 
   const loadServices = async (sortField, ascending) => {
     if (sortField === null || sortField === undefined) {
@@ -128,6 +129,7 @@ export default function ServiceTable({ hotelId, serviceList }) {
 
   function callDeleteDialog(serviceId) {
     setServiceId(serviceId);
+    setUpdateTable(false);
     setOpenDeleteDialog(true);
   }
 
@@ -178,6 +180,7 @@ export default function ServiceTable({ hotelId, serviceList }) {
       })
         .then((response) => response.data)
         .then((data) => {
+          setUpdateTable(true);
           callAlert(true, "service deleted successfully");
         })
         .catch((error) => callAlert(false));

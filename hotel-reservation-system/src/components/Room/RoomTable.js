@@ -49,6 +49,7 @@ export default function RoomTable({ hotelId }) {
   const [roomId, setRoomId] = useState(0);
   const [room, setRoom] = useState();
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
+  const [updateTable, setUpdateTable] = useState(true);
   const [currentSortField, setCurrentSortField] = useState("");
   const [currentAscending, setCurrentAscending] = useState("");
   const [currentRoomNumber, setCurrentRoomNumber] = useState("");
@@ -74,10 +75,10 @@ export default function RoomTable({ hotelId }) {
   );
 
   useEffect(() => {
-    if (filterFlag) {
+    if (updateTable && filterFlag) {
       loadRooms();
     }
-  }, [rowsPerPage, page, openDialog, openDeleteDialog]);
+  }, [rowsPerPage, page, openDialog,updateTable]);
 
   const loadRooms = async (
     sortField,
@@ -152,6 +153,7 @@ export default function RoomTable({ hotelId }) {
 
   function callDeleteDialog(roomId) {
     setRoomId(roomId);
+    setUpdateTable(false);
     setOpenDeleteDialog(true);
   }
   function handleCloseDeleteDialog() {
@@ -165,6 +167,7 @@ export default function RoomTable({ hotelId }) {
       })
         .then((response) => response.data)
         .then((data) => {
+          setUpdateTable(true);
           callAlert(true, "room deleted successfully");
         })
         .catch((error) => callAlert(false));
