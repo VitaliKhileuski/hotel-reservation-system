@@ -22,18 +22,12 @@ export default function RoomFilter({ getValuesFromFilter, hotelId }) {
   const [roomNumber, setRoomNumber] = useState("");
   const token = localStorage.getItem("token");
 
-  const loadRoomsNumbers = async (
-    value,
-    setNewItems,
-    setCurrentLoading,
-    limit
-  ) => {
+  const loadRoomsNumbers = async (value, setNewItems, setCurrentLoading) => {
     setRoomNumber(value);
     setCurrentLoading(true);
     await API.get("/hotels/" + hotelId + "/getRoomsNumbers", {
       params: {
         roomNumber: value,
-        limit: limit,
       },
       headers: { Authorization: "Bearer " + token },
     })

@@ -68,18 +68,12 @@ export default function Home() {
       .catch((error) => console.log(error));
   };
 
-  const loadHotelNames = async (
-    value,
-    setNewItems,
-    setCurrentLoading,
-    limit
-  ) => {
+  const loadHotelNames = async (value, setNewItems, setCurrentLoading) => {
     setCurrentLoading(true);
     setHotelName(value);
     await API.get("/hotels/hotelNames", {
       params: {
         hotelName: value,
-        limit: limit,
       },
     })
       .then((response) => response.data)

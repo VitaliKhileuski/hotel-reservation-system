@@ -242,11 +242,7 @@ export default function OrderConfirmation({
         CallAlert(true, "order updated successfully");
       })
       .catch((error) => {
-        CallAlert(
-          false,
-          "",
-          "something went wrong.Please, try again"
-        );
+        CallAlert(false, "", "something went wrong.Please, try again");
       });
   };
 

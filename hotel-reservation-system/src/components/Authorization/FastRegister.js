@@ -8,7 +8,7 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { Formik, Form, ErrorMessage, Field } from "formik";
-import {  useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import api from "./../../api/";
 import { FAST_REGISTER_VALIDATIOM_SCHEMA } from "../../constants/ValidationSchemas";
 import CallAlert from "../../Notifications/NotificationHandler";

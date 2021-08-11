@@ -24,14 +24,13 @@ export default function UsersFilter({ getValuesFromFilter, isHotelAdmins }) {
   const [surname, setSurname] = useState("");
   const token = localStorage.getItem("token");
 
-  const loadEmails = async (value, setNewItems, setCurrentLoading, limit) => {
+  const loadEmails = async (value, setNewItems, setCurrentLoading) => {
     setEmail(value);
     console.log(email);
     setCurrentLoading(true);
     await API.get("/users/emails", {
       params: {
         email: value,
-        limit: limit,
       },
       headers: { Authorization: "Bearer " + token },
     })
@@ -42,13 +41,12 @@ export default function UsersFilter({ getValuesFromFilter, isHotelAdmins }) {
       })
       .catch((error) => {});
   };
-  const loadSurnames = async (value, setNewItems, setCurrentLoading, limit) => {
+  const loadSurnames = async (value, setNewItems, setCurrentLoading) => {
     setSurname(value);
     setCurrentLoading(true);
     await API.get("/users/surnames", {
       params: {
         surname: value,
-        limit: limit,
       },
       headers: { Authorization: "Bearer " + token },
     })
@@ -63,15 +61,13 @@ export default function UsersFilter({ getValuesFromFilter, isHotelAdmins }) {
   const loadHotelAdminsSurnames = async (
     value,
     setNewItems,
-    setCurrentLoading,
-    limit
+    setCurrentLoading
   ) => {
     setCurrentLoading(true);
     setSurname(value);
     await API.get("/users/hotelAdminsSurnames", {
       params: {
         surname: value,
-        limit: limit,
       },
       headers: { Authorization: "Bearer " + token },
     })
@@ -85,15 +81,13 @@ export default function UsersFilter({ getValuesFromFilter, isHotelAdmins }) {
   const loadHotelAdminsEmails = async (
     value,
     setNewItems,
-    setCurrentLoading,
-    limit
+    setCurrentLoading
   ) => {
     setCurrentLoading(true);
     setEmail(value);
     await API.get("/users/hotelAdminsEmails", {
       params: {
         email: value,
-        limit: limit,
       },
       headers: { Authorization: "Bearer " + token },
     })

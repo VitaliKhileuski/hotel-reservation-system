@@ -1,6 +1,6 @@
 import { TOKEN_DATA } from "../../storage/actions/actionTypes.js";
 import { HOME_PATH } from "../../constants/RoutingPaths";
-import store from './../../storage/storage'
+import store from "./../../storage/storage";
 
 export function FillStorage(token) {
   const jwt = JSON.parse(atob(token.split(".")[1]));

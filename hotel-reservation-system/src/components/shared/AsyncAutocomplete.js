@@ -7,7 +7,6 @@ export default function AsyncAutocomplete({ request, label }) {
   const [items, setItems] = useState([]);
   const [value, setValue] = useState("");
   const [loading, setLoading] = useState(false);
-  const limit = 6;
 
   function handleChangeValue(value) {
     setValue(value);
@@ -23,7 +22,7 @@ export default function AsyncAutocomplete({ request, label }) {
 
   useEffect(() => {
     const timeoutId = setTimeout(
-      () => request(value, setNewItems, setCurrentLoading, limit),
+      () => request(value, setNewItems, setCurrentLoading),
       400
     );
     return () => clearTimeout(timeoutId);

@@ -24,18 +24,12 @@ export default function HotelFilter({ getValuesFromFilter }) {
     getValuesFromFilter(hotelName);
   }, [hotelName]);
 
-  const loadHotelNames = async (
-    value,
-    setNewItems,
-    setCurrentLoading,
-    limit
-  ) => {
+  const loadHotelNames = async (value, setNewItems, setCurrentLoading) => {
     setHotelName(value);
     setCurrentLoading(true);
     await API.get("/hotels/hotelNames", {
       params: {
         hotelName: value,
-        limit: limit,
       },
     })
       .then((response) => response.data)
