@@ -106,7 +106,6 @@ export default function MainReservationDialog({
 
   function checkValidInfo(isValid) {
     setIsValidInfo(isValid);
-    console.log(isValid);
   }
 
   return (

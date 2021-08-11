@@ -1,5 +1,5 @@
 import { ALERT_INFO } from "../storage/actions/actionTypes";
-import store from './../storage/storage'
+import store from "./../storage/storage";
 
 export default function CallAlert(success, message, failureMessage) {
   store.dispatch({

@@ -49,15 +49,13 @@ export default function OrderFilter({ getValuesFromFilter }) {
   const loadCustomersSurnames = async (
     value,
     setNewItems,
-    setCurrentLoading,
-    limit
+    setCurrentLoading
   ) => {
     setSurname(value);
     setCurrentLoading(true);
     await API.get("/users/customersSurnames", {
       params: {
         surname: value,
-        limit: limit,
       },
       headers: { Authorization: "Bearer " + token },
     })

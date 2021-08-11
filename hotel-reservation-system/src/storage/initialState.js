@@ -15,8 +15,8 @@ const initialState = {
 
   alertInfo: {
     openAlert: false,
+    alertSuccessStatus: true,
     message: "",
-    success: true,
     failureMessage: "",
   },
 };
