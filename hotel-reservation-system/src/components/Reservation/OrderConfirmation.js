@@ -232,6 +232,7 @@ export default function OrderConfirmation({
       CheckOutTime: checkOutTime,
       checkInDate: requestCheckInDate,
       checkOutDate: requestCheckOutDate,
+      Services: selectedServices,
     };
     await API.put("/orders/" + orderId + "/updateOrder", request, {
       headers: { Authorization: "Bearer " + token },

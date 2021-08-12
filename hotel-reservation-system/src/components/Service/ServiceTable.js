@@ -35,7 +35,12 @@ const useStyles = makeStyles({
   },
 });
 
-export default function ServiceTable({ hotelId, serviceList }) {
+export default function ServiceTable({
+  hotelId,
+  serviceList,
+  isDisableCU,
+  rerender,
+}) {
   const token = localStorage.getItem("token");
   const [services, setServices] = useState([]);
   const [maxNumberOfServices, setMaxNumberOfServices] = useState(0);
@@ -50,6 +55,7 @@ export default function ServiceTable({ hotelId, serviceList }) {
   const [updateTable, setUpdateTable] = useState(true);
   const [currentSortField, setCurrentSortField] = useState("");
   const [currentAscending, setCurrentAscending] = useState("");
+  const [currentRerender, setCurrentRerender] = useState(rerender);
 
   const form = (
     <AddServiceForm
@@ -62,8 +68,9 @@ export default function ServiceTable({ hotelId, serviceList }) {
   useEffect(() => {
     if (hotelId === undefined) {
       setServices(serviceList);
+      setCurrentRerender(false);
     }
-  }, [serviceList, service]);
+  }, [serviceList, services, currentRerender]);
 
   useEffect(() => {
     if (updateTable && !!hotelId) {
@@ -156,6 +163,15 @@ export default function ServiceTable({ hotelId, serviceList }) {
         quantity: service.quantity--,
       };
       setService(newService);
+    } else {
+      deleteServiceFromCollection(service);
+      setCurrentRerender(true);
+    }
+  }
+  function deleteServiceFromCollection(service) {
+    const index = services.indexOf(service);
+    if (index > -1) {
+      services.splice(index, 1);
     }
   }
 
@@ -268,14 +284,18 @@ export default function ServiceTable({ hotelId, serviceList }) {
                     <>
                       <TableCell align="right">{service.quantity}</TableCell>
                       <TableCell>
-                        <Tooltip title="add">
-                          <IconButton
-                            onClick={() => increaseQuantity(service)}
-                            color="inherit"
-                          >
-                            <AddIcon></AddIcon>
-                          </IconButton>
-                        </Tooltip>
+                        {!isDisableCU ? (
+                          <Tooltip title="add">
+                            <IconButton
+                              onClick={() => increaseQuantity(service)}
+                              color="inherit"
+                            >
+                              <AddIcon></AddIcon>
+                            </IconButton>
+                          </Tooltip>
+                        ) : (
+                          ""
+                        )}
                         <Tooltip title="substract">
                           <IconButton
                             onClick={() => reduceQuantity(service)}
