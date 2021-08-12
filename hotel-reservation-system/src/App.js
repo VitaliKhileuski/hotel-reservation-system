@@ -15,7 +15,7 @@ export default function App() {
   const history = useHistory();
 
   function handleCloseAlert() {
-    dispatch({ type: ALERT_INFO, openAlert: false, alertSuccessStatus : true });
+    dispatch({ type: ALERT_INFO, openAlert: false, alertSuccessStatus: true });
   }
 
   const refreshAuthLogic = async (failedRequest) =>

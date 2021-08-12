@@ -77,6 +77,7 @@ export default function HotelTable() {
   const [hotelAdminEmail, setHotelAdminEmail] = useState("");
   const [hotelAdminSurname, setHotelAdminSurname] = useState("");
   const [currentSortField, setCurrentSortField] = useState("");
+  const [updateTable, setUpdateTable] = useState(true);
   const [currentAscending, setCurrentAscending] = useState("asc");
   const adminId = useSelector((state) => state.tokenData.userId);
   const [filterFlag, setFilterFlag] = useState(true);
@@ -93,16 +94,10 @@ export default function HotelTable() {
   );
 
   useEffect(() => {
-    if (
-      !openDeleteDialog &&
-      !open &&
-      !imageDialogOpen &&
-      filterFlag &&
-      !!adminId
-    ) {
+    if (updateTable && !open && !imageDialogOpen && filterFlag && !!adminId) {
       loadHotels();
     }
-  }, [rowsPerPage, page, open, openDeleteDialog, imageDialogOpen, adminId]);
+  }, [rowsPerPage, page, open, updateTable, imageDialogOpen, adminId]);
 
   const loadHotels = async (
     sortField,
@@ -179,6 +174,7 @@ export default function HotelTable() {
         .then((response) => response.data)
         .then((data) => {
           handleClose();
+          setUpdateTable(true);
           callAlert(true, "hotel deleted successfully");
         })
         .catch((error) => {
@@ -191,6 +187,7 @@ export default function HotelTable() {
 
   function callAlertDialog(hotelId) {
     setHotelId(hotelId);
+    setUpdateTable(false);
     setOpenDeleteDialog(true);
   }
 
@@ -230,7 +227,7 @@ export default function HotelTable() {
     SetPageForRequest(1);
     setHotelAdminEmail(email);
     setHotelAdminSurname(surname);
-    loadHotels(undefined,"asc",email, surname, true, 1);
+    loadHotels(undefined, "asc", email, surname, true, 1);
   }
   function getValueFromHotelFilter(hotelName) {
     setHotelName(hotelName);
@@ -245,10 +242,7 @@ export default function HotelTable() {
       setCurrentAscending("desc");
       ascending = "desc";
     }
-    loadHotels(
-      sortField,
-      ascending
-    );
+    loadHotels(sortField, ascending);
   }
   return (
     <>

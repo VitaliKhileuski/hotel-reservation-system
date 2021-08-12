@@ -56,7 +56,7 @@ export default function UserTable() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const [userSurname, setUserSurname] = useState("");
-  const [updateTable,setUpdateTable] = useState(true);
+  const [updateTable, setUpdateTable] = useState(true);
   const [currentSortField, setCurrentSortField] = useState("");
   const [currentAscending, setCurrentAscending] = useState("");
   const [filterFlag, setFilterFlag] = useState(true);

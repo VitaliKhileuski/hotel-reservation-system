@@ -47,7 +47,7 @@ export default function FastRegister({ handleClose }) {
     passwordConfirm: "",
   };
   const onSubmit = (values) => {
-    if (ValidateEmail(email.trim()) && emailErrorLabel === ""){
+    if (ValidateEmail(email.trim()) && emailErrorLabel === "") {
       const request = {
         Email: email,
         Password: values.password,

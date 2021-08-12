@@ -54,33 +54,33 @@ export default function Register({ handleClose }) {
   };
   const onSubmit = (values) => {
     ValidateEmail(email);
-            if (ValidateEmail(email.trim()) && emailErrorLabel === ""){
-              const request = {
-                Email: email,
-                Name: values.firstName,
-                SurName: values.lastName,
-                PhoneNumber: values.phone,
-                Password: values.password,
-              };
-              api
-                .post("/account/register", request)
-                .then((response) => {
-                  if (role !== ADMIN) {
-                    if (!!response && !!response.data) {
-                      fillStorage(response.data[0]);
-                      fillLocalStorage(response.data[0], response.data[1]);
-                    }
-                  } else {
-                    handleClose();
-                    callAlert(true, "user was added successfully");
-                  }
-                })
-                .catch((error) => {
-                  if (!!error.response) {
-                    setEmailErrorLabel(error.response.data.Message);
-                  }
-                });
+    if (ValidateEmail(email.trim()) && emailErrorLabel === "") {
+      const request = {
+        Email: email,
+        Name: values.firstName,
+        SurName: values.lastName,
+        PhoneNumber: values.phone,
+        Password: values.password,
+      };
+      api
+        .post("/account/register", request)
+        .then((response) => {
+          if (role !== ADMIN) {
+            if (!!response && !!response.data) {
+              fillStorage(response.data[0]);
+              fillLocalStorage(response.data[0], response.data[1]);
             }
+          } else {
+            handleClose();
+            callAlert(true, "user was added successfully");
+          }
+        })
+        .catch((error) => {
+          if (!!error.response) {
+            setEmailErrorLabel(error.response.data.Message);
+          }
+        });
+    }
   };
   function ValidateEmail(email) {
     setEmail(email);

@@ -67,7 +67,7 @@ export default function AddHotelForm({ hotel, handleClose, updateMainInfo }) {
       role === ADMIN ||
       (checked && ValidateLimitDays(limitDays)) ||
       !checked
-    ){
+    ) {
       const request = {
         Name: values.name.trim(),
         Location: {
@@ -80,7 +80,7 @@ export default function AddHotelForm({ hotel, handleClose, updateMainInfo }) {
         CheckInTime: checkInTime,
         CheckOutTime: checkOutTime,
       };
-  
+
       const CreateHotel = async () => {
         await API.post("/hotels/", request, {
           headers: { Authorization: "Bearer " + token },

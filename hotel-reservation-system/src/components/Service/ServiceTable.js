@@ -47,7 +47,7 @@ export default function ServiceTable({ hotelId, serviceList }) {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [serviceId, setServiceId] = useState(0);
   const [service, setService] = useState();
-  const [updateTable,setUpdateTable] = useState(true);
+  const [updateTable, setUpdateTable] = useState(true);
   const [currentSortField, setCurrentSortField] = useState("");
   const [currentAscending, setCurrentAscending] = useState("");
 
@@ -69,7 +69,7 @@ export default function ServiceTable({ hotelId, serviceList }) {
     if (updateTable && !!hotelId) {
       loadServices();
     }
-  }, [rowsPerPage, page, openDialog,updateTable]);
+  }, [rowsPerPage, page, openDialog, updateTable]);
 
   const loadServices = async (sortField, ascending) => {
     if (sortField === null || sortField === undefined) {

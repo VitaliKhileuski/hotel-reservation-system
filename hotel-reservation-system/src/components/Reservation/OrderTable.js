@@ -289,7 +289,7 @@ export default function OrderTable() {
   const [orderId, setOrderId] = useState("");
   const [currentOrder, setCurrentOrder] = useState();
   const token = localStorage.getItem("token");
-  const [updateTable,setUpdateTable] = useState(true);
+  const [updateTable, setUpdateTable] = useState(true);
   const [filterflag, setFilterFlag] = useState(true);
   const updateOrderForm = !!currentOrder ? (
     <Payment
@@ -310,11 +310,10 @@ export default function OrderTable() {
   );
 
   useEffect(() => {
-    if (updateTable  && filterflag && !openUpdateOrder) {
+    if (updateTable && filterflag && !openUpdateOrder) {
       loadOrders();
     }
-  }, [rowsPerPage, page, openUpdateOrder,updateTable]);
-
+  }, [rowsPerPage, page, openUpdateOrder, updateTable]);
 
   const loadOrders = async (
     sortField,
@@ -324,7 +323,7 @@ export default function OrderTable() {
     surname,
     orderNumber,
     flag,
-    pageNumber,
+    pageNumber
   ) => {
     let requestCountry = country;
     let requestCity = city;
@@ -422,10 +421,7 @@ export default function OrderTable() {
       setCurrentAscending("desc");
       ascending = "desc";
     }
-    loadOrders(
-      sortField,
-      ascending
-    );
+    loadOrders(sortField, ascending);
   }
   function handleCloseUpdateOrderDialog() {
     setOpenUpdateOrder(false);

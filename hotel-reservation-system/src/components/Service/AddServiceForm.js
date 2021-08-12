@@ -48,12 +48,12 @@ export default function AddServiceForm({ hotelId, service, handleClose }) {
     if (
       ValidateServiceName(serviceName.trim()) &&
       serviceNameErrorLabel === ""
-    ){
+    ) {
       const request = {
         Name: serviceName,
         Payment: values.payment,
       };
-  
+
       if (!!service) {
         console.log(service);
         await UpdateService(request);

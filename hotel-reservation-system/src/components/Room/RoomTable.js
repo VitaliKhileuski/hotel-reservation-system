@@ -78,15 +78,14 @@ export default function RoomTable({ hotelId }) {
     if (updateTable && filterFlag) {
       loadRooms();
     }
-  }, [rowsPerPage, page, openDialog,updateTable]);
+  }, [rowsPerPage, page, openDialog, updateTable]);
 
   const loadRooms = async (
     sortField,
     ascending,
     roomNumber,
     flag,
-    pageNumber,
-    
+    pageNumber
   ) => {
     let requestRoomNumber = roomNumber;
     let requestPageNumber = !!pageNumber ? pageNumber : pageForRequest;
@@ -182,7 +181,7 @@ export default function RoomTable({ hotelId }) {
     setPage(0);
     SetPageForRequest(1);
     setCurrentRoomNumber(roomNumber);
-    loadRooms(undefined,"asc",roomNumber, true, 1);
+    loadRooms(undefined, "asc", roomNumber, true, 1);
   }
 
   return (
