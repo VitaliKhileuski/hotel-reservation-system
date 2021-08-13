@@ -1,5 +1,5 @@
 import { React, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
@@ -26,8 +26,13 @@ import { HOTEL_EDITOR_PATH } from "../../constants/RoutingPaths";
 import BaseDialog from "../shared/BaseDialog";
 import BaseDeleteDialog from "./../shared/BaseDeleteDialog";
 import BaseImageDialog from "../shared/BaseImageDialog";
-import callAlert from "../../Notifications/NotificationHandler";
+import { callErrorAlert } from "../../Notifications/NotificationHandler";
 import UsersFilter from "../Filters/UserFilter";
+import {
+  updateTableWithCallingAlert,
+  deleteTrigger,
+  updateTrigger,
+} from "./../../helpers/UpdateTableWithCallingAlert";
 import HotelFilter from "../Filters/HotelFilter";
 import { getRole } from "./../Authorization/TokenData";
 import { ADMIN, HOTEL_ADMIN } from "../../constants/Roles";
@@ -39,7 +44,7 @@ const useStyles = makeStyles({
     width: "100%",
   },
   container: {
-    minHeight: 600,
+    minHeight: "80%",
   },
   addHotelButton: {
     marginTop: 30,
@@ -57,6 +62,7 @@ const useStyles = makeStyles({
 
 export default function HotelTable() {
   const history = useHistory();
+  const dispatch = useDispatch();
   const token = localStorage.getItem("token");
   const role = getRole(token);
   const [hotel, setHotel] = useState();
@@ -77,11 +83,11 @@ export default function HotelTable() {
   const [hotelAdminEmail, setHotelAdminEmail] = useState("");
   const [hotelAdminSurname, setHotelAdminSurname] = useState("");
   const [currentSortField, setCurrentSortField] = useState("");
-  const [updateTable, setUpdateTable] = useState(true);
   const [currentAscending, setCurrentAscending] = useState("asc");
   const adminId = useSelector((state) => state.tokenData.userId);
   const [filterFlag, setFilterFlag] = useState(true);
-
+  const updateTableInfo = useSelector((state) => state.updateTableInfo);
+  
   const form = <AddHotelForm handleClose={handleClose}></AddHotelForm>;
 
   const component = (
@@ -94,10 +100,16 @@ export default function HotelTable() {
   );
 
   useEffect(() => {
-    if (updateTable && !open && !imageDialogOpen && filterFlag && !!adminId) {
+    if (
+      !open &&
+      !imageDialogOpen &&
+      filterFlag &&
+      !!adminId &&
+      (updateTableInfo.updateTable || !!updateTableInfo.action)
+    ) {
       loadHotels();
     }
-  }, [rowsPerPage, page, open, updateTable, imageDialogOpen, adminId]);
+  }, [open, imageDialogOpen, adminId, updateTableInfo]);
 
   const loadHotels = async (
     sortField,
@@ -137,20 +149,29 @@ export default function HotelTable() {
         console.log(data);
         setHotels(data.items);
         setMaxNumberOfHotels(data.numberOfItems);
+        updateTableWithCallingAlert(
+          updateTableInfo,
+          "hotel created successfully",
+          "hotel deleted successfully"
+        );
       })
-      .catch((error) => {});
+      .catch((error) => {
+        callErrorAlert();
+      });
     setFilterFlag(true);
   };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
     SetPageForRequest(newPage + 1);
+    updateTrigger();
   };
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
     SetPageForRequest(1);
+    updateTrigger();
   };
 
   function handleClose() {
@@ -173,12 +194,11 @@ export default function HotelTable() {
       })
         .then((response) => response.data)
         .then((data) => {
+          deleteTrigger();
           handleClose();
-          setUpdateTable(true);
-          callAlert(true, "hotel deleted successfully");
         })
         .catch((error) => {
-          callAlert(false);
+          callErrorAlert();
         });
     };
     await DeleteHotel();
@@ -187,7 +207,6 @@ export default function HotelTable() {
 
   function callAlertDialog(hotelId) {
     setHotelId(hotelId);
-    setUpdateTable(false);
     setOpenDeleteDialog(true);
   }
 
@@ -281,7 +300,7 @@ export default function HotelTable() {
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>
-                <TableCell align="right" style={{ minWidth: 150 }}>
+                <TableCell align="right" style={{ minWidth: "10%" }}>
                   <TableSortLabel
                     active={currentSortField === "Name"}
                     direction={currentAscending}
@@ -290,7 +309,7 @@ export default function HotelTable() {
                     Name
                   </TableSortLabel>
                 </TableCell>
-                <TableCell align="right" style={{ minWidth: 150 }}>
+                <TableCell align="right" style={{ minWidth: "10%" }}>
                   <TableSortLabel
                     active={currentSortField === "Location.Country"}
                     direction={currentAscending}
@@ -299,7 +318,7 @@ export default function HotelTable() {
                     Country
                   </TableSortLabel>
                 </TableCell>
-                <TableCell align="right" style={{ minWidth: 150 }}>
+                <TableCell align="right" style={{ minWidth: "10%" }}>
                   <TableSortLabel
                     active={currentSortField === "Location.City"}
                     direction={currentAscending}
@@ -308,7 +327,7 @@ export default function HotelTable() {
                     City
                   </TableSortLabel>
                 </TableCell>
-                <TableCell align="right" style={{ minWidth: 150 }}>
+                <TableCell align="right" style={{ minWidth: "10%" }}>
                   <TableSortLabel
                     active={currentSortField === "Location.Street"}
                     direction={currentAscending}
@@ -317,7 +336,7 @@ export default function HotelTable() {
                     Street
                   </TableSortLabel>
                 </TableCell>
-                <TableCell align="right" style={{ minWidth: 150 }}>
+                <TableCell align="right" style={{ minWidth: "10%" }}>
                   <TableSortLabel
                     active={currentSortField === "Location.BuildingNumber"}
                     direction={currentAscending}
@@ -326,7 +345,7 @@ export default function HotelTable() {
                     Building number
                   </TableSortLabel>
                 </TableCell>
-                <TableCell align="right" style={{ minWidth: 150 }}>
+                <TableCell align="right" style={{ minWidth: "10%" }}>
                   <TableSortLabel
                     active={currentSortField === "LimitDays"}
                     direction={currentAscending}
@@ -335,7 +354,7 @@ export default function HotelTable() {
                     limit days
                   </TableSortLabel>
                 </TableCell>
-                <TableCell align="right" style={{ minWidth: 100 }}>
+                <TableCell align="right" style={{ minWidth: "8%" }}>
                   <TableSortLabel
                     active={currentSortField === "CheckInTime"}
                     direction={currentAscending}
@@ -344,7 +363,7 @@ export default function HotelTable() {
                     Check-in time
                   </TableSortLabel>
                 </TableCell>
-                <TableCell align="right" style={{ minWidth: 100 }}>
+                <TableCell align="right" style={{ minWidth: "10%" }}>
                   <TableSortLabel
                     active={currentSortField === "CheckOutTime"}
                     direction={currentAscending}
@@ -353,11 +372,11 @@ export default function HotelTable() {
                     Check-out time
                   </TableSortLabel>
                 </TableCell>
-                <TableCell style={{ minWidth: 30 }} />
-                <TableCell style={{ minWidth: 30 }} />
-                <TableCell style={{ minWidth: 30 }} />
-                <TableCell style={{ minWidth: 30 }} />
-                <TableCell style={{ minWidth: 30 }} />
+                <TableCell style={{ minWidth: "3%" }} />
+                <TableCell style={{ minWidth: "3%" }} />
+                <TableCell style={{ minWidth: "3%" }} />
+                <TableCell style={{ minWidth: "3%" }} />
+                <TableCell style={{ minWidth: "3%" }} />
               </TableRow>
             </TableHead>
             <TableBody>

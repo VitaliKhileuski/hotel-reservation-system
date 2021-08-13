@@ -1,15 +1,20 @@
 import { ALERT_INFO } from "../storage/actions/actionTypes";
 import store from "./../storage/storage";
 
-export default function callAlert(success, message, failureMessage) {
-  console.log("success", success);
-  console.log("message", message);
-  console.log("failureMessage", failureMessage);
+export function callSuccessAlert(message) {
   store.dispatch({
     type: ALERT_INFO,
     openAlert: true,
     message: message,
-    alertSuccessStatus: success,
+    alertSuccessStatus: true,
+  });
+}
+
+export function callErrorAlert(failureMessage) {
+  store.dispatch({
+    type: ALERT_INFO,
+    openAlert: true,
+    alertSuccessStatus: false,
     failureMessage: failureMessage,
   });
 }

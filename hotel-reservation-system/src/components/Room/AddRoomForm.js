@@ -3,12 +3,17 @@ import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import TextField from "@material-ui/core/TextField";
 import Grid from "@material-ui/core/Grid";
+import { useDispatch } from "react-redux";
 import Box from "@material-ui/core/Box";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { Formik, Form, ErrorMessage, Field } from "formik";
 import API from "../../api";
-import callAlert from "../../Notifications/NotificationHandler";
+import { createTrigger } from "../../helpers/UpdateTableWithCallingAlert";
+import {
+  callSuccessAlert,
+  callErrorAlert,
+} from "../../Notifications/NotificationHandler";
 import { ROOM_VALIDATION_SCHEMA } from "../../constants/ValidationSchemas";
 
 const useStyles = makeStyles((theme) => ({
@@ -34,6 +39,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function AddRoomForm({ hotelId, room, handleClose }) {
   const classes = useStyles();
+  const dispatch = useDispatch();
   const token = localStorage.getItem("token");
   const initialValues = {
     roomNumber: !!room ? room.roomNumber : "",
@@ -54,9 +60,9 @@ export default function AddRoomForm({ hotelId, room, handleClose }) {
       })
         .then((response) => response.data)
         .then((data) => {
-          callAlert(true, "room added successfully");
+          createTrigger();
         })
-        .catch((error) => callAlert(false));
+        .catch((error) => callErrorAlert());
     };
     if (!!room) {
       console.log(room);
@@ -74,9 +80,9 @@ export default function AddRoomForm({ hotelId, room, handleClose }) {
     })
       .then((response) => response.data)
       .then((data) => {
-        callAlert(true, "room updated successfully");
+        callSuccessAlert("room updated successfully");
       })
-      .catch((error) => callAlert(false));
+      .catch((error) => callErrorAlert());
   };
 
   return (

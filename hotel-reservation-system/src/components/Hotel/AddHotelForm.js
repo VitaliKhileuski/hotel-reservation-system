@@ -5,16 +5,17 @@ import TextField from "@material-ui/core/TextField";
 import Checkbox from "@material-ui/core/Checkbox";
 import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { Formik, Form, ErrorMessage, Field } from "formik";
+import { createTrigger } from "../../helpers/UpdateTableWithCallingAlert";
 import API from "./../../api/";
 import { HOTEL_VALIDATION_SCHEMA } from "../../constants/ValidationSchemas";
 import { NUMBER_REGEX } from "./../../constants/Regex";
 import { ADMIN } from "../../constants/Roles";
-import callAlert from "../../Notifications/NotificationHandler";
+import { callSuccessAlert } from "../../Notifications/NotificationHandler";
 
 const useStyles = makeStyles((theme) => ({
   root: {},
@@ -88,7 +89,7 @@ export default function AddHotelForm({ hotel, handleClose, updateMainInfo }) {
           .then((response) => response.data)
           .then((data) => {
             handleClose();
-            callAlert(true, "Hotel added succesfully");
+            createTrigger();
           })
           .catch((error) => {
             setBuildingNumberLabelError(error.response.data.Message);
@@ -108,7 +109,7 @@ export default function AddHotelForm({ hotel, handleClose, updateMainInfo }) {
     })
       .then((response) => response.data)
       .then((data) => {
-        callAlert(true, "Hotel updated succcessfully");
+        callSuccessAlert("Hotel updated succcessfully");
         updateMainInfo();
       })
       .catch((error) => {
@@ -261,7 +262,7 @@ export default function AddHotelForm({ hotel, handleClose, updateMainInfo }) {
                   </Grid>
                   <Grid item sm={6}>
                     <TextField
-                      id="time"
+                      id="check-in"
                       label="check-in"
                       type="time"
                       value={checkInTime}
@@ -275,7 +276,7 @@ export default function AddHotelForm({ hotel, handleClose, updateMainInfo }) {
                   </Grid>
                   <Grid item sm={6}>
                     <TextField
-                      id="time"
+                      id="check-out"
                       label="check-out"
                       type="time"
                       defaultValue="12:00"

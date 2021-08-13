@@ -12,12 +12,20 @@ import TableHead from "@material-ui/core/TableHead";
 import IconButton from "@material-ui/core/IconButton";
 import EditIcon from "@material-ui/icons/Edit";
 import Tooltip from "@material-ui/core/Tooltip";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import DeleteIcon from "@material-ui/icons/Delete";
 import AddPhotoAlternateIcon from "@material-ui/icons/AddPhotoAlternate";
 import API from "../../api";
 import BaseDialog from "../shared/BaseDialog";
-import callAlert from "../../Notifications/NotificationHandler";
+import {
+  updateTableWithCallingAlert,
+  updateTrigger,
+  deleteTrigger,
+} from "./../../helpers/UpdateTableWithCallingAlert";
+import {
+  callSuccessAlert,
+  callErrorAlert,
+} from "../../Notifications/NotificationHandler";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
 import BaseDeleteDialog from "../shared/BaseDeleteDialog";
 import BaseImageDialog from "../shared/BaseImageDialog";
@@ -37,6 +45,7 @@ const useStyles = makeStyles({
 });
 
 export default function RoomTable({ hotelId }) {
+  const dispatch = useDispatch();
   const token = localStorage.getItem("token");
   const [rooms, setRooms] = useState([]);
   const [maxNumberOfRooms, setMaxNumberOfRooms] = useState(0);
@@ -49,12 +58,12 @@ export default function RoomTable({ hotelId }) {
   const [roomId, setRoomId] = useState(0);
   const [room, setRoom] = useState();
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
-  const [updateTable, setUpdateTable] = useState(true);
   const [currentSortField, setCurrentSortField] = useState("");
   const [currentAscending, setCurrentAscending] = useState("");
   const [currentRoomNumber, setCurrentRoomNumber] = useState("");
   const userId = useSelector((state) => state.tokenData.userId);
   const [filterFlag, setFilterFlag] = useState(true);
+  const updateTableInfo = useSelector((state) => state.updateTableInfo);
 
   function callImageDialog(room) {
     setRoomId(room.id);
@@ -75,10 +84,13 @@ export default function RoomTable({ hotelId }) {
   );
 
   useEffect(() => {
-    if (updateTable && filterFlag) {
+    if (
+      filterFlag &&
+      (updateTableInfo.updateTable || !!updateTableInfo.action)
+    ) {
       loadRooms();
     }
-  }, [rowsPerPage, page, openDialog, updateTable]);
+  }, [openDialog, updateTableInfo]);
 
   const loadRooms = async (
     sortField,
@@ -111,6 +123,11 @@ export default function RoomTable({ hotelId }) {
       .then((data) => {
         setRooms(data.items);
         setMaxNumberOfRooms(data.numberOfItems);
+        updateTableWithCallingAlert(
+          updateTableInfo,
+          "room created successfully",
+          "room deleted successfully"
+        );
       })
       .catch((error) => console.log(error.response.data.message));
     setFilterFlag(true);
@@ -132,12 +149,14 @@ export default function RoomTable({ hotelId }) {
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
     SetPageForRequest(newPage + 1);
+    updateTrigger();
   };
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
     SetPageForRequest(1);
+    updateTrigger();
   };
 
   function OpenAddRoomDialog(room) {
@@ -152,7 +171,6 @@ export default function RoomTable({ hotelId }) {
 
   function callDeleteDialog(roomId) {
     setRoomId(roomId);
-    setUpdateTable(false);
     setOpenDeleteDialog(true);
   }
   function handleCloseDeleteDialog() {
@@ -166,10 +184,9 @@ export default function RoomTable({ hotelId }) {
       })
         .then((response) => response.data)
         .then((data) => {
-          setUpdateTable(true);
-          callAlert(true, "room deleted successfully");
+          deleteTrigger();
         })
-        .catch((error) => callAlert(false));
+        .catch((error) => callErrorAlert());
     };
 
     await DeleteRoom();

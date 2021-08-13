@@ -27,8 +27,16 @@ import OrderFilter from "../Filters/OrderFilter";
 import Payment from "./Payment";
 import RoomDetails from "../Room/RoomDetails";
 import BaseDeleteDialog from "../shared/BaseDeleteDialog";
-import callAlert from "../../Notifications/NotificationHandler";
+import {
+  callSuccessAlert,
+  callErrorAlert,
+} from "../../Notifications/NotificationHandler";
 import { USER } from "../../constants/Roles";
+import {
+  updateTableWithCallingAlert,
+  updateTrigger,
+  deleteTrigger,
+} from "../../helpers/UpdateTableWithCallingAlert";
 
 const useRowStyles = makeStyles({
   root: {
@@ -289,8 +297,9 @@ export default function OrderTable() {
   const [orderId, setOrderId] = useState("");
   const [currentOrder, setCurrentOrder] = useState();
   const token = localStorage.getItem("token");
-  const [updateTable, setUpdateTable] = useState(true);
   const [filterflag, setFilterFlag] = useState(true);
+  const updateTableInfo = useSelector((state) => state.updateTableInfo);
+  console.log(updateTableInfo);
   const updateOrderForm = !!currentOrder ? (
     <Payment
       selectedServices={currentOrder.services}
@@ -310,10 +319,14 @@ export default function OrderTable() {
   );
 
   useEffect(() => {
-    if (updateTable && filterflag && !openUpdateOrder) {
+    if (
+      filterflag &&
+      !openUpdateOrder &&
+      (updateTableInfo.updateTable || !!updateTableInfo.action)
+    ) {
       loadOrders();
     }
-  }, [rowsPerPage, page, openUpdateOrder, updateTable]);
+  }, [openUpdateOrder, updateTableInfo]);
 
   const loadOrders = async (
     sortField,
@@ -358,8 +371,13 @@ export default function OrderTable() {
         console.log(data.items);
         setOrders(data.items);
         setMaxNumberOfOrders(data.numberOfItems);
+        updateTableWithCallingAlert(
+          updateTableInfo,
+          "",
+          "order deleted successfully"
+        );
       })
-      .catch((error) => console.log(error.response.data.Message));
+      .catch((error) => callErrorAlert());
     setFilterFlag(true);
   };
 
@@ -370,10 +388,9 @@ export default function OrderTable() {
       })
         .then((response) => response.data)
         .then((data) => {
-          setUpdateTable(true);
-          callAlert(true, "order deleted successfully");
+          deleteTrigger();
         })
-        .catch((error) => callAlert(false));
+        .catch((error) => callErrorAlert());
     };
     DeleteOrder();
     handleCloseDeleteDialog();
@@ -384,7 +401,6 @@ export default function OrderTable() {
   }
 
   function handleClickDeleteIcon(orderId) {
-    setUpdateTable(false);
     setOrderId(orderId);
     setDeleteDialogOpen(true);
   }
@@ -403,12 +419,14 @@ export default function OrderTable() {
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
     setPageForRequest(newPage + 1);
+    updateTrigger();
   };
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
     setPageForRequest(1);
+    updateTrigger();
   };
 
   function orderBy(sortField) {

@@ -19,6 +19,10 @@ const initialState = {
     message: "",
     failureMessage: "",
   },
+  updateTableInfo: {
+    updateTable: true,
+    action: "",
+  },
 };
 
 export default initialState;

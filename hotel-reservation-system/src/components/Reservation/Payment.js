@@ -2,7 +2,7 @@ import { React, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
-import callAlert from "../../Notifications/NotificationHandler";
+import { callSuccessAlert } from "../../Notifications/NotificationHandler";
 import ServiceChoice from "./../Service/ServiceChoise";
 import BaseDialog from "../shared/BaseDialog";
 import OrderConfirmation from "./OrderConfirmation";
@@ -67,7 +67,7 @@ export default function Payment({
   function getSelectedServices(value) {
     console.log(value);
     handleCloseEditServicesDialog();
-    callAlert(true, "new services was saved. Final price recalculated");
+    callSuccessAlert("new services was saved. Final price recalculated");
     setCurrentSelectedServices(value);
   }
 

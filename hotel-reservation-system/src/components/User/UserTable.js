@@ -1,5 +1,5 @@
 import { React, useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import IconButton from "@material-ui/core/IconButton";
@@ -16,7 +16,15 @@ import TableRow from "@material-ui/core/TableRow";
 import Button from "@material-ui/core/Button";
 import DeleteIcon from "@material-ui/icons/Delete";
 import API from "../../api";
-import callAlert from "../../Notifications/NotificationHandler";
+import {
+  callSuccessAlert,
+  callErrorAlert,
+} from "../../Notifications/NotificationHandler";
+import {
+  updateTableWithCallingAlert,
+  deleteTrigger,
+  updateTrigger,
+} from "../../helpers/UpdateTableWithCallingAlert";
 import BaseDialog from "../shared/BaseDialog";
 import BaseDeleteDialog from "../shared/BaseDeleteDialog";
 import Register from "./../Authorization/Register";
@@ -56,18 +64,21 @@ export default function UserTable() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const [userSurname, setUserSurname] = useState("");
-  const [updateTable, setUpdateTable] = useState(true);
   const [currentSortField, setCurrentSortField] = useState("");
   const [currentAscending, setCurrentAscending] = useState("");
   const [filterFlag, setFilterFlag] = useState(true);
+  const updateTableInfo = useSelector((state) => state.updateTableInfo);
 
   const form = <Register handleClose={handleCloseAddUserDialog}></Register>;
 
   useEffect(() => {
-    if (updateTable && !addUserDialogOpen && filterFlag) {
+    if (
+      (updateTableInfo.updateTable || !!updateTableInfo.action) &&
+      filterFlag
+    ) {
       loadUsers();
     }
-  }, [rowsPerPage, page, updateTable, addUserDialogOpen]);
+  }, [updateTableInfo]);
 
   const loadUsers = async (
     sortField,
@@ -103,6 +114,11 @@ export default function UserTable() {
       .then((data) => {
         setUsers(data.items);
         setMaxNumberOfUsers(data.numberOfItems);
+        updateTableWithCallingAlert(
+          updateTableInfo,
+          "user created successfully",
+          "user deleted successfully"
+        );
       })
       .catch((error) => console.log(error.response.data.message));
     setFilterFlag(true);
@@ -111,12 +127,14 @@ export default function UserTable() {
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
     SetPageForRequest(newPage + 1);
+    updateTrigger();
   };
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
     SetPageForRequest(1);
+    updateTrigger();
   };
 
   async function deleteUser() {
@@ -126,10 +144,9 @@ export default function UserTable() {
       })
         .then((response) => response.data)
         .then((data) => {
-          setUpdateTable(true);
-          callAlert(true, "user deleted successfully");
+          deleteTrigger();
         })
-        .catch((error) => callAlert(false));
+        .catch((error) => callErrorAlert());
     };
     await DeleteUser();
     handleCloseDeleteDialog();
@@ -138,7 +155,6 @@ export default function UserTable() {
 
   function deleteUserById(userId) {
     setUserId(userId);
-    setUpdateTable(false);
     setDeleteDialogOpen(true);
   }
 

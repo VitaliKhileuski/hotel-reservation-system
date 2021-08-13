@@ -1,5 +1,6 @@
 import { React, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
+import { useSelector } from "react-redux";
 import Paper from "@material-ui/core/Paper";
 import IconButton from "@material-ui/core/IconButton";
 import Table from "@material-ui/core/Table";
@@ -17,7 +18,15 @@ import TableSortLabel from "@material-ui/core/TableSortLabel";
 import AddIcon from "@material-ui/icons/Add";
 import RemoveIcon from "@material-ui/icons/Remove";
 import API from "../../api";
-import callAlert from "../../Notifications/NotificationHandler";
+import {
+  callSuccessAlert,
+  callErrorAlert,
+} from "../../Notifications/NotificationHandler";
+import {
+  updateTableWithCallingAlert,
+  updateTrigger,
+  deleteTrigger,
+} from "../../helpers/UpdateTableWithCallingAlert";
 import BaseDialog from "../shared/BaseDialog";
 import BaseDeleteDialog from "../shared/BaseDeleteDialog";
 import AddServiceForm from "./AddServiceForm";
@@ -52,10 +61,10 @@ export default function ServiceTable({
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [serviceId, setServiceId] = useState(0);
   const [service, setService] = useState();
-  const [updateTable, setUpdateTable] = useState(true);
   const [currentSortField, setCurrentSortField] = useState("");
   const [currentAscending, setCurrentAscending] = useState("");
   const [currentRerender, setCurrentRerender] = useState(rerender);
+  const updateTableInfo = useSelector((state) => state.updateTableInfo);
 
   const form = (
     <AddServiceForm
@@ -73,10 +82,13 @@ export default function ServiceTable({
   }, [serviceList, services, currentRerender]);
 
   useEffect(() => {
-    if (updateTable && !!hotelId) {
+    if (
+      (updateTableInfo.updateTable || !!updateTableInfo.action) &&
+      !!hotelId
+    ) {
       loadServices();
     }
-  }, [rowsPerPage, page, openDialog, updateTable]);
+  }, [openDialog]);
 
   const loadServices = async (sortField, ascending) => {
     if (sortField === null || sortField === undefined) {
@@ -95,6 +107,11 @@ export default function ServiceTable({
       .then((data) => {
         setServices(data.items);
         setMaxNumberOfServices(data.numberOfItems);
+        updateTableWithCallingAlert(
+          updateTableInfo,
+          "service created successfully",
+          "service deleted successfully"
+        );
       })
       .catch((error) => console.log(error.response.data.message));
   };
@@ -115,17 +132,17 @@ export default function ServiceTable({
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
     SetPageForRequest(newPage + 1);
-    console.log(newPage);
+    updateTrigger();
   };
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
     SetPageForRequest(1);
+    updateTrigger();
   };
 
   function OpenAddServiceDialog(service) {
-    console.log(service);
     setService(service);
     setOpenDialog(true);
   }
@@ -136,7 +153,6 @@ export default function ServiceTable({
 
   function callDeleteDialog(serviceId) {
     setServiceId(serviceId);
-    setUpdateTable(false);
     setOpenDeleteDialog(true);
   }
 
@@ -196,10 +212,9 @@ export default function ServiceTable({
       })
         .then((response) => response.data)
         .then((data) => {
-          setUpdateTable(true);
-          callAlert(true, "service deleted successfully");
+          deleteTrigger();
         })
-        .catch((error) => callAlert(false));
+        .catch((error) => callErrorAlert());
     };
 
     await DeleteService();

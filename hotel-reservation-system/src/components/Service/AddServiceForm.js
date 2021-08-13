@@ -8,7 +8,8 @@ import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { Formik, Form, ErrorMessage, Field } from "formik";
 import API from "../../api";
-import callAlert from "../../Notifications/NotificationHandler";
+import { createTrigger } from "../../helpers/UpdateTableWithCallingAlert";
+import { callSuccessAlert } from "../../Notifications/NotificationHandler";
 import { SERVICE_VALIDATION_SCHEMA } from "../../constants/ValidationSchemas";
 
 const useStyles = makeStyles((theme) => ({
@@ -72,7 +73,7 @@ export default function AddServiceForm({ hotelId, service, handleClose }) {
       .then((response) => response.data)
       .then((data) => {
         handleClose();
-        callAlert(true, "service added successfully");
+        createTrigger();
       })
       .catch((error) => {
         setServiceNameErrorLabel(error.response.data.Message);
@@ -86,7 +87,7 @@ export default function AddServiceForm({ hotelId, service, handleClose }) {
       .then((response) => response.data)
       .then((data) => {
         handleClose();
-        callAlert(true, "service updated successfully");
+        callSuccessAlert("service updated successfully");
       })
       .catch((error) => {
         console.log(error.response.data.Message);

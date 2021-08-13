@@ -47,30 +47,27 @@ export default function ServiceChoice({
   const [rerender, setRerender] = useState(true);
 
   useEffect(() => {
-    if (rerender) {
-      const tempServices = [];
-      const loadServices = async () => {
-        await API.get("/hotels/" + hotelId + "/getServices")
-          .then((response) => response.data)
-          .then((data) => {
-            if (!!data) {
-              data.map((item) => {
-                let itemWithQuantity = {
-                  Serviceid: item.id,
-                  name: item.name,
-                  payment: item.payment,
-                  quantity: 1,
-                };
-                tempServices.push(itemWithQuantity);
-              });
-              setServices(tempServices);
-            }
-          })
-          .catch((error) => console.log(error));
-      };
-      loadServices();
-      setRerender(false);
-    }
+    const tempServices = [];
+    const loadServices = async () => {
+      await API.get("/hotels/" + hotelId + "/getServices")
+        .then((response) => response.data)
+        .then((data) => {
+          if (!!data) {
+            data.map((item) => {
+              let itemWithQuantity = {
+                Serviceid: item.id,
+                name: item.name,
+                payment: item.payment,
+                quantity: 1,
+              };
+              tempServices.push(itemWithQuantity);
+            });
+            setServices(tempServices);
+          }
+        })
+        .catch((error) => console.log(error));
+    };
+    loadServices();
   }, [rerender]);
 
   useEffect(() => {

@@ -6,7 +6,7 @@ import { useHistory } from "react-router";
 import { useSelector } from "react-redux";
 import API from "./../../api";
 import MainReservationDialog from "../Reservation/MainReservationDialog";
-import callAlert from "../../Notifications/NotificationHandler";
+import { callErrorAlert } from "../../Notifications/NotificationHandler";
 import RoomDetails from "./RoomDetails";
 
 const useStyles = makeStyles((theme) => ({
@@ -49,7 +49,7 @@ export default function RoomPage(props) {
       .then((response) => response.data)
       .then((data) => {
         if (data) {
-          callAlert(false, "", "room is blocked");
+          callErrorAlert("room is blocked");
         } else {
           callReservationDialog();
         }

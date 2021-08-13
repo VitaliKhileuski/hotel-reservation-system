@@ -3,16 +3,17 @@ import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import TextField from "@material-ui/core/TextField";
 import { Link, Redirect } from "react-router-dom";
+import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
-import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { Formik, Form, ErrorMessage, Field } from "formik";
 import { useDispatch, useSelector } from "react-redux";
 import api from "./../../api/";
+import { createTrigger } from "../../helpers/UpdateTableWithCallingAlert";
 import { REGISTER_VALIDATION_SCHEMA } from "../../constants/ValidationSchemas";
-import callAlert from "../../Notifications/NotificationHandler";
+import { callSuccessAlert } from "../../Notifications/NotificationHandler";
 import { ADMIN } from "../../constants/Roles";
 import { EMAIL_REGEX } from "../../constants/Regex";
 import { fillStorage, fillLocalStorage } from "./TokenData";
@@ -72,7 +73,7 @@ export default function Register({ handleClose }) {
             }
           } else {
             handleClose();
-            callAlert(true, "user was added successfully");
+            createTrigger();
           }
         })
         .catch((error) => {

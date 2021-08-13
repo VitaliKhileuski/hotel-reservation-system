@@ -39,6 +39,9 @@ import {
 export default function RouterList() {
   return (
     <Switch>
+      <Route exact path="/">
+        <Redirect to={HOME_PATH} />
+      </Route>
       <Route path={NOT_FOUND_ERROR_PATH} component={NotFoundErrorPage}></Route>
       <Route
         path={NOT_AUTHORIZED_ERROR_PATH}

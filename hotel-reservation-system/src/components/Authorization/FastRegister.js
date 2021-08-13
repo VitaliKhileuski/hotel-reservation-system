@@ -11,7 +11,7 @@ import { Formik, Form, ErrorMessage, Field } from "formik";
 import { useSelector } from "react-redux";
 import api from "./../../api/";
 import { FAST_REGISTER_VALIDATIOM_SCHEMA } from "../../constants/ValidationSchemas";
-import callAlert from "../../Notifications/NotificationHandler";
+import { callSuccessAlert } from "../../Notifications/NotificationHandler";
 import { EMAIL_REGEX } from "../../constants/Regex";
 import { fillStorage, fillLocalStorage } from "./TokenData";
 
@@ -59,8 +59,7 @@ export default function FastRegister({ handleClose }) {
           fillStorage(data[0]);
           fillLocalStorage(data[0], data[1]);
           handleClose();
-          callAlert(
-            true,
+          callSuccessAlert(
             "you successfully registered, now you can order this room"
           );
         })

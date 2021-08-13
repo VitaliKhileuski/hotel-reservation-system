@@ -40,7 +40,7 @@ export default function UpdateUserForm({ changeFlag, handleClose, user }) {
   const [email, setEmail] = useState(user.email);
   const token = localStorage.getItem("token");
 
-  useSelector((state) => console.log(state.tokenData))
+  useSelector((state) => console.log(state.tokenData));
 
   const initialValues = {
     lastName: !!user ? user.surname : "",
