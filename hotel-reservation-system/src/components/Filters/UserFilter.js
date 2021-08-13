@@ -43,19 +43,25 @@ export default function UsersFilter({ getValuesFromFilter, isHotelAdmins }) {
   };
   const loadSurnames = async (value, setNewItems, setCurrentLoading) => {
     setSurname(value);
-    setCurrentLoading(true);
-    await API.get("/users/surnames", {
-      params: {
-        surname: value,
-      },
-      headers: { Authorization: "Bearer " + token },
-    })
-      .then((response) => response.data)
-      .then((data) => {
-        setCurrentLoading(false);
-        setNewItems(data);
+    if (!!value) {
+      setCurrentLoading(true);
+      await API.get("/users/surnames", {
+        params: {
+          surname: value,
+        },
+        headers: { Authorization: "Bearer " + token },
       })
-      .catch((error) => {});
+        .then((response) => response.data)
+        .then((data) => {
+          setCurrentLoading(false);
+          setNewItems(data);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else {
+      setNewItems([]);
+    }
   };
 
   const loadHotelAdminsSurnames = async (
@@ -63,40 +69,50 @@ export default function UsersFilter({ getValuesFromFilter, isHotelAdmins }) {
     setNewItems,
     setCurrentLoading
   ) => {
-    setCurrentLoading(true);
     setSurname(value);
-    await API.get("/users/hotelAdminsSurnames", {
-      params: {
-        surname: value,
-      },
-      headers: { Authorization: "Bearer " + token },
-    })
-      .then((response) => response.data)
-      .then((data) => {
-        setCurrentLoading(false);
-        setNewItems(data);
+    if (!!value) {
+      setCurrentLoading(true);
+      await API.get("/users/hotelAdminsSurnames", {
+        params: {
+          surname: value,
+        },
+        headers: { Authorization: "Bearer " + token },
       })
-      .catch((error) => {});
+        .then((response) => response.data)
+        .then((data) => {
+          setCurrentLoading(false);
+          setNewItems(data);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else {
+      setNewItems([]);
+    }
   };
   const loadHotelAdminsEmails = async (
     value,
     setNewItems,
     setCurrentLoading
   ) => {
-    setCurrentLoading(true);
     setEmail(value);
-    await API.get("/users/hotelAdminsEmails", {
-      params: {
-        email: value,
-      },
-      headers: { Authorization: "Bearer " + token },
-    })
-      .then((response) => response.data)
-      .then((data) => {
-        setCurrentLoading(false);
-        setNewItems(data);
+    if (!!value) {
+      setCurrentLoading(true);
+      await API.get("/users/hotelAdminsEmails", {
+        params: {
+          email: value,
+        },
+        headers: { Authorization: "Bearer " + token },
       })
-      .catch((error) => {});
+        .then((response) => response.data)
+        .then((data) => {
+          setCurrentLoading(false);
+          setNewItems(data);
+        })
+        .catch((error) => {});
+    } else {
+      setNewItems([]);
+    }
   };
 
   return (

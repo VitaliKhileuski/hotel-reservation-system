@@ -69,21 +69,25 @@ export default function HotelsPage() {
   };
 
   const loadHotelNames = async (value, setNewItems, setCurrentLoading) => {
-    setCurrentLoading(true);
     setHotelName(value);
-    await API.get("/hotels/hotelNames", {
-      params: {
-        hotelName: value,
-      },
-    })
-      .then((response) => response.data)
-      .then((data) => {
-        if (!!data) {
-          setCurrentLoading(false);
-          setNewItems(data);
-        }
+    if (!!value) {
+      setCurrentLoading(true);
+      await API.get("/hotels/hotelNames", {
+        params: {
+          hotelName: value,
+        },
       })
-      .catch((error) => console.log(error));
+        .then((response) => response.data)
+        .then((data) => {
+          if (!!data) {
+            setCurrentLoading(false);
+            setNewItems(data);
+          }
+        })
+        .catch((error) => console.log(error));
+    } else {
+      setNewItems([]);
+    }
   };
 
   useEffect(() => {

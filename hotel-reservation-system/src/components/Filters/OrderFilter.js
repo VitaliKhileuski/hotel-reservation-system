@@ -52,21 +52,25 @@ export default function OrderFilter({ getValuesFromFilter }) {
     setCurrentLoading
   ) => {
     setSurname(value);
-    setCurrentLoading(true);
-    await API.get("/users/customersSurnames", {
-      params: {
-        surname: value,
-      },
-      headers: { Authorization: "Bearer " + token },
-    })
-      .then((response) => response.data)
-      .then((data) => {
-        if (!!data) {
-          setCurrentLoading(false);
-          setNewItems(data);
-        }
+    if (!!value) {
+      setCurrentLoading(true);
+      await API.get("/users/customersSurnames", {
+        params: {
+          surname: value,
+        },
+        headers: { Authorization: "Bearer " + token },
       })
-      .catch((error) => console.log(error));
+        .then((response) => response.data)
+        .then((data) => {
+          if (!!data) {
+            setCurrentLoading(false);
+            setNewItems(data);
+          }
+        })
+        .catch((error) => console.log(error));
+    } else {
+      setNewItems([]);
+    }
   };
 
   useEffect(() => {

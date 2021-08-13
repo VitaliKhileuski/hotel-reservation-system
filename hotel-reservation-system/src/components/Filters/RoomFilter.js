@@ -24,21 +24,25 @@ export default function RoomFilter({ getValuesFromFilter, hotelId }) {
 
   const loadRoomsNumbers = async (value, setNewItems, setCurrentLoading) => {
     setRoomNumber(value);
-    setCurrentLoading(true);
-    await API.get("/hotels/" + hotelId + "/getRoomsNumbers", {
-      params: {
-        roomNumber: value,
-      },
-      headers: { Authorization: "Bearer " + token },
-    })
-      .then((response) => response.data)
-      .then((data) => {
-        setCurrentLoading(false);
-        setNewItems(data);
+    if (!!value) {
+      setCurrentLoading(true);
+      await API.get("/hotels/" + hotelId + "/getRoomsNumbers", {
+        params: {
+          roomNumber: value,
+        },
+        headers: { Authorization: "Bearer " + token },
       })
-      .catch((error) => {
-        console.log(error);
-      });
+        .then((response) => response.data)
+        .then((data) => {
+          setCurrentLoading(false);
+          setNewItems(data);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else {
+      setNewItems([]);
+    }
   };
 
   return (
