@@ -5,7 +5,10 @@ import {
   Route,
   Redirect,
 } from "react-router-dom";
-import { NOT_AUTHORIZED_ERROR_PATH, FORBIDDEN_ERROR_PATH } from './../constants/RoutingPaths'
+import {
+  NOT_AUTHORIZED_ERROR_PATH,
+  FORBIDDEN_ERROR_PATH,
+} from "./../constants/RoutingPaths";
 
 export default function AuthRoute({
   Component,
@@ -27,9 +30,10 @@ export default function AuthRoute({
       render={(props) =>
         isAuthed && userHasRequireRole ? (
           <Component {...props} />
+        ) : !isAuthed ? (
+          <Redirect to={NOT_AUTHORIZED_ERROR_PATH} />
         ) : (
-         !isAuthed ? <Redirect to={NOT_AUTHORIZED_ERROR_PATH} />
-         : <Redirect to={FORBIDDEN_ERROR_PATH}></Redirect>
+          <Redirect to={FORBIDDEN_ERROR_PATH}></Redirect>
         )
       }
     />
