@@ -8,7 +8,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { Formik, Form, ErrorMessage, Field } from "formik";
 import api from "./../../api/";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { TOKEN_DATA } from "../../storage/actions/actionTypes.js";
 import { UPDATE_USER_VALIDATION_SCHEMA } from "../../constants/ValidationSchemas";
 import { EMAIL_REGEX } from "../../constants/Regex";
@@ -39,6 +39,8 @@ export default function UpdateUserForm({ changeFlag, handleClose, user }) {
   const [emailErrorLabel, setEmailErrorLabel] = useState("");
   const [email, setEmail] = useState(user.email);
   const token = localStorage.getItem("token");
+
+  useSelector((state) => console.log(state.tokenData))
 
   const initialValues = {
     lastName: !!user ? user.surname : "",
