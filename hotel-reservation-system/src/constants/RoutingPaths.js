@@ -8,3 +8,6 @@ export const ORDERS_PATH = "/orders";
 export const USER_PROFILE_PATH = "/userProfile";
 export const HOTEL_EDITOR_PATH = "/hotelEditor";
 export const USERS_PATH = "/users";
+export const NOT_FOUND_ERROR_PATH ="/error/notFound"
+export const NOT_AUTHORIZED_ERROR_PATH ="/error/notAuthorized"
+export const FORBIDDEN_ERROR_PATH ="/error/forbidden"

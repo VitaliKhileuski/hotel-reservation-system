@@ -16,6 +16,9 @@ import UserProfile from "./../components/User/UserProfile";
 import UserTable from "../components/User/UserTable";
 import AuthRoute from "./../Routing/AuthRoute";
 import RoomPage from "./../components/Room/RoomPage";
+import NotAuthorizeErrorPage from "../components/Errors/NotAuthorizeErrorPage";
+import ForbiddenPage from '../components/Errors/ForbiddenPage'
+import NotFoundErrorPage from "../components/Errors/NotFoundErrorPage"
 import { ADMIN, HOTEL_ADMIN } from "../constants/Roles";
 import {
   HOME_PATH,
@@ -28,11 +31,17 @@ import {
   USER_PROFILE_PATH,
   HOTEL_EDITOR_PATH,
   USERS_PATH,
+  NOT_FOUND_ERROR_PATH,
+  NOT_AUTHORIZED_ERROR_PATH,
+  FORBIDDEN_ERROR_PATH,
 } from "./../constants/RoutingPaths";
 
 export default function RouterList() {
   return (
     <Switch>
+      <Route path={NOT_FOUND_ERROR_PATH} component ={NotFoundErrorPage}></Route>
+      <Route path={NOT_AUTHORIZED_ERROR_PATH} component ={NotAuthorizeErrorPage}></Route>
+      <Route path={FORBIDDEN_ERROR_PATH} component ={ForbiddenPage}></Route>
       <Route path={HOME_PATH} component={HotelsPage} />
       <Route path={LOGIN_PATH} component={Login} />
       <Route path={REGISTER_PATH} component={Register} />
@@ -58,7 +67,7 @@ export default function RouterList() {
         Component={UserTable}
         requiredRoles={[ADMIN]}
       ></AuthRoute>
-      <Redirect to={HOME_PATH} />
+      <Redirect to={NOT_FOUND_ERROR_PATH} />
     </Switch>
   );
 }
