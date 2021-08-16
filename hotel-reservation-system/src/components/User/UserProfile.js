@@ -9,14 +9,18 @@ import profileImage from "./../../img/userProfile.png";
 import UpdateUserForm from "./../User/UpdateUserForm";
 import ChangePasswordForm from "./../User/ChangePasswordForm";
 import BaseDialog from "../shared/BaseDialog";
+import EmailVerification from "./EmailVerification";
 
 export default function UserProfile() {
   const userId = useSelector((state) => state.tokenData.userId);
   const [user, setUser] = useState();
   const token = localStorage.getItem("token");
   const [updateUserDialogOpen, setUpdateUserDialogOpen] = useState(false);
+  const [verificateEmailDialogOpen, setVerificateEmailDialogOpen]  = useState(false);
   const [changePasswordDialogOpen, setChangePasswordOpen] = useState(false);
   const [flagForRerender, setFlagForRerender] = useState(false);
+  const [isVerified, setIsVerified] = useState(false);
+
 
   const updateUserForm = (
     <UpdateUserForm
@@ -32,6 +36,10 @@ export default function UserProfile() {
       handleClose={handlecloseChangePassword}
     ></ChangePasswordForm>
   );
+  const emailVerificationForm = (
+    <EmailVerification></EmailVerification>
+  )
+
 
   useEffect(async () => {
     const loadUser = async () => {
@@ -41,6 +49,7 @@ export default function UserProfile() {
         .then((response) => response.data)
         .then((data) => {
           setUser(data);
+          setIsVerified(data.isVerified);
           console.log(data);
         })
         .catch((error) => console.log(error.response.data.message));
@@ -50,6 +59,29 @@ export default function UserProfile() {
       setFlagForRerender(true);
     }
   }, [userId, updateUserDialogOpen, flagForRerender]);
+
+
+  function handleCloseVerificationEmailDialog(){
+    setVerificateEmailDialogOpen(false);
+  }
+  
+  const sendEmailWithVerificationCode = async () => {
+    await API.post("/emailVerification/"+ userId, null, {
+      headers: { Authorization: "Bearer " + token },
+    })
+    .then((response) => response.data)
+    .then((data) => {
+
+    })
+    .catch((error) => {
+      console.log(error);
+    })
+  }
+
+  function handleClickEmailVerification(){
+    sendEmailWithVerificationCode();
+    setVerificateEmailDialogOpen(true);
+  }
 
   function handlecloseUpdateUserDialog() {
     setUpdateUserDialogOpen(false);
@@ -103,6 +135,9 @@ export default function UserProfile() {
               <Typography style={{ margin: 30 }} variant="h5" color="primary">
                 Surname: {!!user ? user.surname : ""}
               </Typography>
+              <Typography style={{ margin: 30 }} variant="h5" color={isVerified ? "primary" : "error"}>
+              {isVerified ? "verified" : "you are not verified"}
+              </Typography>
               <Typography variant="h5" color="primary"></Typography>
               <div
                 style={
@@ -120,12 +155,20 @@ export default function UserProfile() {
                   Edit profile
                 </Button>
                 <Button
+                style={{ marginRight: 20 }}
                   variant="contained"
                   onClick={changePassword}
                   color="primary"
                 >
                   Change password
                 </Button>
+                {isVerified ? "" : <Button
+                  variant="contained"
+                  onClick={handleClickEmailVerification}
+                  color="primary"
+                >
+                  Verificate email
+                </Button>}
               </div>
             </Paper>
           </Grid>
@@ -137,6 +180,13 @@ export default function UserProfile() {
         form={updateUserForm}
         title="Update"
       ></BaseDialog>
+      <BaseDialog
+      open={verificateEmailDialogOpen}
+      handleClose={handleCloseVerificationEmailDialog}
+      form ={emailVerificationForm}
+      title="email verification">
+
+      </BaseDialog>
       <BaseDialog
         open={changePasswordDialogOpen}
         handleClose={handlecloseChangePassword}
