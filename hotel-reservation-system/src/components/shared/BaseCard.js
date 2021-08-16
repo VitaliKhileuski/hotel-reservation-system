@@ -20,7 +20,7 @@ const useStyles = makeStyles({
     height: 170,
   },
   cardContent: {
-    height: 100,
+    height: 80,
   },
 });
 

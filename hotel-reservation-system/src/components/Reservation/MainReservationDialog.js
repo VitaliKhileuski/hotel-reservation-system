@@ -22,6 +22,7 @@ const useStyles = makeStyles((theme) => ({
     flex: 1,
   },
   dateFilter: {
+    margin : 30,
     display: "flex",
     justifyContent: "center",
   },
@@ -134,6 +135,7 @@ export default function MainReservationDialog({
       <div className={classes.dateFilter}>
         {flag && !!room ? (
           <DateFilter
+
             roomId={room.id}
             checkInDate={checkIn}
             checkOutDate={checkOut}

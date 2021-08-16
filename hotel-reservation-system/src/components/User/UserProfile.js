@@ -99,13 +99,14 @@ export default function UserProfile() {
         direction="row"
         style={{ marginTop: 30 }}
         justify="center"
-        lignItems="center"
+        alignItems="center"
       >
         <Grid sm={4} item>
           <img src={profileImage}></img>
         </Grid>
         <Grid item sm={4}>
           <Grid
+            
             container
             direction="column"
             justify="flex-start"
@@ -113,33 +114,72 @@ export default function UserProfile() {
           >
             {!!user ? (
               <Paper style={{ width: "100%", height: "50%", padding: 20 }}>
-                <Typography style={{ margin: 30 }} variant="h5" color="primary">
-                  Email: {!!user ? user.email : ""}
+                <Grid container direction="row">
+                <Grid container
+                 sm={6}
+                 direction="column"
+                 spacing={3}
+                 justify="flex-start"
+                 alignItems="flex-start">
+                  <Grid item>
+                  <Typography  variant="h5" color="primary">
+                  Email:
                 </Typography>
-                <Typography style={{ margin: 30 }} variant="h5" color="primary">
-                  Phone number : {!!user ? user.phoneNumber : ""}
+                  </Grid>
+                  <Grid item>
+                  <Typography  variant="h5" color="primary">
+                  Phone number:
                 </Typography>
-                <Typography style={{ margin: 30 }} variant="h5" color="primary">
-                  Name: {!!user ? user.name : ""}
+                  </Grid>
+                  <Grid item>
+                  <Typography  variant="h5" color="primary">
+                   Name:
                 </Typography>
-                <Typography style={{ margin: 30 }} variant="h5" color="primary">
-                  Surname: {!!user ? user.surname : ""}
+                  </Grid>
+                  <Grid item>
+                  <Typography variant="h5" color="primary">
+                  Surname: 
                 </Typography>
-                <Typography
-                  style={{ margin: 30 }}
+                  </Grid>
+                  <Grid item>
+                  <Typography
                   variant="h5"
                   color={isVerified ? "primary" : "error"}
                 >
                   {isVerified ? "verified" : "you are not verified"}
-                </Typography>
-                <Typography variant="h5" color="primary"></Typography>
-                <div
-                  style={
-                    ({ margin: 30 },
-                    { display: "flex" },
-                    { justifyContent: "space-around" })
-                  }
-                >
+                </Typography>    
+                  </Grid>
+                </Grid>
+                <Grid container
+                sm={6}
+                direction="column"
+                spacing={3}
+                justify="flex-start"
+                alignItems="flex-start">
+                  <Grid item >
+                  <Typography variant="h5" color="primary">
+                  {user.email} 
+                 </Typography>
+                  </Grid>
+                  <Grid item >
+                  <Typography variant="h5" color="primary">
+                  {user.phoneNumber} 
+                 </Typography>
+                  </Grid>
+                  <Grid item >
+                  <Typography variant="h5" color="primary">
+                  {user.name} 
+                 </Typography>
+                  </Grid>
+                  <Grid item >
+                  <Typography variant="h5" color="primary">
+                  {user.surname} 
+                 </Typography>
+                  </Grid>
+                </Grid>
+                </Grid>
+                <Grid container spacing={2} style={{marginTop : 50}} alignItems="center"  justify="center">
+                  <Grid item>
                   <Button
                     variant="contained"
                     onClick={editProfile}
@@ -148,6 +188,8 @@ export default function UserProfile() {
                   >
                     Edit profile
                   </Button>
+                  </Grid>
+                  <Grid item>
                   <Button
                     style={{ marginRight: 20 }}
                     variant="contained"
@@ -156,18 +198,21 @@ export default function UserProfile() {
                   >
                     Change password
                   </Button>
-                  {isVerified ? (
+               </Grid>
+               {isVerified ? (
                     ""
                   ) : (
-                    <Button
-                      variant="contained"
-                      onClick={handleClickEmailVerification}
-                      color="primary"
-                    >
-                      Verificate email
-                    </Button>
+                    <Grid item><Button
+                    variant="contained"
+                    onClick={handleClickEmailVerification}
+                    color="primary"
+                  >
+                    Verificate email
+                  </Button></Grid>
+                    
                   )}
-                </div>
+                  
+                </Grid>
               </Paper>
             ) : (
               <Skeleton width="100%" height={400} variant="rect"></Skeleton>

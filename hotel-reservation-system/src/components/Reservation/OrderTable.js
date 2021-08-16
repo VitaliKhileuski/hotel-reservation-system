@@ -275,6 +275,7 @@ function Row({ order, handleClickDeleteIcon, handleClickUpdateOrder }) {
         title="Room details"
         handleClose={handleCloseRoomDetails}
         form={component}
+        fullWidth={true}
       ></BaseDialog>
     </>
   );

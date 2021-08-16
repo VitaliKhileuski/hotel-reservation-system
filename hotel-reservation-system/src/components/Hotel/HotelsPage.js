@@ -23,9 +23,9 @@ const useStyles = makeStyles((theme) => ({
       "& > * + *": {
         marginTop: "2",
       },
-      grid: {
-        marginTop: 15,
-      },
+      grid : {
+        marginTop: 15
+      }
     },
     nav: {
       "& > * + *": {
@@ -213,7 +213,7 @@ export default function () {
             options={cities}
             getOptionLabel={(option) => option}
             onChange={(event, value) => setCity(value)}
-            disabled={currentCountry === null ? true : false}
+            disabled={!!!currentCountry}
             style={{ width: 300 }}
             value={city}
             renderInput={(params) => (
@@ -242,6 +242,7 @@ export default function () {
             variant="contained"
             color="primary"
             size="large"
+            style ={{ margin : 10}}
             disabled={!isValidDates}
             onClick={handleSearchButton}
           >
@@ -250,27 +251,19 @@ export default function () {
         </Grid>
       </Grid>
 
-      {!loading && hotels.length === 0 ? (
-        <Typography variant="h5" style={{ marginTop: 20 }}>
-          No hotels
-        </Typography>
-      ) : (
-        <>
-          {" "}
-          <HotelList
-            hotels={hotels}
-            checkInDate={checkInDate}
-            checkOutDate={checkOutDate}
-          ></HotelList>
-          <Pagination
-            className={classes.pagination}
-            page={page}
-            count={maxPage}
-            color="primary"
-            onChange={changePage}
-          />
-        </>
-      )}
+    {!loading && hotels.length===0 ? <Typography variant="h5" style={{marginTop : 20}}>No hotels</Typography> : <> <HotelList
+        hotels={hotels}
+        checkInDate={checkInDate}
+        checkOutDate={checkOutDate}
+      ></HotelList>
+      <Pagination
+        className={classes.pagination}
+        page={page}
+        count={maxPage}
+        color="primary"
+        onChange={changePage}
+      /></>}
+      
     </>
   );
 }
