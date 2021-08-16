@@ -13,11 +13,14 @@ import { ROOM_DETAILS_PATH } from "./../../constants/RoutingPaths";
 
 const useStyles = makeStyles({
   root: {
-    minWidth: 350,
+    width: 350,
     margin: 11,
   },
   media: {
     height: 170,
+  },
+  cardContent: {
+    height: 100,
   },
 });
 
@@ -66,7 +69,7 @@ export default function BaseCard({
               ))}
             </Carousel>
           )}
-          <CardContent>
+          <CardContent className={classes.cardContent}>
             {contentRows.map((content, i) => {
               return (
                 <Typography variant="body2" key={i}>

@@ -2,6 +2,7 @@ import { React, useEffect, useState } from "react";
 import Pagination from "@material-ui/lab/Pagination";
 import { makeStyles } from "@material-ui/core/styles";
 import { useSelector } from "react-redux";
+import Typography from "@material-ui/core/Typography";
 import API from "./../../api";
 import RoomList from "./RoomList";
 
@@ -22,6 +23,7 @@ export default function RoomsPage(props) {
   const [checkOutDate, setCheckOutDate] = useState(
     props.location.state.checkOutDate
   );
+  const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [numberOfPages, setNumberOfPages] = useState(0);
   const pageSize = 8;
@@ -44,14 +46,17 @@ export default function RoomsPage(props) {
         .then((data) => {
           console.log(data);
           setRooms(data.items);
+          setLoading(false);
           setNumberOfPages(data.numberOfPages);
         })
         .catch((error) => console.log(error.response.data.message));
     };
     if (!!token && !!userId) {
+      setLoading(true);
       loadRooms();
     }
     if (!token && !userId) {
+      setLoading(true);
       loadRooms();
     }
   }, [page, userId]);
@@ -62,18 +67,26 @@ export default function RoomsPage(props) {
 
   return (
     <>
-      <RoomList
-        rooms={rooms}
-        checkInDate={checkInDate}
-        checkOutDate={checkOutDate}
-      ></RoomList>
-      <Pagination
-        className={classes.pagination}
-        page={page}
-        count={numberOfPages}
-        color="primary"
-        onChange={changePage}
-      />
+      {!loading && rooms.length === 0 ? (
+        <Typography variant="h5" style={{ marginTop: 20 }}>
+          No rooms
+        </Typography>
+      ) : (
+        <>
+          <RoomList
+            rooms={rooms}
+            checkInDate={checkInDate}
+            checkOutDate={checkOutDate}
+          ></RoomList>
+          <Pagination
+            className={classes.pagination}
+            page={page}
+            count={numberOfPages}
+            color="primary"
+            onChange={changePage}
+          />
+        </>
+      )}
     </>
   );
 }

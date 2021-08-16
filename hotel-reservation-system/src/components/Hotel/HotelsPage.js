@@ -23,6 +23,9 @@ const useStyles = makeStyles((theme) => ({
       "& > * + *": {
         marginTop: "2",
       },
+      grid: {
+        marginTop: 15,
+      },
     },
     nav: {
       "& > * + *": {
@@ -32,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function HotelsPage() {
+export default function () {
   const [city, setCity] = useState("");
   const [countries, setCountries] = useState([]);
   const [cities, setCities] = useState([]);
@@ -41,6 +44,7 @@ export default function HotelsPage() {
   const [hotelNames, setHotelNames] = useState([]);
   const [hotelName, setHotelName] = useState("");
   const [isValidDates, setIsValidDates] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [checkInDate, setCheckInDate] = useState(
     useSelector((state) => state.dates.checkInDate)
   );
@@ -101,6 +105,7 @@ export default function HotelsPage() {
     };
     setCities([]);
     if (currentCountry !== "") {
+      setLoading(true);
       loadCities();
     }
     setCity("");
@@ -135,6 +140,7 @@ export default function HotelsPage() {
         .then((response) => response.data)
         .then((data) => {
           setHotels(data.items);
+          setLoading(false);
           setMaxPage(data.numberOfPages);
         })
         .catch((error) => console.log(error));
@@ -243,18 +249,28 @@ export default function HotelsPage() {
           </Button>
         </Grid>
       </Grid>
-      <HotelList
-        hotels={hotels}
-        checkInDate={checkInDate}
-        checkOutDate={checkOutDate}
-      ></HotelList>
-      <Pagination
-        className={classes.pagination}
-        page={page}
-        count={maxPage}
-        color="primary"
-        onChange={changePage}
-      />
+
+      {!loading && hotels.length === 0 ? (
+        <Typography variant="h5" style={{ marginTop: 20 }}>
+          No hotels
+        </Typography>
+      ) : (
+        <>
+          {" "}
+          <HotelList
+            hotels={hotels}
+            checkInDate={checkInDate}
+            checkOutDate={checkOutDate}
+          ></HotelList>
+          <Pagination
+            className={classes.pagination}
+            page={page}
+            count={maxPage}
+            color="primary"
+            onChange={changePage}
+          />
+        </>
+      )}
     </>
   );
 }

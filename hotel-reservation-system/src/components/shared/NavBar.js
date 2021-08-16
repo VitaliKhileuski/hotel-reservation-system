@@ -22,6 +22,7 @@ import "./../../css/App.css";
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
+    marginBottom: 5,
   },
   title: {
     flexGrow: 1,

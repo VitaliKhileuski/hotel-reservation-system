@@ -6,6 +6,7 @@ import Button from "@material-ui/core/Button";
 import { useSelector } from "react-redux";
 import API from "../../api";
 import profileImage from "./../../img/userProfile.png";
+import Skeleton from "@material-ui/lab/Skeleton";
 import UpdateUserForm from "./../User/UpdateUserForm";
 import ChangePasswordForm from "./../User/ChangePasswordForm";
 import BaseDialog from "../shared/BaseDialog";
@@ -110,63 +111,67 @@ export default function UserProfile() {
             justify="flex-start"
             alignItems="flex-start"
           >
-            <Paper>
-              <Typography style={{ margin: 30 }} variant="h5" color="primary">
-                Email: {!!user ? user.email : ""}
-              </Typography>
-              <Typography style={{ margin: 30 }} variant="h5" color="primary">
-                Phone number : {!!user ? user.phoneNumber : ""}
-              </Typography>
-              <Typography style={{ margin: 30 }} variant="h5" color="primary">
-                Name: {!!user ? user.name : ""}
-              </Typography>
-              <Typography style={{ margin: 30 }} variant="h5" color="primary">
-                Surname: {!!user ? user.surname : ""}
-              </Typography>
-              <Typography
-                style={{ margin: 30 }}
-                variant="h5"
-                color={isVerified ? "primary" : "error"}
-              >
-                {isVerified ? "verified" : "you are not verified"}
-              </Typography>
-              <Typography variant="h5" color="primary"></Typography>
-              <div
-                style={
-                  ({ margin: 30 },
-                  { display: "flex" },
-                  { justifyContent: "space-around" })
-                }
-              >
-                <Button
-                  variant="contained"
-                  onClick={editProfile}
-                  style={{ marginRight: 20 }}
-                  color="primary"
+            {!!user ? (
+              <Paper style={{ width: "100%", height: "50%", padding: 20 }}>
+                <Typography style={{ margin: 30 }} variant="h5" color="primary">
+                  Email: {!!user ? user.email : ""}
+                </Typography>
+                <Typography style={{ margin: 30 }} variant="h5" color="primary">
+                  Phone number : {!!user ? user.phoneNumber : ""}
+                </Typography>
+                <Typography style={{ margin: 30 }} variant="h5" color="primary">
+                  Name: {!!user ? user.name : ""}
+                </Typography>
+                <Typography style={{ margin: 30 }} variant="h5" color="primary">
+                  Surname: {!!user ? user.surname : ""}
+                </Typography>
+                <Typography
+                  style={{ margin: 30 }}
+                  variant="h5"
+                  color={isVerified ? "primary" : "error"}
                 >
-                  Edit profile
-                </Button>
-                <Button
-                  style={{ marginRight: 20 }}
-                  variant="contained"
-                  onClick={changePassword}
-                  color="primary"
+                  {isVerified ? "verified" : "you are not verified"}
+                </Typography>
+                <Typography variant="h5" color="primary"></Typography>
+                <div
+                  style={
+                    ({ margin: 30 },
+                    { display: "flex" },
+                    { justifyContent: "space-around" })
+                  }
                 >
-                  Change password
-                </Button>
-                {isVerified ? (
-                  ""
-                ) : (
                   <Button
                     variant="contained"
-                    onClick={handleClickEmailVerification}
+                    onClick={editProfile}
+                    style={{ marginRight: 20 }}
                     color="primary"
                   >
-                    Verificate email
+                    Edit profile
                   </Button>
-                )}
-              </div>
-            </Paper>
+                  <Button
+                    style={{ marginRight: 20 }}
+                    variant="contained"
+                    onClick={changePassword}
+                    color="primary"
+                  >
+                    Change password
+                  </Button>
+                  {isVerified ? (
+                    ""
+                  ) : (
+                    <Button
+                      variant="contained"
+                      onClick={handleClickEmailVerification}
+                      color="primary"
+                    >
+                      Verificate email
+                    </Button>
+                  )}
+                </div>
+              </Paper>
+            ) : (
+              <Skeleton width="100%" height={400} variant="rect"></Skeleton>
+            )}
           </Grid>
         </Grid>
       </Grid>
