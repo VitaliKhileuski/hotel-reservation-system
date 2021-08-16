@@ -87,7 +87,7 @@ export default function HotelTable() {
   const adminId = useSelector((state) => state.tokenData.userId);
   const [filterFlag, setFilterFlag] = useState(true);
   const updateTableInfo = useSelector((state) => state.updateTableInfo);
-  
+
   const form = <AddHotelForm handleClose={handleClose}></AddHotelForm>;
 
   const component = (

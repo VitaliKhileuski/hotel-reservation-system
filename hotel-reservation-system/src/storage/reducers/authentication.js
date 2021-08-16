@@ -15,10 +15,8 @@ export default function authentication(state = initialState, action) {
         ...state,
         tokenData: {
           ...state.tokenData,
-          isLogged: !!action.isLogged
-            ? action.isLogged
-            : state.tokenData.isLogged,
-          role: !!action.role ? action.role : state.tokenData.isLogged,
+          isLogged: action.isLogged,
+          role: !!action.role ? action.role : state.tokenData.role,
           name: !!action.name ? action.name : state.tokenData.name,
           userId: !!action.userId ? action.userId : state.tokenData.userId,
           email: !!action.email ? action.email : state.tokenData.email,

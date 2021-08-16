@@ -35,7 +35,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 export default function NavBar() {
-  const dispatch = useDispatch();
   const history = useHistory();
   const [open, setOpen] = useState(false);
   const anchorRef = useRef(null);
@@ -46,6 +45,7 @@ export default function NavBar() {
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen);
   };
+  console.log(isLogged);
   const handleClose = (event) => {
     if (anchorRef.current && anchorRef.current.contains(event.target)) {
       return;

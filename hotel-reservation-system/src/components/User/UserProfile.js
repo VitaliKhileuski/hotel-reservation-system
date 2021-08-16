@@ -16,11 +16,11 @@ export default function UserProfile() {
   const [user, setUser] = useState();
   const token = localStorage.getItem("token");
   const [updateUserDialogOpen, setUpdateUserDialogOpen] = useState(false);
-  const [verificateEmailDialogOpen, setVerificateEmailDialogOpen]  = useState(false);
+  const [verificateEmailDialogOpen, setVerificateEmailDialogOpen] =
+    useState(false);
   const [changePasswordDialogOpen, setChangePasswordOpen] = useState(false);
   const [flagForRerender, setFlagForRerender] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
-
 
   const updateUserForm = (
     <UpdateUserForm
@@ -37,9 +37,11 @@ export default function UserProfile() {
     ></ChangePasswordForm>
   );
   const emailVerificationForm = (
-    <EmailVerification></EmailVerification>
-  )
-
+    <EmailVerification
+      userId={userId}
+      handleClose={handleCloseVerificationEmailDialog}
+    ></EmailVerification>
+  );
 
   useEffect(async () => {
     const loadUser = async () => {
@@ -54,32 +56,18 @@ export default function UserProfile() {
         })
         .catch((error) => console.log(error.response.data.message));
     };
-    if (!!userId && flagForRerender === false) {
+    if (!!userId && !flagForRerender) {
       await loadUser();
       setFlagForRerender(true);
     }
   }, [userId, updateUserDialogOpen, flagForRerender]);
 
-
-  function handleCloseVerificationEmailDialog(){
+  function handleCloseVerificationEmailDialog() {
     setVerificateEmailDialogOpen(false);
-  }
-  
-  const sendEmailWithVerificationCode = async () => {
-    await API.post("/emailVerification/"+ userId, null, {
-      headers: { Authorization: "Bearer " + token },
-    })
-    .then((response) => response.data)
-    .then((data) => {
-
-    })
-    .catch((error) => {
-      console.log(error);
-    })
+    setFlagForRerender(false);
   }
 
-  function handleClickEmailVerification(){
-    sendEmailWithVerificationCode();
+  function handleClickEmailVerification() {
     setVerificateEmailDialogOpen(true);
   }
 
@@ -135,8 +123,12 @@ export default function UserProfile() {
               <Typography style={{ margin: 30 }} variant="h5" color="primary">
                 Surname: {!!user ? user.surname : ""}
               </Typography>
-              <Typography style={{ margin: 30 }} variant="h5" color={isVerified ? "primary" : "error"}>
-              {isVerified ? "verified" : "you are not verified"}
+              <Typography
+                style={{ margin: 30 }}
+                variant="h5"
+                color={isVerified ? "primary" : "error"}
+              >
+                {isVerified ? "verified" : "you are not verified"}
               </Typography>
               <Typography variant="h5" color="primary"></Typography>
               <div
@@ -155,20 +147,24 @@ export default function UserProfile() {
                   Edit profile
                 </Button>
                 <Button
-                style={{ marginRight: 20 }}
+                  style={{ marginRight: 20 }}
                   variant="contained"
                   onClick={changePassword}
                   color="primary"
                 >
                   Change password
                 </Button>
-                {isVerified ? "" : <Button
-                  variant="contained"
-                  onClick={handleClickEmailVerification}
-                  color="primary"
-                >
-                  Verificate email
-                </Button>}
+                {isVerified ? (
+                  ""
+                ) : (
+                  <Button
+                    variant="contained"
+                    onClick={handleClickEmailVerification}
+                    color="primary"
+                  >
+                    Verificate email
+                  </Button>
+                )}
               </div>
             </Paper>
           </Grid>
@@ -181,12 +177,11 @@ export default function UserProfile() {
         title="Update"
       ></BaseDialog>
       <BaseDialog
-      open={verificateEmailDialogOpen}
-      handleClose={handleCloseVerificationEmailDialog}
-      form ={emailVerificationForm}
-      title="email verification">
-
-      </BaseDialog>
+        open={verificateEmailDialogOpen}
+        handleClose={handleCloseVerificationEmailDialog}
+        form={emailVerificationForm}
+        title="email verification"
+      ></BaseDialog>
       <BaseDialog
         open={changePasswordDialogOpen}
         handleClose={handlecloseChangePassword}

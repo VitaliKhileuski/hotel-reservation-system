@@ -253,6 +253,15 @@ export default function UserTable() {
                     Phone number
                   </TableSortLabel>
                 </TableCell>
+                <TableCell align="right" style={{ minWidth: 50 }}>
+                  <TableSortLabel
+                    active={currentSortField === "isVerified"}
+                    direction={currentAscending}
+                    onClick={() => orderBy("IsVerified")}
+                  >
+                    Is verified
+                  </TableSortLabel>
+                </TableCell>
                 <TableCell />
               </TableRow>
             </TableHead>
@@ -264,6 +273,9 @@ export default function UserTable() {
                   <TableCell align="right">{user.name}</TableCell>
                   <TableCell align="right">{user.surname}</TableCell>
                   <TableCell align="right">{user.phoneNumber}</TableCell>
+                  <TableCell align="right">
+                    {user.isVerified ? "verified" : "not verified"}
+                  </TableCell>
                   <TableCell>
                     {user.role.name !== ADMIN ? (
                       <Tooltip title="delete">
