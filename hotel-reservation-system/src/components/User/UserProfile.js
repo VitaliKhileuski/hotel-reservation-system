@@ -106,7 +106,6 @@ export default function UserProfile() {
         </Grid>
         <Grid item sm={4}>
           <Grid
-            
             container
             direction="column"
             justify="flex-start"
@@ -115,103 +114,113 @@ export default function UserProfile() {
             {!!user ? (
               <Paper style={{ width: "100%", height: "50%", padding: 20 }}>
                 <Grid container direction="row">
-                <Grid container
-                 sm={6}
-                 direction="column"
-                 spacing={3}
-                 justify="flex-start"
-                 alignItems="flex-start">
-                  <Grid item>
-                  <Typography  variant="h5" color="primary">
-                  Email:
-                </Typography>
+                  <Grid
+                    container
+                    sm={6}
+                    direction="column"
+                    spacing={3}
+                    justify="flex-start"
+                    alignItems="flex-start"
+                  >
+                    <Grid item>
+                      <Typography variant="h5" color="primary">
+                        Email:
+                      </Typography>
+                    </Grid>
+                    <Grid item>
+                      <Typography variant="h5" color="primary">
+                        Phone number:
+                      </Typography>
+                    </Grid>
+                    <Grid item>
+                      <Typography variant="h5" color="primary">
+                        Name:
+                      </Typography>
+                    </Grid>
+                    <Grid item>
+                      <Typography variant="h5" color="primary">
+                        Surname:
+                      </Typography>
+                    </Grid>
+                    <Grid item>
+                      <Typography
+                        variant="h5"
+                        color={isVerified ? "primary" : "error"}
+                      >
+                        {isVerified ? "verified" : "you are not verified"}
+                      </Typography>
+                    </Grid>
                   </Grid>
-                  <Grid item>
-                  <Typography  variant="h5" color="primary">
-                  Phone number:
-                </Typography>
+                  <Grid
+                    container
+                    sm={6}
+                    direction="column"
+                    spacing={3}
+                    justify="flex-start"
+                    alignItems="flex-start"
+                  >
+                    <Grid item>
+                      <Typography variant="h5" color="primary">
+                        {user.email}
+                      </Typography>
+                    </Grid>
+                    <Grid item>
+                      <Typography variant="h5" color="primary">
+                        {user.phoneNumber}
+                      </Typography>
+                    </Grid>
+                    <Grid item>
+                      <Typography variant="h5" color="primary">
+                        {user.name}
+                      </Typography>
+                    </Grid>
+                    <Grid item>
+                      <Typography variant="h5" color="primary">
+                        {user.surname}
+                      </Typography>
+                    </Grid>
                   </Grid>
-                  <Grid item>
-                  <Typography  variant="h5" color="primary">
-                   Name:
-                </Typography>
-                  </Grid>
-                  <Grid item>
-                  <Typography variant="h5" color="primary">
-                  Surname: 
-                </Typography>
-                  </Grid>
-                  <Grid item>
-                  <Typography
-                  variant="h5"
-                  color={isVerified ? "primary" : "error"}
+                </Grid>
+                <Grid
+                  container
+                  spacing={2}
+                  style={{ marginTop: 50 }}
+                  alignItems="center"
+                  justify="center"
                 >
-                  {isVerified ? "verified" : "you are not verified"}
-                </Typography>    
-                  </Grid>
-                </Grid>
-                <Grid container
-                sm={6}
-                direction="column"
-                spacing={3}
-                justify="flex-start"
-                alignItems="flex-start">
-                  <Grid item >
-                  <Typography variant="h5" color="primary">
-                  {user.email} 
-                 </Typography>
-                  </Grid>
-                  <Grid item >
-                  <Typography variant="h5" color="primary">
-                  {user.phoneNumber} 
-                 </Typography>
-                  </Grid>
-                  <Grid item >
-                  <Typography variant="h5" color="primary">
-                  {user.name} 
-                 </Typography>
-                  </Grid>
-                  <Grid item >
-                  <Typography variant="h5" color="primary">
-                  {user.surname} 
-                 </Typography>
-                  </Grid>
-                </Grid>
-                </Grid>
-                <Grid container spacing={2} style={{marginTop : 50}} alignItems="center"  justify="center">
                   <Grid item>
-                  <Button
-                    variant="contained"
-                    onClick={editProfile}
-                    style={{ marginRight: 20 }}
-                    color="primary"
-                  >
-                    Edit profile
-                  </Button>
+                    <Button
+                      variant="contained"
+                      onClick={editProfile}
+                      style={{ marginRight: 20 }}
+                      color="primary"
+                    >
+                      Edit profile
+                    </Button>
                   </Grid>
                   <Grid item>
-                  <Button
-                    style={{ marginRight: 20 }}
-                    variant="contained"
-                    onClick={changePassword}
-                    color="primary"
-                  >
-                    Change password
-                  </Button>
-               </Grid>
-               {isVerified ? (
+                    <Button
+                      style={{ marginRight: 20 }}
+                      variant="contained"
+                      onClick={changePassword}
+                      color="primary"
+                    >
+                      Change password
+                    </Button>
+                  </Grid>
+                  {isVerified ? (
                     ""
                   ) : (
-                    <Grid item><Button
-                    variant="contained"
-                    onClick={handleClickEmailVerification}
-                    color="primary"
-                  >
-                    Verificate email
-                  </Button></Grid>
-                    
+                    <Grid item>
+                      <Button
+                        variant="contained"
+                        onClick={handleClickEmailVerification}
+                        color="primary"
+                      >
+                        Verificate email
+                      </Button>
+                    </Grid>
                   )}
-                  
                 </Grid>
               </Paper>
             ) : (
