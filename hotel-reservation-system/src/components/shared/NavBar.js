@@ -4,7 +4,6 @@ import { ClickAwayListener } from "@material-ui/core";
 import AppBar from "@material-ui/core/AppBar";
 import Button from "@material-ui/core/Button";
 import Toolbar from "@material-ui/core/Toolbar";
-import { useDispatch } from "react-redux";
 import Typography from "@material-ui/core/Typography";
 import MenuItem from "@material-ui/core/MenuItem";
 import MenuList from "@material-ui/core/MenuList";
@@ -16,7 +15,14 @@ import { useSelector } from "react-redux";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import { ADMIN, USER } from "../../constants/Roles";
 import { logout } from "../Authorization/TokenData";
-import { HOME_PATH } from "./../../constants/RoutingPaths";
+import {
+  HOME_PATH,
+  USERS_PATH,
+  ORDERS_PATH,
+  OWNED_HOTELS_PATH,
+  USER_PROFILE_PATH,
+  REVIEWS_MANAGMENT_PATH,
+} from "./../../constants/RoutingPaths";
 import "./../../css/App.css";
 
 const useStyles = makeStyles((theme) => ({
@@ -81,7 +87,7 @@ export default function NavBar() {
             Hotels
           </Typography>
           {isLogged ? (
-            <div>
+            <div style={{ marginRight: 30 }}>
               <Button
                 ref={anchorRef}
                 style={{ color: "white" }}
@@ -115,23 +121,36 @@ export default function NavBar() {
                           id="menu-list-grow"
                           onKeyDown={handleListKeyDown}
                         >
-                          <Link to="/userProfile" className={classes.link}>
+                          <Link to={USER_PROFILE_PATH} className={classes.link}>
                             <MenuItem onClick={handleClose}>
                               User profile
                             </MenuItem>
                           </Link>
                           {role === ADMIN ? (
-                            <Link to="/users" className={classes.link}>
-                              <MenuItem onClick={handleClose}>Users</MenuItem>
-                            </Link>
+                            <>
+                              <Link to={USERS_PATH} className={classes.link}>
+                                <MenuItem onClick={handleClose}>Users</MenuItem>
+                              </Link>
+                              <Link
+                                to={REVIEWS_MANAGMENT_PATH}
+                                className={classes.link}
+                              >
+                                <MenuItem onClick={handleClose}>
+                                  Reviews managment
+                                </MenuItem>
+                              </Link>
+                            </>
                           ) : (
                             ""
                           )}
-                          <Link to="/orders" className={classes.link}>
+                          <Link to={ORDERS_PATH} className={classes.link}>
                             <MenuItem onClick={handleClose}>Orders</MenuItem>
                           </Link>
                           {role !== USER ? (
-                            <Link to="/ownedHotels" className={classes.link}>
+                            <Link
+                              to={OWNED_HOTELS_PATH}
+                              className={classes.link}
+                            >
                               <MenuItem onClick={handleClose}>
                                 Owned hotels
                               </MenuItem>
@@ -144,6 +163,7 @@ export default function NavBar() {
                               handleClose(e);
                               logout(history);
                             }}
+                            style={{ color: "blue" }}
                           >
                             Logout
                           </MenuItem>

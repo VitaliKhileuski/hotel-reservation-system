@@ -15,6 +15,7 @@ import OrderTable from "./../components/Reservation/OrderTable";
 import UserProfile from "./../components/User/UserProfile";
 import UserTable from "../components/User/UserTable";
 import AuthRoute from "./../Routing/AuthRoute";
+import ReviewsManagment from "./../components/Review/ReviewsManagment";
 import RoomPage from "./../components/Room/RoomPage";
 import NotAuthorizeErrorPage from "../components/Errors/NotAuthorizeErrorPage";
 import ForbiddenPage from "../components/Errors/ForbiddenPage";
@@ -29,6 +30,7 @@ import {
   OWNED_HOTELS_PATH,
   ORDERS_PATH,
   USER_PROFILE_PATH,
+  REVIEWS_MANAGMENT_PATH,
   HOTEL_EDITOR_PATH,
   USERS_PATH,
   NOT_FOUND_ERROR_PATH,
@@ -51,6 +53,11 @@ export default function RouterList() {
       <Route path={HOME_PATH} component={HotelsPage} />
       <Route path={LOGIN_PATH} component={Login} />
       <Route path={REGISTER_PATH} component={Register} />
+      <AuthRoute
+        path={REVIEWS_MANAGMENT_PATH}
+        Component={ReviewsManagment}
+        requireRoles={[ADMIN]}
+      />
       <Route path={ROOMS_PATH} render={(props) => <RoomsPage {...props} />} />
       <Route
         path={ROOM_DETAILS_PATH}

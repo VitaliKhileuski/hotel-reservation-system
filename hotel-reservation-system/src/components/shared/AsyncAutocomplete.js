@@ -22,7 +22,7 @@ export default function AsyncAutocomplete({ request, label }) {
 
   useEffect(() => {
     const timeoutId = setTimeout(
-      async () => await request(value, setNewItems, setCurrentLoading),
+      () => request(value, setNewItems, setCurrentLoading),
       400
     );
     return () => clearTimeout(timeoutId);

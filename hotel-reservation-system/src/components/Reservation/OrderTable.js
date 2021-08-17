@@ -14,6 +14,7 @@ import TableSortLabel from "@material-ui/core/TableSortLabel";
 import TablePagination from "@material-ui/core/TablePagination";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
+import StarIcon from "@material-ui/icons/Star";
 import Typography from "@material-ui/core/Typography";
 import UpdateIcon from "@material-ui/icons/Update";
 import Paper from "@material-ui/core/Paper";
@@ -24,19 +25,20 @@ import BaseDialog from "../shared/BaseDialog";
 import { useStyles } from "@material-ui/pickers/views/Calendar/SlideTransition";
 import API from "./../../api";
 import OrderFilter from "../Filters/OrderFilter";
-import Payment from "./Payment";
 import RoomDetails from "../Room/RoomDetails";
 import BaseDeleteDialog from "../shared/BaseDeleteDialog";
 import {
   callSuccessAlert,
   callErrorAlert,
 } from "../../Notifications/NotificationHandler";
+import ReviewForm from "../Review/ReviewForm";
 import { USER } from "../../constants/Roles";
 import {
   updateTableWithCallingAlert,
   updateTrigger,
   deleteTrigger,
 } from "../../helpers/UpdateTableWithCallingAlert";
+import Payment from "./Payment";
 
 const useRowStyles = makeStyles({
   root: {
@@ -52,7 +54,12 @@ function ccyFormat(num) {
   return `${num.toFixed(2)}`;
 }
 
-function Row({ order, handleClickDeleteIcon, handleClickUpdateOrder }) {
+function Row({
+  order,
+  handleClickDeleteIcon,
+  handleClickUpdateOrder,
+  handleClickRateOrder,
+}) {
   const [open, setOpen] = useState(false);
   const classes = useRowStyles();
   const [roomDetailsOpen, setRoomDetailsOpen] = useState(false);
@@ -111,6 +118,14 @@ function Row({ order, handleClickDeleteIcon, handleClickUpdateOrder }) {
               onClick={() => handleClickUpdateOrder(order)}
             >
               <UpdateIcon></UpdateIcon>
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="review">
+            <IconButton
+              onClick={() => handleClickRateOrder(order.id)}
+              color="inherit"
+            >
+              <StarIcon></StarIcon>
             </IconButton>
           </Tooltip>
           <Tooltip title="delete">
@@ -292,6 +307,7 @@ export default function OrderTable() {
   const [currentSurname, setCurrentSurname] = useState("");
   const [currentOrderNumber, setCurrentOrderNumber] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [rateOrderDialogOpen, setRateOrderDialogOpen] = useState(false);
   const [currentSortField, setCurrentSortField] = useState("");
   const [openUpdateOrder, setOpenUpdateOrder] = useState(false);
   const [currentAscending, setCurrentAscending] = useState("asc");
@@ -318,6 +334,7 @@ export default function OrderTable() {
   ) : (
     ""
   );
+  const rateOrderForm = <ReviewForm orderId={orderId}></ReviewForm>;
 
   useEffect(() => {
     if (
@@ -353,6 +370,7 @@ export default function OrderTable() {
     if (sortField === null || sortField === undefined) {
       sortField = currentSortField;
     }
+
     let requestAscending = (ascending || currentAscending) === "asc";
     await API.get("/orders", {
       params: {
@@ -399,6 +417,13 @@ export default function OrderTable() {
 
   function handleCloseDeleteDialog() {
     setDeleteDialogOpen(false);
+  }
+  function handleClickRateOrder(orderId) {
+    setOrderId(orderId);
+    setRateOrderDialogOpen(true);
+  }
+  function handleCloseRateOrderDialog() {
+    setRateOrderDialogOpen(false);
   }
 
   function handleClickDeleteIcon(orderId) {
@@ -555,6 +580,7 @@ export default function OrderTable() {
                 order={order}
                 handleClickDeleteIcon={handleClickDeleteIcon}
                 handleClickUpdateOrder={handleClickUpdateOrder}
+                handleClickRateOrder={handleClickRateOrder}
               />
             ))}
           </TableBody>
@@ -582,6 +608,12 @@ export default function OrderTable() {
         handleClose={handleCloseUpdateOrderDialog}
         form={updateOrderForm}
         fullWidth={true}
+      ></BaseDialog>
+      <BaseDialog
+        title="Please, rate hotel"
+        open={rateOrderDialogOpen}
+        handleClose={handleCloseRateOrderDialog}
+        form={rateOrderForm}
       ></BaseDialog>
     </>
   );
