@@ -38,6 +38,7 @@ export default function HotelList({
               return (
                 <>
                   <BaseCard
+                    hotel={hotelListItem}
                     imageUrls={hotelListItem.imageUrls}
                     contentRows={content}
                     clickAction={() => toRoomsPage(hotelListItem)}

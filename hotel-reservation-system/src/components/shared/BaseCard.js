@@ -7,6 +7,7 @@ import CardActionArea from "@material-ui/core/CardActionArea";
 import CardContent from "@material-ui/core/CardContent";
 import CardMedia from "@material-ui/core/CardMedia";
 import Typography from "@material-ui/core/Typography";
+import Rating from "@material-ui/lab/Rating";
 import { useHistory } from "react-router";
 import defaultImage from "./../../img/room.jpg";
 import { ROOM_DETAILS_PATH } from "./../../constants/RoutingPaths";
@@ -20,11 +21,12 @@ const useStyles = makeStyles({
     height: 170,
   },
   cardContent: {
-    height: 80,
+    height: 120,
   },
 });
 
 export default function BaseCard({
+  hotel,
   imageUrls,
   room,
   contentRows,
@@ -34,6 +36,7 @@ export default function BaseCard({
 }) {
   const classes = useStyles();
   const history = useHistory();
+  console.log(hotel);
 
   function openRoomDetails() {
     history.push({
@@ -77,6 +80,16 @@ export default function BaseCard({
                 </Typography>
               );
             })}
+            {!!hotel ? (
+              <>
+                <Rating readOnly value={hotel.averageRating}></Rating>
+                <Typography variant="body2">
+                  {!!hotel.reviews ? hotel.reviews.length : "0"} reviews
+                </Typography>
+              </>
+            ) : (
+              ""
+            )}
           </CardContent>
         </CardActionArea>
       </Card>

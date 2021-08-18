@@ -11,12 +11,15 @@ export default function authentication(state = initialState, action) {
     case TOKEN_DATA:
       console.log(state);
       console.log(action);
+      if (action.role === "") {
+        console.log("dfdsf");
+      }
       return {
         ...state,
         tokenData: {
           ...state.tokenData,
           isLogged: action.isLogged,
-          role: !!action.role ? action.role : state.tokenData.role,
+          role: action.role,
           name: !!action.name ? action.name : state.tokenData.name,
           userId: !!action.userId ? action.userId : state.tokenData.userId,
           email: !!action.email ? action.email : state.tokenData.email,

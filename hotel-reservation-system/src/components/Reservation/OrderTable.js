@@ -334,7 +334,12 @@ export default function OrderTable() {
   ) : (
     ""
   );
-  const rateOrderForm = <ReviewForm orderId={orderId}></ReviewForm>;
+  const rateOrderForm = (
+    <ReviewForm
+      orderId={orderId}
+      handleClose={handleCloseRateOrderDialog}
+    ></ReviewForm>
+  );
 
   useEffect(() => {
     if (

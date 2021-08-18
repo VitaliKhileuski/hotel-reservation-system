@@ -44,6 +44,8 @@ export default function Register({ handleClose }) {
   const [emailErrorLabel, setEmailErrorLabel] = useState("");
   const [email, setEmail] = useState("");
   const role = useSelector((state) => state.tokenData.role);
+  useSelector((state) => console.log(state.tokenData));
+  console.log(role);
 
   const initialValues = {
     lastName: "",
