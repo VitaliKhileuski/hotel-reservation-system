@@ -14,11 +14,10 @@ export default function HotelList({
 }) {
   const history = useHistory();
   function toRoomsPage(hotel) {
-    const hotelId = hotel.id;
     history.push({
       pathname: ROOMS_PATH,
       state: {
-        hotelId,
+        hotel,
         checkInDate,
         checkOutDate,
       },

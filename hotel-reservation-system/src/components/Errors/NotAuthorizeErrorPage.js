@@ -53,12 +53,7 @@ export default function ForbiddenPage() {
           spacing={3}
         >
           <Grid item>
-            <Button
-              onClick={toHomePage}
-              classname={classes.button}
-              variant="contained"
-              color="primary"
-            >
+            <Button onClick={toHomePage} variant="contained" color="primary">
               to home page
             </Button>
           </Grid>

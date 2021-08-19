@@ -20,9 +20,6 @@ const useStyles = makeStyles({
   media: {
     height: 170,
   },
-  cardContent: {
-    height: 120,
-  },
 });
 
 export default function BaseCard({
@@ -36,7 +33,7 @@ export default function BaseCard({
 }) {
   const classes = useStyles();
   const history = useHistory();
-  console.log(hotel);
+  const cardContentHeight = !!hotel ? 120 : 80;
 
   function openRoomDetails() {
     history.push({
@@ -72,7 +69,7 @@ export default function BaseCard({
               ))}
             </Carousel>
           )}
-          <CardContent className={classes.cardContent}>
+          <CardContent style={{ height: cardContentHeight }}>
             {contentRows.map((content, i) => {
               return (
                 <Typography variant="body2" key={i}>
@@ -82,7 +79,15 @@ export default function BaseCard({
             })}
             {!!hotel ? (
               <>
-                <Rating readOnly value={hotel.averageRating}></Rating>
+                {!!hotel.averageRating ? (
+                  <Rating
+                    readOnly
+                    precision={0.1}
+                    value={hotel.averageRating}
+                  ></Rating>
+                ) : (
+                  ""
+                )}
                 <Typography variant="body2">
                   {!!hotel.reviews ? hotel.reviews.length : "0"} reviews
                 </Typography>

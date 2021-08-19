@@ -3,8 +3,12 @@ import Pagination from "@material-ui/lab/Pagination";
 import { makeStyles } from "@material-ui/core/styles";
 import { useSelector } from "react-redux";
 import Typography from "@material-ui/core/Typography";
+import Grid from "@material-ui/core/Grid";
+import Rating from "@material-ui/lab/Rating";
+import Link from "@material-ui/core/Link";
 import API from "./../../api";
 import RoomList from "./RoomList";
+import ReviewsPageDialog from "../Review/ReviewsPageDialog";
 
 const useStyles = makeStyles((theme) => ({
   pagination: {
@@ -16,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function RoomsPage(props) {
   const [rooms, setRooms] = useState([]);
-  const [hotelId, setHotelId] = useState(props.location.state.hotelId);
+  const [hotel, setHotel] = useState(props.location.state.hotel);
   const [checkInDate, setCheckInDate] = useState(
     props.location.state.checkInDate
   );
@@ -30,10 +34,11 @@ export default function RoomsPage(props) {
   const classes = useStyles();
   const userId = useSelector((state) => state.tokenData.userId);
   const token = localStorage.getItem("token");
+  const [reviewsPageDialogOpen, setReviewsPageDialog] = useState(false);
 
   useEffect(() => {
     const loadRooms = async () => {
-      await API.get("/rooms/" + hotelId, {
+      await API.get("/rooms/" + hotel.id, {
         params: {
           UserId: userId,
           CheckInDate: checkInDate.toJSON(),
@@ -65,28 +70,65 @@ export default function RoomsPage(props) {
     setPage(value);
   };
 
+  function handleClickReviewsDetails() {
+    setReviewsPageDialog(true);
+  }
+  function handleCloseReviewsPageDialog() {
+    console.log("sdfdsfs");
+    setReviewsPageDialog(false);
+  }
+
   return (
     <>
-      {!loading && rooms.length === 0 ? (
-        <Typography variant="h5" style={{ marginTop: 20 }}>
-          No rooms
-        </Typography>
-      ) : (
-        <>
-          <RoomList
-            rooms={rooms}
-            checkInDate={checkInDate}
-            checkOutDate={checkOutDate}
-          ></RoomList>
-          <Pagination
-            className={classes.pagination}
-            page={page}
-            count={numberOfPages}
-            color="primary"
-            onChange={changePage}
-          />
-        </>
-      )}
+      <Grid container direction="row" align="center">
+        <Grid container direction="column">
+          <Grid item>
+            <Typography variant="h6">{hotel.name}</Typography>
+          </Grid>
+          <Grid item>
+            <Rating
+              readOnly
+              value={hotel.averageRating}
+              precision={0.1}
+            ></Rating>
+          </Grid>
+          <Grid item>
+            <Link
+              onClick={handleClickReviewsDetails}
+              style={{ cursor: "pointer" }}
+            >
+              show more info
+            </Link>
+          </Grid>
+        </Grid>
+        <Grid item>
+          {!loading && rooms.length === 0 ? (
+            <Typography variant="h5" style={{ marginTop: 20 }}>
+              No rooms
+            </Typography>
+          ) : (
+            <>
+              <RoomList
+                rooms={rooms}
+                checkInDate={checkInDate}
+                checkOutDate={checkOutDate}
+              ></RoomList>
+              <Pagination
+                className={classes.pagination}
+                page={page}
+                count={numberOfPages}
+                color="primary"
+                onChange={changePage}
+              />
+            </>
+          )}
+        </Grid>
+      </Grid>
+      <ReviewsPageDialog
+        open={reviewsPageDialogOpen}
+        handleClose={handleCloseReviewsPageDialog}
+        hotel={hotel}
+      ></ReviewsPageDialog>
     </>
   );
 }

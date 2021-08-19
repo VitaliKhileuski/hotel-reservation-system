@@ -139,6 +139,7 @@ export default function () {
       })
         .then((response) => response.data)
         .then((data) => {
+          console.log(data.items);
           setHotels(data.items);
           setLoading(false);
           setMaxPage(data.numberOfPages);

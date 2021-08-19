@@ -103,7 +103,6 @@ export default function ReviewForm({ orderId, handleClose }) {
         {categoriesWithRatings.length !== 0 ? (
           <Grid
             container
-            classname={classes.ratings}
             direction="column"
             justifyContent="flex-start"
             alignItems="flex-end"
