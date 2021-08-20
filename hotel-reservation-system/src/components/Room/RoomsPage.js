@@ -80,8 +80,13 @@ export default function RoomsPage(props) {
 
   return (
     <>
-      <Grid container direction="row" align="center">
-        <Grid container direction="column">
+      <Grid
+        container
+        direction="row"
+        justifyContent="space-evenly"
+        align="center"
+      >
+        <Grid container direction="column" justifyContent="space-evenly">
           <Grid item>
             <Typography variant="h6">{hotel.name}</Typography>
           </Grid>

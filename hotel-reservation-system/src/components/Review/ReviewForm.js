@@ -50,24 +50,31 @@ export default function ReviewForm({ orderId, handleClose }) {
         requestRatings.push(category);
       }
     });
-
-    const request = {
-      Ratings: requestRatings,
-      Comment: comment.trim(),
-    };
-    API.post("/review/" + orderId + "/createReview", request, {
-      headers: { Authorization: "Bearer " + token },
-    })
-      .then((response) => response.data)
-      .then((data) => {
-        handleClose();
-        callSuccessAlert("rated successfully");
+    if (requestRatings.length === 0 && comment.trim() === "") {
+      setCommentErrorLabel(
+        "Please, fill at least 1 category or write a comment"
+      );
+      setTimeout(() => setCommentErrorLabel(""), 3000);
+    } else {
+      const request = {
+        Ratings: requestRatings,
+        Comment: comment.trim(),
+      };
+      API.post("/review/" + orderId + "/createReview", request, {
+        headers: { Authorization: "Bearer " + token },
       })
-      .catch((error) => {
-        console.log(error);
-        callErrorAlert();
-      });
+        .then((response) => response.data)
+        .then((data) => {
+          handleClose();
+          callSuccessAlert("rated successfully");
+        })
+        .catch((error) => {
+          console.log(error);
+          callErrorAlert();
+        });
+    }
   };
+
   const loadReviewCategories = async () => {
     API.get("/review/getAllReviewCategories", {
       headers: { Authorization: "Bearer " + token },

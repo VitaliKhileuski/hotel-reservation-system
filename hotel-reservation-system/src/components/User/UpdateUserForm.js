@@ -1,5 +1,6 @@
 import { React, useState } from "react";
 import Button from "@material-ui/core/Button";
+import { useDispatch, useSelector } from "react-redux";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import TextField from "@material-ui/core/TextField";
 import Grid from "@material-ui/core/Grid";
@@ -8,7 +9,6 @@ import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { Formik, Form, ErrorMessage, Field } from "formik";
 import api from "./../../api/";
-import { useDispatch, useSelector } from "react-redux";
 import { TOKEN_DATA } from "../../storage/actions/actionTypes.js";
 import { UPDATE_USER_VALIDATION_SCHEMA } from "../../constants/ValidationSchemas";
 import { EMAIL_REGEX } from "../../constants/Regex";
