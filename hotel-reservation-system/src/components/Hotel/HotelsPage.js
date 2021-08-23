@@ -264,13 +264,13 @@ export default function () {
             checkInDate={checkInDate}
             checkOutDate={checkOutDate}
           ></HotelList>
-          <Pagination
+          {maxPage!==1 ? <Pagination
             className={classes.pagination}
             page={page}
             count={maxPage}
             color="primary"
             onChange={changePage}
-          />
+          /> : "" }          
         </>
       )}
     </>

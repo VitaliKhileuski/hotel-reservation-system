@@ -118,13 +118,13 @@ export default function RoomsPage(props) {
                 checkInDate={checkInDate}
                 checkOutDate={checkOutDate}
               ></RoomList>
-              <Pagination
+              {numberOfPages!==1 ? <Pagination
                 className={classes.pagination}
                 page={page}
                 count={numberOfPages}
                 color="primary"
                 onChange={changePage}
-              />
+              /> : ""}
             </>
           )}
         </Grid>

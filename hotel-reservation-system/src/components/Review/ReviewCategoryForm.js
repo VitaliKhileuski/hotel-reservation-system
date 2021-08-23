@@ -39,7 +39,7 @@ export default function ReviewCategoryForm({ handleClose }) {
     const request = {
       Name: currentCategory.trim(),
     };
-    await API.post("/review/addCategory", request, {
+    await API.post("/reviews/addCategory", request, {
       headers: { Authorization: "Bearer " + token },
     })
       .then((response) => response.data)

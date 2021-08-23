@@ -25,6 +25,7 @@ const useStyles = makeStyles((theme) => ({
   ratings: {
     flexWrap: "noWrap",
     alignItems: "center",
+    padding : 10
   },
   container: {
     justifyContent: "center",
@@ -50,10 +51,9 @@ export default function ReviewsPageDialog({ open, handleClose, hotel }) {
     }
   }, [requestPageNumber]);
 
-  useEffect(() => {}, []);
 
   const loadReviews = async () => {
-    API.get("/review/" + hotel.id + "/page", {
+    API.get("/reviews/" + hotel.id + "/page", {
       params: {
         pageNumber: requestPageNumber,
         pageSize: rowsPerPage,

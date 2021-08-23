@@ -69,7 +69,7 @@ export default function ReviewCategoriesList() {
   }
 
   const loadReviewCategories = async () => {
-    API.get("/review/getAllReviewCategories", {
+    API.get("/reviews/getAllReviewCategories", {
       headers: { Authorization: "Bearer " + token },
     })
       .then((response) => response.data)
@@ -86,7 +86,7 @@ export default function ReviewCategoriesList() {
       });
   };
   const deleteCategory = async () => {
-    API.delete("/review/" + currentCategoryId + "/deleteReviewCategory", {
+    API.delete("/reviews/" + currentCategoryId + "/deleteReviewCategory", {
       headers: { Authorization: "Bearer " + token },
     })
       .then((response) => response.data)

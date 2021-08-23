@@ -28,20 +28,41 @@ const useStyles = makeStyles((theme) => ({
 export default function ReviewForm({ orderId, handleClose }) {
   const classes = useStyles();
   const [categoriesWithRatings, setCategoriesWithRatings] = useState([]);
+  const [review, setReview ] = useState();
   const [comment, setComment] = useState("");
   const [commentErrorLabel, setCommentErrorLabel] = useState("");
   const token = localStorage.getItem("token");
   const [rerender, setRerender] = useState(false);
   const maxLengthOfComment = 2000;
+
   useEffect(() => {
     loadReviewCategories();
   }, []);
 
   useEffect(() => {
     if (rerender) {
-      if (setRerender(false));
+      setRerender(false);
     }
-  }, [rerender]);
+  }, [rerender,review]);
+  useEffect(() => {
+    const getReview = async () => {
+      API.get("/orders/"+orderId +"/getReview", {
+        headers: { Authorization: "Bearer " + token },
+      })
+      .then((response) => response.data)
+      .then((data) => {
+        setReview(data);
+        setComment(review.comment);
+      })
+      .catch((error) => {
+        callErrorAlert();
+      })
+    }
+
+    getReview();
+  },[])
+
+
 
   const createReview = async () => {
     const requestRatings = [];
@@ -50,17 +71,16 @@ export default function ReviewForm({ orderId, handleClose }) {
         requestRatings.push(category);
       }
     });
-    if (requestRatings.length === 0 && comment.trim() === "") {
-      setCommentErrorLabel(
-        "Please, fill at least 1 category or write a comment"
-      );
-      setTimeout(() => setCommentErrorLabel(""), 3000);
-    } else {
+    if(requestRatings.length===0 && comment.trim()===""){
+      setCommentErrorLabel("Please, fill at least 1 category or write a comment")
+      setTimeout(() =>setCommentErrorLabel(""),3000);
+    }
+    else{
       const request = {
         Ratings: requestRatings,
         Comment: comment.trim(),
       };
-      API.post("/review/" + orderId + "/createReview", request, {
+      API.post("/reviews/" + orderId + "/createReview", request, {
         headers: { Authorization: "Bearer " + token },
       })
         .then((response) => response.data)
@@ -71,12 +91,12 @@ export default function ReviewForm({ orderId, handleClose }) {
         .catch((error) => {
           console.log(error);
           callErrorAlert();
-        });
+        });      
     }
   };
 
   const loadReviewCategories = async () => {
-    API.get("/review/getAllReviewCategories", {
+    API.get("/reviews/getAllReviewCategories", {
       headers: { Authorization: "Bearer " + token },
     })
       .then((response) => response.data)
@@ -141,8 +161,9 @@ export default function ReviewForm({ orderId, handleClose }) {
       </div>
       <TextField
         className={classes.textField}
+        disabled={!!review}
         id="outlined-multiline-static"
-        label={`Write a comment. maximum number of characters ${maxLengthOfComment}`}
+        placeholder={`Write a comment. maximum number of characters ${maxLengthOfComment}`}
         value={comment}
         onChange={(e) => {
           if (!!commentErrorLabel && comment.length - 1 <= maxLengthOfComment) {
@@ -156,6 +177,13 @@ export default function ReviewForm({ orderId, handleClose }) {
         rows={6}
         variant="outlined"
       />
+       {!!review ? <TextField
+        rows={6}
+        className={classes.textField}
+        variant="outlined"
+        placeholder={`Write a additional comment. maximum number of characters ${maxLengthOfComment-comment.length} characters`}
+        variant="outlined">
+          </TextField> : ""}
       <Button
         onClick={handleClickCreateReview}
         className={classes.button}
